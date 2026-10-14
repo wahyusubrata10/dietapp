@@ -48,6 +48,7 @@ import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.BuildConfig
 import com.hawdietpro.app.core.Format
 import com.hawdietpro.app.data.gemini.GeminiClient
+import com.hawdietpro.app.data.prefs.AnalysisMode
 import com.hawdietpro.app.data.prefs.AppPreferences
 import com.hawdietpro.app.data.prefs.SecureStorage
 import com.hawdietpro.app.data.prefs.Settings
@@ -113,6 +114,10 @@ class SettingsViewModel @Inject constructor(
     fun setModel(model: String) {
         viewModelScope.launch { prefs.setGeminiModelOverride(model) }
     }
+    fun setAnalysisMode(mode: AnalysisMode) {
+        viewModelScope.launch { prefs.setAnalysisMode(mode) }
+    }
+
     fun setTheme(mode: ThemeMode) {
         viewModelScope.launch { prefs.setThemeMode(mode) }
     }
@@ -222,6 +227,22 @@ fun SettingsScreen(
                     }
                 }
             }
+
+            SectionHeader("Mode analisa AI")
+            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                AnalysisMode.entries.forEachIndexed { i, mode ->
+                    SegmentedButton(
+                        selected = settings.analysisMode == mode,
+                        onClick = { viewModel.setAnalysisMode(mode) },
+                        shape = SegmentedButtonDefaults.itemShape(i, AnalysisMode.entries.size),
+                    ) { Text(mode.label) }
+                }
+            }
+            Text(
+                settings.analysisMode.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
 
             SectionHeader("Model AI")
             HawCard {

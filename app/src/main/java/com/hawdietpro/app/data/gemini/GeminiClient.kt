@@ -1,6 +1,7 @@
 package com.hawdietpro.app.data.gemini
 
 import android.util.Base64
+import com.hawdietpro.app.data.prefs.AnalysisMode
 import com.hawdietpro.app.data.prefs.AppPreferences
 import com.hawdietpro.app.data.prefs.SecureStorage
 import com.hawdietpro.app.data.remote.RemoteConfigStore
@@ -46,8 +47,11 @@ class GeminiClient @Inject constructor(
             .replace("{user_hint}", vars.userHint?.takeIf { it.isNotBlank() }?.let { "Catatan pengguna: $it" } ?: "")
             .replace("{reference_names}", vars.referenceNames.joinToString(", "))
 
-        val thinking = if (config.thinkingBudget != null || config.thinkingLevel != null) {
-            ThinkingConfig(thinkingBudget = config.thinkingBudget, thinkingLevel = config.thinkingLevel)
+        val settings = prefs.current()
+        val fast = settings.analysisMode == AnalysisMode.CEPAT
+        // Mode Teliti: thinking bawaan model (kualitas maksimal). Mode Cepat: thinking diperkecil sesuai remote config.
+        val thinking = if (fast && (config.fastThinkingBudget != null || config.fastThinkingLevel != null)) {
+            ThinkingConfig(thinkingBudget = config.fastThinkingBudget, thinkingLevel = config.fastThinkingLevel)
         } else null
         val request = GenerateContentRequest(
             systemInstruction = Content(parts = listOf(Part(text = config.systemPrompt))),
@@ -73,8 +77,10 @@ class GeminiClient @Inject constructor(
             request.copy(generationConfig = request.generationConfig?.copy(thinkingConfig = null)),
         )
 
-        val override = prefs.current().geminiModelOverride
-        val models = (listOfNotNull(override) + config.model + config.fallbackModels).distinct()
+        val override = settings.geminiModelOverride
+        // Mode Teliti tidak pernah turun ke model "lite" yang kurang teliti.
+        val fallbacks = if (fast) config.fallbackModels else config.fallbackModels.filterNot { it.contains("lite", ignoreCase = true) }
+        val models = (listOfNotNull(override) + config.model + fallbacks).distinct()
 
         var lastError: GeminiError? = null
         // Model sibuk (503), kuota per-model habis (429), atau tidak tersedia (404) → coba model cadangan.

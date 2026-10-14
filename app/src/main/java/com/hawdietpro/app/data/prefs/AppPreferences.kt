@@ -28,8 +28,18 @@ enum class ThemeMode(val label: String) {
     }
 }
 
+enum class AnalysisMode(val label: String, val description: String) {
+    TELITI("Teliti", "Kualitas analisa maksimal (AI berpikir dulu). Sedikit lebih lama."),
+    CEPAT("Cepat", "Jawaban lebih cepat, ketelitian bisa sedikit turun pada piring yang rumit.");
+
+    companion object {
+        fun parse(value: String?) = entries.firstOrNull { it.name == value } ?: TELITI
+    }
+}
+
 data class Settings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val analysisMode: AnalysisMode = AnalysisMode.TELITI,
     val autoDownloadUpdates: Boolean = true,
     val updatesWifiOnly: Boolean = true,
     val geminiModelOverride: String? = null,
@@ -45,6 +55,7 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
 
     private object Keys {
         val THEME = stringPreferencesKey("theme_mode")
+        val ANALYSIS_MODE = stringPreferencesKey("analysis_mode")
         val AUTO_DOWNLOAD = booleanPreferencesKey("auto_download_updates")
         val WIFI_ONLY = booleanPreferencesKey("updates_wifi_only")
         val MODEL_OVERRIDE = stringPreferencesKey("gemini_model_override")
@@ -58,6 +69,7 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
     val settings: Flow<Settings> = context.dataStore.data.map { p ->
         Settings(
             themeMode = ThemeMode.parse(p[Keys.THEME]),
+            analysisMode = AnalysisMode.parse(p[Keys.ANALYSIS_MODE]),
             autoDownloadUpdates = p[Keys.AUTO_DOWNLOAD] ?: true,
             updatesWifiOnly = p[Keys.WIFI_ONLY] ?: true,
             geminiModelOverride = p[Keys.MODEL_OVERRIDE]?.takeIf { it.isNotBlank() },
@@ -72,6 +84,7 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
     suspend fun current(): Settings = settings.first()
 
     suspend fun setThemeMode(mode: ThemeMode) = context.dataStore.edit { it[Keys.THEME] = mode.name }
+    suspend fun setAnalysisMode(mode: AnalysisMode) = context.dataStore.edit { it[Keys.ANALYSIS_MODE] = mode.name }
     suspend fun setAutoDownloadUpdates(value: Boolean) = context.dataStore.edit { it[Keys.AUTO_DOWNLOAD] = value }
     suspend fun setUpdatesWifiOnly(value: Boolean) = context.dataStore.edit { it[Keys.WIFI_ONLY] = value }
     suspend fun setGeminiModelOverride(value: String?) = context.dataStore.edit {
