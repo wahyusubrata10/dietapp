@@ -49,6 +49,9 @@ import com.hawdietpro.app.ui.feature.queue.QueueScreen
 import com.hawdietpro.app.ui.feature.settings.SettingsScreen
 import com.hawdietpro.app.ui.feature.update.UpdateScreen
 import com.hawdietpro.app.ui.feature.weight.WeightScreen
+import com.hawdietpro.app.ui.navigation.HawBottomBar
+import com.hawdietpro.app.ui.navigation.QuickAction
+import com.hawdietpro.app.ui.navigation.QuickAddSheet
 import com.hawdietpro.app.ui.navigation.Routes
 import com.hawdietpro.app.ui.navigation.TopLevelDestination
 import com.hawdietpro.app.ui.theme.HawDietTheme
@@ -109,6 +112,22 @@ private fun MainScaffold(
         onDeepLinkHandled()
     }
 
+    var showQuickAdd by rememberSaveable { mutableStateOf(false) }
+    if (showQuickAdd) {
+        QuickAddSheet(
+            onDismiss = { showQuickAdd = false },
+            onAction = { action ->
+                showQuickAdd = false
+                when (action) {
+                    QuickAction.CAMERA -> navController.navigate(Routes.camera())
+                    QuickAction.GALLERY -> navController.navigate(Routes.camera(openGallery = true))
+                    QuickAction.MANUAL -> navController.navigate(Routes.manualMeal())
+                    QuickAction.WEIGHT -> navController.navigate(Routes.WEIGHT)
+                }
+            },
+        )
+    }
+
     val mustUpdate by viewModel.mustUpdate.collectAsStateWithLifecycle()
     var mustUpdateDismissed by rememberSaveable { mutableStateOf(false) }
     if (mustUpdate && !mustUpdateDismissed) {
@@ -130,17 +149,11 @@ private fun MainScaffold(
         snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar {
-                    TopLevelDestination.entries.forEach { dest ->
-                        val selected = currentDestination?.hierarchy?.any { it.route == dest.route } == true
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = { navController.navigateTopLevel(dest.route) },
-                            icon = { Icon(if (selected) dest.selectedIcon else dest.unselectedIcon, contentDescription = dest.label) },
-                            label = { Text(dest.label) },
-                        )
-                    }
-                }
+                HawBottomBar(
+                    currentRoute = { route -> currentDestination?.hierarchy?.any { it.route == route } == true },
+                    onNavigate = { navController.navigateTopLevel(it) },
+                    onAdd = { showQuickAdd = true },
+                )
             }
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -151,12 +164,13 @@ private fun MainScaffold(
                     HomeScreen(
                         mainViewModel = viewModel,
                         onOpenCamera = { type -> navController.navigate(Routes.camera(type)) },
-                        onManual = { type -> navController.navigate(Routes.manualMeal(type)) },
+                        onManual = { type, time -> navController.navigate(Routes.manualMeal(type, time)) },
                         onOpenMeal = { id -> navController.navigate(Routes.editMeal(id)) },
                         onOpenQueue = { navController.navigate(Routes.QUEUE) },
                         onOpenUpdate = { navController.navigate(Routes.UPDATE) },
                         onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                         onOpenWeight = { navController.navigate(Routes.WEIGHT) },
+                        onOpenProfile = { navController.navigateTopLevel(Routes.PROFILE) },
                     )
                 }
                 composable(Routes.HISTORY) {
@@ -180,7 +194,9 @@ private fun MainScaffold(
                 }
                 composable(
                     Routes.CAMERA,
-                    arguments = listOf(navArgument("type") { type = NavType.StringType; nullable = true; defaultValue = null }),
+                    arguments = listOf("type", "gallery").map { name ->
+                        navArgument(name) { type = NavType.StringType; nullable = true; defaultValue = null }
+                    },
                 ) {
                     CameraScreen(
                         onClose = { navController.popBackStack() },

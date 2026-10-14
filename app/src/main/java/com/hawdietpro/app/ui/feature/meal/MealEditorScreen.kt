@@ -1,5 +1,20 @@
 package com.hawdietpro.app.ui.feature.meal
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import com.hawdietpro.app.domain.model.NutritionSource
+import com.hawdietpro.app.ui.components.Pill
+import com.hawdietpro.app.ui.components.SectionHeader
+import com.hawdietpro.app.ui.components.SegmentedMacroBar
+import com.hawdietpro.app.ui.theme.HawTheme
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -380,7 +395,6 @@ private fun ErrorView(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun EditorContent(
     state: EditorState,
@@ -394,17 +408,19 @@ private fun EditorContent(
 
     LazyColumn(
         Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        if (meal.photoPath != null) item { PhotoHeader(meal.photoPath) }
+        if (meal.photoPath != null && File(meal.photoPath).exists()) item { PhotoHero(meal) }
 
         item {
             OutlinedTextField(
                 value = meal.menuName,
                 onValueChange = viewModel::setMenuName,
                 label = { Text("Nama menu") },
+                placeholder = { Text("mis. Nasi Padang Rendang") },
                 singleLine = true,
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = MaterialTheme.typography.titleMedium,
             )
@@ -419,125 +435,195 @@ private fun EditorContent(
                         onClick = { showDate = true },
                         label = { Text(Format.relativeDay(zoned.toLocalDate())) },
                         leadingIcon = { Icon(Icons.Filled.CalendarToday, null, Modifier.size(18.dp)) },
+                        shape = CircleShape,
                     )
                     AssistChip(
                         onClick = { showTime = true },
                         label = { Text(Format.time(meal.eatenAt)) },
                         leadingIcon = { Icon(Icons.Filled.Schedule, null, Modifier.size(18.dp)) },
+                        shape = CircleShape,
                     )
                 }
             }
         }
 
-        item { TotalsCard(meal) }
+        item { NutritionCard(meal) }
 
         if (meal.grade != null) item { AssessmentCard(meal) }
 
         item {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Elemen di piring (${meal.items.size})", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                TextButton(onClick = onAdd) {
-                    Icon(Icons.Filled.Add, null)
-                    Spacer(Modifier.width(4.dp))
-                    Text("Tambah")
-                }
-            }
-        }
-
-        if (meal.items.isEmpty()) {
-            item {
-                HawCard(onClick = onAdd) {
-                    Text(
-                        "Belum ada elemen. Ketuk untuk menambah dari database makanan Indonesia.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+            SectionHeader(
+                "Elemen di piring",
+                subtitle = if (meal.items.isEmpty()) "Belum ada elemen" else "${meal.items.size} elemen · ketuk untuk ubah gram / nama",
+                action = {
+                    TextButton(onClick = onAdd) {
+                        Icon(Icons.Filled.Add, null, Modifier.size(18.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text("Tambah")
+                    }
+                },
+            )
         }
 
         itemsIndexed(meal.items) { index, item ->
             ItemCard(item, onClick = { onEditItem(index) })
         }
 
+        item { AddElementCard(onAdd, empty = meal.items.isEmpty()) }
+
         item {
             OutlinedTextField(
                 value = meal.userNote.orEmpty(),
                 onValueChange = viewModel::setNote,
                 label = { Text("Catatan pribadi (opsional)") },
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.fillMaxWidth(),
                 maxLines = 4,
             )
         }
-        item { Spacer(Modifier.height(24.dp)) }
+
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                SourceBadge(NutritionSource.DB)
+                Text("angka dari database TKPI", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                SourceBadge(NutritionSource.AI)
+                Text("estimasi AI", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
     }
 
     if (showDate) DatePickDialog(meal, onDismiss = { showDate = false }, onPick = { viewModel.setDate(it); showDate = false })
     if (showTime) TimePickDialog(meal, onDismiss = { showTime = false }, onPick = { viewModel.setTime(it); showTime = false })
 }
 
+/** Foto besar dengan gradasi gelap di bawah berisi skor & keyakinan AI. */
 @Composable
-private fun TotalsCard(meal: Meal) {
-    val t = meal.total
-    HawCard(color = MaterialTheme.colorScheme.surfaceContainerLowest) {
-        Column {
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(Format.kcalNumber(t.calories), style = MaterialTheme.typography.displaySmall)
-                Spacer(Modifier.width(6.dp))
-                Text("kkal", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 6.dp))
-                Spacer(Modifier.weight(1f))
-                meal.confidence?.let {
-                    SuggestionChip(onClick = {}, label = { Text("Keyakinan AI ${(it * 100).roundToInt()}%") })
-                }
+private fun PhotoHero(meal: Meal) {
+    Box(Modifier.fillMaxWidth().aspectRatio(4f / 3f).clip(RoundedCornerShape(28.dp))) {
+        AsyncImage(
+            model = File(meal.photoPath!!),
+            contentDescription = "Foto makanan",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(0.45f to Color.Transparent, 1f to Color.Black.copy(alpha = 0.72f)),
+            ),
+        )
+        Row(
+            Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            meal.grade?.let {
+                GradeBadge(it, size = 46.dp)
+                Spacer(Modifier.width(12.dp))
             }
-            Spacer(Modifier.height(12.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                MacroValue("Protein", t.protein, MacroColors.Protein)
-                MacroValue("Karbo", t.carbs, MacroColors.Carbs)
-                MacroValue("Lemak", t.fat, MacroColors.Fat)
-                MacroValue("Serat", t.fiber, MacroColors.Fiber)
+            Column(Modifier.weight(1f)) {
+                Text(
+                    meal.menuName.ifBlank { "Makanan" },
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.White,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    "${Format.kcal(meal.total.calories)} · ${meal.items.size} elemen",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.85f),
+                )
+            }
+            meal.confidence?.let {
+                Pill("AI ${(it * 100).roundToInt()}%", Color.White, filled = false, icon = Icons.Filled.AutoAwesome)
             }
         }
     }
 }
 
 @Composable
-private fun MacroValue(label: String, grams: Double, color: androidx.compose.ui.graphics.Color) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("${Format.oneDecimal(grams)} g", style = MaterialTheme.typography.titleMedium, color = color)
-        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+private fun NutritionCard(meal: Meal) {
+    val t = meal.total
+    HawCard {
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(Format.kcalNumber(t.calories), style = MaterialTheme.typography.displaySmall)
+                Spacer(Modifier.width(6.dp))
+                Text("kkal", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 6.dp))
+            }
+            SegmentedMacroBar(t, height = 12.dp)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                val split = t.macroEnergy
+                MacroValue("Protein", t.protein, split.proteinPct, MacroColors.Protein)
+                MacroValue("Karbo", t.carbs, split.carbsPct, MacroColors.Carbs)
+                MacroValue("Lemak", t.fat, split.fatPct, MacroColors.Fat)
+                MacroValue("Serat", t.fiber, null, MacroColors.Fiber)
+            }
+        }
+    }
+}
+
+@Composable
+private fun MacroValue(label: String, grams: Double, pct: Double?, color: Color) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(8.dp).clip(CircleShape).background(color))
+            Spacer(Modifier.width(6.dp))
+            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Text("${Format.oneDecimal(grams)} g", style = MaterialTheme.typography.titleMedium)
+        pct?.let { Text("${it.roundToInt()}% energi", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun AssessmentCard(meal: Meal) {
+    val grade = meal.grade ?: return
     HawCard {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                GradeBadge(meal.grade!!, size = 44.dp)
+                GradeBadge(grade, size = 44.dp)
                 Spacer(Modifier.width(12.dp))
                 Column {
-                    Text("Skor gizi ${meal.grade.name}", style = MaterialTheme.typography.titleMedium)
+                    Text("Skor gizi ${grade.name}", style = MaterialTheme.typography.titleMedium)
                     Text(
-                        meal.assessments.joinToString(" · "),
-                        style = MaterialTheme.typography.bodyMedium,
+                        when (grade.name) {
+                            "A" -> "Sangat baik, pertahankan!"
+                            "B" -> "Baik, sedikit lagi sempurna"
+                            "C" -> "Cukup, ada yang bisa diperbaiki"
+                            "D" -> "Kurang seimbang"
+                            else -> "Perlu banyak perbaikan"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                val positive = setOf("Seimbang", "Kaya serat", "Protein baik")
+                meal.assessments.forEach { label ->
+                    Pill(label, if (label in positive) HawTheme.colors.success else HawTheme.colors.warning)
+                }
+            }
             if (meal.suggestions.isNotEmpty()) {
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Text("Saran", style = MaterialTheme.typography.labelLarge)
-                meal.suggestions.forEach { s ->
-                    Row {
-                        Text("•  ", color = MaterialTheme.colorScheme.primary)
-                        Text(s, style = MaterialTheme.typography.bodyMedium)
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    meal.suggestions.forEach { s ->
+                        Row(verticalAlignment = Alignment.Top) {
+                            Icon(Icons.Filled.Lightbulb, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(18.dp).padding(top = 2.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(s, style = MaterialTheme.typography.bodyMedium)
+                        }
                     }
                 }
             }
             meal.aiNotes?.let { notes ->
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Text("Catatan AI: $notes", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Surface(color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f), shape = MaterialTheme.shapes.medium) {
+                    Row(Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
+                        Icon(Icons.Filled.AutoAwesome, null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(notes, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface)
+                    }
+                }
             }
         }
     }
@@ -545,29 +631,60 @@ private fun AssessmentCard(meal: Meal) {
 
 @Composable
 private fun ItemCard(item: FoodItem, onClick: () -> Unit) {
-    HawCard(onClick = onClick) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(item.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-                    Spacer(Modifier.width(6.dp))
-                    SourceBadge(item.source)
+    val accent = when (item.source) {
+        NutritionSource.DB -> MaterialTheme.colorScheme.primary
+        NutritionSource.AI -> MaterialTheme.colorScheme.tertiary
+        NutritionSource.MANUAL -> MaterialTheme.colorScheme.secondary
+    }
+    HawCard(onClick = onClick, contentPadding = 0.dp) {
+        Row(Modifier.height(IntrinsicSize.Min), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.width(5.dp).fillMaxHeight().background(accent))
+            Row(Modifier.weight(1f).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(item.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+                        Spacer(Modifier.width(6.dp))
+                        SourceBadge(item.source)
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Pill(Format.gramsInt(item.grams), MaterialTheme.colorScheme.onSurfaceVariant)
+                        item.cookingMethod?.let {
+                            Spacer(Modifier.width(6.dp))
+                            Text(it, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    MacroInline(item.nutrients)
                 }
-                Text(
-                    buildString {
-                        append(Format.gramsInt(item.grams))
-                        item.cookingMethod?.let { append(" · ").append(it) }
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(Modifier.height(4.dp))
-                MacroInline(item.nutrients)
+                Spacer(Modifier.width(8.dp))
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(Format.kcalNumber(item.nutrients.calories), style = MaterialTheme.typography.titleLarge)
+                    Text("kkal", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(Format.kcalNumber(item.nutrients.calories), style = MaterialTheme.typography.titleMedium)
-                Text("kkal", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
+        }
+    }
+}
+
+@Composable
+private fun AddElementCard(onAdd: () -> Unit, empty: Boolean) {
+    Surface(
+        onClick = onAdd,
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.06f),
+        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            Icon(Icons.Filled.AddCircle, null, tint = MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.width(8.dp))
+            Text(
+                if (empty) "Tambah elemen dari database makanan Indonesia" else "Ada yang terlewat? Tambah elemen",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }

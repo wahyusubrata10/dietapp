@@ -20,7 +20,7 @@ object Routes {
     const val ANALYTICS = "analisa"
     const val PROFILE = "profil"
 
-    const val CAMERA = "kamera?type={type}"
+    const val CAMERA = "kamera?type={type}&gallery={gallery}"
     const val MEAL_EDITOR = "makan?id={id}&photo={photo}&type={type}&time={time}&hint={hint}&pending={pending}"
     const val PROFILE_EDIT = "profil/edit"
     const val SETTINGS = "pengaturan"
@@ -29,7 +29,8 @@ object Routes {
     const val UPDATE = "update"
     const val BACKUP = "backup"
 
-    fun camera(type: MealType? = null) = "kamera?type=${type?.name.orEmpty()}"
+    fun camera(type: MealType? = null, openGallery: Boolean = false) =
+        "kamera?type=${type?.name.orEmpty()}&gallery=${if (openGallery) "1" else ""}"
 
     fun editMeal(id: Long) = "makan?id=$id"
 

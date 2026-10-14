@@ -94,6 +94,12 @@ fun CameraScreen(
         uri?.let(viewModel::onPicked)
     }
     val pickFromGallery = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }
+    LaunchedEffect(Unit) {
+        if (viewModel.openGalleryOnStart) {
+            viewModel.consumeOpenGallery()
+            pickFromGallery()
+        }
+    }
 
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         val photo = state.photoPath

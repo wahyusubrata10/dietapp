@@ -17,7 +17,7 @@
         android:pathData="M42,66C42,50 52,40 68,40C68,56 58,66 42,66Z" />
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#2E7D5B"
+        android:strokeColor="#1A8A5F"
         android:strokeWidth="2"
         android:strokeLineCap="round"
         android:pathData="M45,63L62,46" />

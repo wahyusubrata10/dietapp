@@ -39,7 +39,10 @@ import com.hawdietpro.app.ui.theme.GradeColors
 import com.hawdietpro.app.ui.theme.MacroColors
 import kotlin.math.roundToInt
 
-/** Ring progres kalori: terisi sesuai kalori masuk / target, merah bila melebihi. */
+/**
+ * Ring progres kalori: terisi sesuai kalori masuk / target, berubah merah bila melebihi.
+ * Warna bisa diatur agar cocok di atas latar gradasi (hero).
+ */
 @Composable
 fun CalorieRing(
     consumed: Double,
@@ -47,12 +50,16 @@ fun CalorieRing(
     modifier: Modifier = Modifier,
     size: Dp = 180.dp,
     stroke: Dp = 16.dp,
+    trackColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    progressColor: Color = MaterialTheme.colorScheme.primary,
+    overColor: Color = MaterialTheme.colorScheme.error,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
+    subTextColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     val progress = if (target > 0) (consumed / target).toFloat() else 0f
-    val animated by animateFloatAsState(progress.coerceIn(0f, 1f), tween(700), label = "ring")
+    val animated by animateFloatAsState(progress.coerceIn(0f, 1f), tween(800), label = "ring")
     val over = consumed > target && target > 0
-    val track = MaterialTheme.colorScheme.surfaceContainerHighest
-    val color = if (over) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+    val color = if (over) overColor else progressColor
     val remaining = target - consumed.roundToInt()
 
     Box(modifier.size(size), contentAlignment = Alignment.Center) {
@@ -61,20 +68,39 @@ fun CalorieRing(
             val inset = stroke.toPx() / 2
             val arcSize = androidx.compose.ui.geometry.Size(this.size.width - inset * 2, this.size.height - inset * 2)
             val topLeft = androidx.compose.ui.geometry.Offset(inset, inset)
-            drawArc(track, -90f, 360f, false, topLeft, arcSize, style = s)
-            drawArc(color, -90f, 360f * animated, false, topLeft, arcSize, style = s)
+            drawArc(trackColor, -90f, 360f, false, topLeft, arcSize, style = s)
+            if (animated > 0f) drawArc(color, -90f, 360f * animated, false, topLeft, arcSize, style = s)
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 Format.grouped(if (remaining >= 0) remaining else -remaining),
                 style = MaterialTheme.typography.headlineLarge,
-                color = if (over) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                color = if (over) overColor else textColor,
             )
             Text(
                 if (remaining >= 0) "kkal tersisa" else "kkal berlebih",
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = subTextColor,
             )
+        }
+    }
+}
+
+/** Progress makro ringkas untuk di atas latar gradasi. */
+@Composable
+fun HeroMacro(label: String, value: Double, target: Int, color: Color, textColor: Color, subColor: Color, trackColor: Color, modifier: Modifier = Modifier) {
+    val progress = if (target > 0) (value / target).toFloat().coerceIn(0f, 1f) else 0f
+    val animated by animateFloatAsState(progress, tween(700), label = "heroMacro")
+    Column(modifier) {
+        Text(label, style = MaterialTheme.typography.labelMedium, color = subColor)
+        Text(
+            "${value.roundToInt()}/${target}g",
+            style = MaterialTheme.typography.titleSmall,
+            color = textColor,
+        )
+        Spacer(Modifier.height(6.dp))
+        Box(Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)).background(trackColor)) {
+            Box(Modifier.fillMaxWidth(animated).height(6.dp).clip(RoundedCornerShape(3.dp)).background(color))
         }
     }
 }

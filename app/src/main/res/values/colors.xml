@@ -1,5 +1,5 @@
 <resources>
-    <color name="brand_green">#2E7D5B</color>
-    <color name="splash_background">#F6FBF7</color>
-    <color name="ic_launcher_background">#2E7D5B</color>
+    <color name="brand_green">#1A8A5F</color>
+    <color name="splash_background">#F6F8F7</color>
+    <color name="ic_launcher_background">#1A8A5F</color>
 </resources>

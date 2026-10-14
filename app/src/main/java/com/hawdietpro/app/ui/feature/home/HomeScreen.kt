@@ -4,7 +4,11 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,7 +21,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
@@ -26,25 +34,34 @@ import androidx.compose.material.icons.filled.CloudQueue
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.TipsAndUpdates
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -56,24 +73,47 @@ import com.hawdietpro.app.domain.model.MealType
 import com.hawdietpro.app.ui.MainViewModel
 import com.hawdietpro.app.ui.components.Banner
 import com.hawdietpro.app.ui.components.CalorieRing
+import com.hawdietpro.app.ui.components.EmojiBadge
 import com.hawdietpro.app.ui.components.HawCard
+import com.hawdietpro.app.ui.components.HeroMacro
 import com.hawdietpro.app.ui.components.LoadingBox
-import com.hawdietpro.app.ui.components.MacroProgress
 import com.hawdietpro.app.ui.components.MealRow
-import com.hawdietpro.app.ui.components.macroSpecs
+import com.hawdietpro.app.ui.components.SectionHeader
+import com.hawdietpro.app.ui.components.mealTypeColor
 import com.hawdietpro.app.ui.feature.weight.WeightEstimateCompact
+import com.hawdietpro.app.ui.theme.HawTheme
+import com.hawdietpro.app.ui.theme.MacroColors
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import kotlin.math.roundToInt
+
+/** Porsi kalori yang disarankan per waktu makan (dari target harian). */
+private val MEAL_SHARE = mapOf(
+    MealType.SARAPAN to 0.25,
+    MealType.MAKAN_SIANG to 0.35,
+    MealType.MAKAN_MALAM to 0.30,
+    MealType.CAMILAN to 0.10,
+)
+
+private val MEAL_HOUR = mapOf(
+    MealType.SARAPAN to 7,
+    MealType.MAKAN_SIANG to 12,
+    MealType.MAKAN_MALAM to 19,
+    MealType.CAMILAN to 16,
+)
 
 @Composable
 fun HomeScreen(
     mainViewModel: MainViewModel,
     onOpenCamera: (MealType?) -> Unit,
-    onManual: (MealType?) -> Unit,
+    onManual: (MealType?, Long?) -> Unit,
     onOpenMeal: (Long) -> Unit,
     onOpenQueue: () -> Unit,
     onOpenUpdate: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenWeight: () -> Unit,
+    onOpenProfile: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -91,19 +131,29 @@ fun HomeScreen(
         return
     }
 
+    fun addFor(type: MealType?) {
+        if (state.isToday) {
+            onOpenCamera(type)
+        } else {
+            val hour = MEAL_HOUR[type ?: MealType.MAKAN_SIANG] ?: 12
+            onManual(type, state.date.atTime(LocalTime.of(hour, 0)).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
+        }
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize().statusBarsPadding(),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
+        item { Header(state.name, onOpenProfile) }
+
         item {
-            Column {
-                Text(
-                    if (state.name.isNotBlank()) "Halo, ${state.name.substringBefore(' ')} 👋" else "Halo 👋",
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                Text(Format.date(state.date), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
+            DateStrip(
+                days = state.days,
+                selected = state.date,
+                target = state.target?.calories,
+                onSelect = viewModel::select,
+            )
         }
 
         when (val u = update) {
@@ -143,7 +193,7 @@ fun HomeScreen(
             item {
                 Banner(
                     title = "Isi API key Gemini",
-                    text = "Analisa foto membutuhkan API key gratis dari Google AI Studio. Ketuk untuk mengisi.",
+                    text = "Analisa foto butuh API key gratis dari Google AI Studio. Ketuk untuk mengisi.",
                     icon = Icons.Filled.Key,
                     container = MaterialTheme.colorScheme.errorContainer,
                     content = MaterialTheme.colorScheme.onErrorContainer,
@@ -152,33 +202,20 @@ fun HomeScreen(
             }
         }
 
-        item { SummaryCard(state) }
-
-        state.projection?.takeIf { it.days.isNotEmpty() || it.latestActual != null }?.let { proj ->
-            item { WeightEstimateCompact(proj, onClick = onOpenWeight) }
-        }
+        item { HeroCard(state) }
 
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    onClick = { onOpenCamera(null) },
-                    modifier = Modifier.fillMaxWidth().height(64.dp),
-                    shape = MaterialTheme.shapes.large,
-                    contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-                ) {
-                    Icon(Icons.Filled.CameraAlt, null, Modifier.size(26.dp))
-                    Spacer(Modifier.width(12.dp))
-                    Text("Foto Makanan", style = MaterialTheme.typography.titleMedium)
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                QuickAction(
+                    Icons.Filled.CameraAlt,
+                    if (state.isToday) "Foto makanan" else "Tambah",
+                    primary = true,
+                    modifier = Modifier.weight(1.4f),
+                ) { addFor(null) }
+                QuickAction(Icons.Filled.EditNote, "Manual", modifier = Modifier.weight(1f)) {
+                    if (state.isToday) onManual(null, null) else addFor(null)
                 }
-                OutlinedButton(
-                    onClick = { onManual(null) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.large,
-                ) {
-                    Icon(Icons.Filled.EditNote, null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Input manual cepat")
-                }
+                QuickAction(Icons.Filled.MonitorWeight, "Berat", modifier = Modifier.weight(1f), onClick = onOpenWeight)
             }
         }
 
@@ -193,73 +230,166 @@ fun HomeScreen(
             }
         }
 
+        state.projection?.takeIf { state.isToday && (it.days.isNotEmpty() || it.latestActual != null) }?.let { proj ->
+            item { WeightEstimateCompact(proj, onClick = onOpenWeight) }
+        }
+
+        item {
+            SectionHeader(
+                if (state.isToday) "Makanan hari ini" else "Makanan ${Format.dayMonth(state.date)}",
+                subtitle = "${state.meals.size} catatan · ${Format.kcal(state.total.calories)}",
+            )
+        }
+
         MealType.entries.forEach { type ->
             val list = state.byType[type].orEmpty()
             item(key = "type_${type.name}") {
-                HawCard {
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("${type.emoji}  ${type.label}", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                            if (list.isNotEmpty()) {
-                                Text(
-                                    Format.kcal(list.sumOf { it.total.calories }),
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            IconButton(onClick = { onOpenCamera(type) }) {
-                                Icon(Icons.Filled.Add, contentDescription = "Tambah ${type.label}")
-                            }
-                        }
-                        if (list.isEmpty()) {
-                            Text(
-                                "Belum ada catatan",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        } else {
-                            list.forEachIndexed { i, meal ->
-                                if (i > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                                MealRow(meal, onClick = { onOpenMeal(meal.id) }, showType = false)
-                            }
-                        }
-                    }
-                }
+                MealTypeCard(
+                    type = type,
+                    meals = list,
+                    suggested = state.target?.let { (it.calories * (MEAL_SHARE[type] ?: 0.25)).roundToInt() },
+                    onAdd = { addFor(type) },
+                    onOpenMeal = onOpenMeal,
+                )
             }
         }
 
         if (state.insights.isNotEmpty()) {
+            item { SectionHeader("Insight") }
             items(state.insights, key = { it.id }) { InsightCard(it) }
         }
 
         state.tip?.let { tip ->
-            item {
-                Banner(text = tip, title = "Tips hari ini", icon = Icons.Filled.TipsAndUpdates)
+            item { Banner(text = tip, title = "Tips hari ini", icon = Icons.Filled.TipsAndUpdates) }
+        }
+    }
+}
+
+// ─────────────────────────────── Bagian-bagian ───────────────────────────────
+
+private fun greeting(): String = when (LocalTime.now().hour) {
+    in 4..10 -> "Selamat pagi"
+    in 11..14 -> "Selamat siang"
+    in 15..17 -> "Selamat sore"
+    else -> "Selamat malam"
+}
+
+@Composable
+private fun Header(name: String, onOpenProfile: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                greeting() + if (name.isNotBlank()) "," else "",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                if (name.isNotBlank()) "${name.substringBefore(' ')} 👋" else "👋",
+                style = MaterialTheme.typography.headlineMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Surface(onClick = onOpenProfile, shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(46.dp)) {
+            Box(contentAlignment = Alignment.Center) {
+                Text(
+                    name.trim().split(' ').filter { it.isNotBlank() }.take(2).joinToString("") { it.first().uppercase() }.ifBlank { "🙂" },
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
             }
         }
     }
 }
 
 @Composable
-private fun SummaryCard(state: HomeState) {
+private fun DateStrip(days: List<DayChip>, selected: LocalDate, target: Int?, onSelect: (LocalDate) -> Unit) {
+    val listState = rememberLazyListState()
+    LaunchedEffect(days.size) {
+        if (days.isNotEmpty()) listState.scrollToItem(days.lastIndex)
+    }
+    LazyRow(state = listState, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        items(days, key = { it.date.toEpochDay() }) { day ->
+            DayItem(day, day.date == selected, target, onClick = { onSelect(day.date) })
+        }
+    }
+}
+
+@Composable
+private fun DayItem(day: DayChip, selected: Boolean, target: Int?, onClick: () -> Unit) {
+    val primary = MaterialTheme.colorScheme.primary
+    val bg by animateColorAsState(if (selected) primary else HawTheme.colors.card, label = "dayBg")
+    val fg = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+    val sub = if (selected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
+    val ratio = if (target != null && target > 0) (day.calories / target).toFloat() else if (day.calories > 0) 1f else 0f
+    val ringColor = when {
+        ratio > 1.1f -> if (selected) Color.White else MaterialTheme.colorScheme.error
+        else -> if (selected) Color.White else primary
+    }
+    val track = if (selected) Color.White.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surfaceContainerHighest
+    val isToday = day.date == LocalDate.now()
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(18.dp),
+        color = bg,
+        border = if (selected) null else androidx.compose.foundation.BorderStroke(1.dp, HawTheme.colors.cardBorder),
+        modifier = Modifier.width(52.dp),
+    ) {
+        Column(Modifier.padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(Format.dayName(day.date), style = MaterialTheme.typography.labelSmall, color = sub)
+            Spacer(Modifier.height(4.dp))
+            Box(Modifier.size(34.dp), contentAlignment = Alignment.Center) {
+                Canvas(Modifier.size(34.dp)) {
+                    val stroke = 3.dp.toPx()
+                    val inset = stroke / 2
+                    val arc = Size(size.width - stroke, size.height - stroke)
+                    drawArc(track, -90f, 360f, false, Offset(inset, inset), arc, style = Stroke(stroke))
+                    if (ratio > 0f) drawArc(ringColor, -90f, 360f * ratio.coerceAtMost(1f), false, Offset(inset, inset), arc, style = Stroke(stroke, cap = StrokeCap.Round))
+                }
+                Text("${day.date.dayOfMonth}", style = MaterialTheme.typography.labelLarge, color = fg, fontWeight = if (isToday) FontWeight.ExtraBold else FontWeight.SemiBold)
+            }
+        }
+    }
+}
+
+@Composable
+private fun HeroCard(state: HomeState) {
+    val hc = HawTheme.colors
     val target = state.target
-    HawCard(color = MaterialTheme.colorScheme.surfaceContainerLowest) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                CalorieRing(consumed = state.total.calories, target = target?.calories ?: 2000, size = 150.dp, stroke = 14.dp)
-                Spacer(Modifier.width(16.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    LabeledValue("Target", Format.kcal((target?.calories ?: 0).toDouble()))
-                    LabeledValue("Masuk", Format.kcal(state.total.calories))
-                    LabeledValue("Makan", "${state.meals.size} kali")
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(28.dp))
+            .background(hc.heroGradient)
+            .padding(20.dp),
+    ) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                CalorieRing(
+                    consumed = state.total.calories,
+                    target = target?.calories ?: 2000,
+                    size = 148.dp,
+                    stroke = 13.dp,
+                    trackColor = hc.heroTrack,
+                    progressColor = Color.White,
+                    overColor = Color(0xFFFFC9C2),
+                    textColor = hc.heroContent,
+                    subTextColor = hc.heroContentSub,
+                )
+                Spacer(Modifier.width(18.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    HeroStat("Kalori masuk", Format.kcal(state.total.calories))
+                    HeroStat("Target harian", Format.kcal((target?.calories ?: 0).toDouble()))
+                    HeroStat("Waktu makan", "${state.meals.size}× dicatat")
                 }
             }
-            Spacer(Modifier.height(16.dp))
             if (target != null) {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    macroSpecs(state.total, target.proteinG, target.carbsG, target.fatG, target.fiberG).forEach { spec ->
-                        MacroProgress(spec)
-                    }
+                Spacer(Modifier.height(18.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    HeroMacro("Protein", state.total.protein, target.proteinG, MacroColors.Protein, hc.heroContent, hc.heroContentSub, hc.heroTrack, Modifier.weight(1f))
+                    HeroMacro("Karbo", state.total.carbs, target.carbsG, MacroColors.Carbs, hc.heroContent, hc.heroContentSub, hc.heroTrack, Modifier.weight(1f))
+                    HeroMacro("Lemak", state.total.fat, target.fatG, Color(0xFF9FC1FF), hc.heroContent, hc.heroContentSub, hc.heroTrack, Modifier.weight(1f))
+                    HeroMacro("Serat", state.total.fiber, target.fiberG, Color(0xFFB9F6CA), hc.heroContent, hc.heroContentSub, hc.heroTrack, Modifier.weight(1f))
                 }
             }
         }
@@ -267,10 +397,71 @@ private fun SummaryCard(state: HomeState) {
 }
 
 @Composable
-private fun LabeledValue(label: String, value: String) {
+private fun HeroStat(label: String, value: String) {
     Column {
-        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(value, style = MaterialTheme.typography.titleMedium)
+        Text(label, style = MaterialTheme.typography.labelMedium, color = HawTheme.colors.heroContentSub)
+        Text(value, style = MaterialTheme.typography.titleMedium, color = HawTheme.colors.heroContent)
+    }
+}
+
+@Composable
+private fun QuickAction(icon: ImageVector, label: String, modifier: Modifier = Modifier, primary: Boolean = false, onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.large,
+        color = if (primary) MaterialTheme.colorScheme.secondary else HawTheme.colors.card,
+        contentColor = if (primary) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurface,
+        border = if (primary) null else androidx.compose.foundation.BorderStroke(1.dp, HawTheme.colors.cardBorder),
+        modifier = modifier.height(56.dp),
+    ) {
+        Row(Modifier.padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            Icon(icon, null, modifier = Modifier.size(22.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(label, style = MaterialTheme.typography.labelLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+    }
+}
+
+@Composable
+private fun MealTypeCard(
+    type: MealType,
+    meals: List<com.hawdietpro.app.domain.model.Meal>,
+    suggested: Int?,
+    onAdd: () -> Unit,
+    onOpenMeal: (Long) -> Unit,
+) {
+    val color = mealTypeColor(type)
+    val kcal = meals.sumOf { it.total.calories }
+    HawCard(contentPadding = 14.dp) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                EmojiBadge(type.emoji, color, size = 42.dp)
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(type.label, style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        when {
+                            meals.isNotEmpty() -> "${Format.kcal(kcal)}" + (suggested?.let { " dari saran ±${Format.grouped(it)}" } ?: "")
+                            suggested != null -> "Saran ±${Format.grouped(suggested)} kkal"
+                            else -> "Belum dicatat"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                FilledTonalIconButton(
+                    onClick = onAdd,
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = color.copy(alpha = 0.14f), contentColor = color),
+                ) { Icon(Icons.Filled.Add, contentDescription = "Tambah ${type.label}") }
+            }
+            if (meals.isNotEmpty()) {
+                Spacer(Modifier.height(6.dp))
+                meals.forEachIndexed { i, meal ->
+                    if (i > 0) HorizontalDivider(color = HawTheme.colors.cardBorder)
+                    MealRow(meal, onClick = { onOpenMeal(meal.id) }, showType = false)
+                }
+            }
+        }
     }
 }
 

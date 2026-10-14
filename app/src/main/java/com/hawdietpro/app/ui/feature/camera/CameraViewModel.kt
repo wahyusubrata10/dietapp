@@ -40,6 +40,14 @@ class CameraViewModel @Inject constructor(
 
     private var handedOff = false
 
+    /** Dibuka dari "Pilih dari galeri": langsung tampilkan pemilih foto sekali. */
+    var openGalleryOnStart: Boolean = savedState.get<String>("gallery") == "1"
+        private set
+
+    fun consumeOpenGallery() {
+        openGalleryOnStart = false
+    }
+
     val captureDir: File get() = File(images.photoDir.parentFile, "capture").apply { mkdirs() }
 
     fun onCaptured(raw: File) = process { images.importFromFile(raw, maxSize(), quality()) }
