@@ -1,6 +1,19 @@
 package com.hawdietpro.app.ui.feature.profile
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Surface
+import androidx.compose.ui.graphics.Color
+import com.hawdietpro.app.ui.components.IconBadge
+import com.hawdietpro.app.ui.components.Pill
+import com.hawdietpro.app.ui.theme.HawTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -97,36 +110,17 @@ fun ProfileScreen(
             val p = state.profile
             val t = state.target
             if (p != null && t != null) {
+                item { ProfileHero(p, t, onEditProfile) }
                 item {
-                    HawCard(onClick = onEditProfile) {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Column(Modifier.weight(1f)) {
-                                    Text(p.name, style = MaterialTheme.typography.headlineSmall)
-                                    Text(
-                                        "${p.sex.label} · ${p.age} tahun · ${Format.oneDecimal(p.heightCm)} cm · ${Format.kg(p.weightKg)}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                    Text(
-                                        "${p.goal.label} · ${p.activityLevel.label}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                                Icon(Icons.Filled.Edit, contentDescription = "Edit profil")
-                            }
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                StatTile("Target", Format.grouped(t.calories), Modifier.weight(1f), sub = "kkal/hari", color = MaterialTheme.colorScheme.primaryContainer)
-                                StatTile("BMI", Format.oneDecimal(t.bmi), Modifier.weight(1f), sub = t.bmiCategory, color = MaterialTheme.colorScheme.surfaceContainerHigh)
-                                StatTile("TDEE", Format.grouped(t.tdee), Modifier.weight(1f), sub = "kkal", color = MaterialTheme.colorScheme.surfaceContainerHigh)
-                            }
-                        }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        StatTile("Target", Format.grouped(t.calories), Modifier.weight(1f), sub = "kkal/hari", accent = MaterialTheme.colorScheme.primary)
+                        StatTile("BMI", Format.oneDecimal(t.bmi), Modifier.weight(1f), sub = t.bmiCategory, accent = MaterialTheme.colorScheme.tertiary)
+                        StatTile("TDEE", Format.grouped(t.tdee), Modifier.weight(1f), sub = "kkal", accent = MaterialTheme.colorScheme.secondary)
                     }
                 }
             }
             item {
-                Column(Modifier.clip(MaterialTheme.shapes.large)) {
+                MenuGroup("Data & kebiasaan") {
                     MenuItem(Icons.Filled.Edit, "Data diri & target", "Umur, tinggi, berat, aktivitas, tujuan", onEditProfile)
                     MenuItem(Icons.Filled.MonitorWeight, "Log berat badan", "Catat & lihat tren berat", onWeight)
                     MenuItem(
@@ -139,7 +133,7 @@ fun ProfileScreen(
                 }
             }
             item {
-                Column(Modifier.clip(MaterialTheme.shapes.large)) {
+                MenuGroup("Aplikasi") {
                     MenuItem(Icons.Filled.Settings, "Pengaturan", "API key Gemini, model AI, tema", onSettings)
                     MenuItem(Icons.Filled.Backup, "Backup & ekspor", "ZIP (data + foto), CSV untuk Excel", onBackup)
                     MenuItem(
@@ -168,7 +162,7 @@ fun MenuItem(icon: ImageVector, title: String, subtitle: String?, onClick: () ->
     ListItem(
         headlineContent = { Text(title) },
         supportingContent = subtitle?.let { s -> @Composable { Text(s) } },
-        leadingContent = { Icon(icon, null, tint = MaterialTheme.colorScheme.primary) },
+        leadingContent = { IconBadge(icon, MaterialTheme.colorScheme.primary, size = 38.dp) },
         trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 badge?.let {
@@ -178,7 +172,62 @@ fun MenuItem(icon: ImageVector, title: String, subtitle: String?, onClick: () ->
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null)
             }
         },
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         modifier = Modifier.clickable(onClick = onClick),
     )
+}
+
+@Composable
+private fun ProfileHero(p: UserProfile, t: DailyTarget, onEdit: () -> Unit) {
+    val hc = HawTheme.colors
+    Box(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).background(hc.heroGradient).clickable(onClick = onEdit).padding(20.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.size(64.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.22f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    p.name.trim().split(' ').filter { it.isNotBlank() }.take(2).joinToString("") { it.first().uppercase() }.ifBlank { "🙂" },
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = hc.heroContent,
+                )
+            }
+            Spacer(Modifier.width(16.dp))
+            Column(Modifier.weight(1f)) {
+                Text(p.name, style = MaterialTheme.typography.titleLarge, color = hc.heroContent, maxLines = 1)
+                Text(
+                    "${p.sex.label} · ${p.age} th · ${Format.oneDecimal(p.heightCm)} cm · ${Format.kg(p.weightKg)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = hc.heroContentSub,
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Pill(p.goal.label, Color.White)
+                    p.targetWeightKg?.let { Pill("Target ${Format.kg(it)}", Color.White) }
+                }
+            }
+            Icon(Icons.Filled.Edit, contentDescription = "Edit profil", tint = hc.heroContent)
+        }
+    }
+}
+
+@Composable
+private fun MenuGroup(title: String, content: @Composable () -> Unit) {
+    Column {
+        Text(
+            title.uppercase(),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
+        )
+        Surface(
+            shape = MaterialTheme.shapes.large,
+            color = HawTheme.colors.card,
+            border = BorderStroke(1.dp, HawTheme.colors.cardBorder),
+        ) {
+            Column { content() }
+        }
+    }
 }

@@ -59,6 +59,10 @@ import com.hawdietpro.app.ui.components.HawCard
 import com.hawdietpro.app.ui.components.HawScaffold
 import com.hawdietpro.app.ui.components.LoadingBox
 import com.hawdietpro.app.ui.components.MealRow
+import com.hawdietpro.app.ui.components.Pill
+import com.hawdietpro.app.ui.components.SoftProgress
+import com.hawdietpro.app.ui.theme.HawTheme
+import androidx.compose.material3.HorizontalDivider
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
@@ -187,18 +191,30 @@ private fun Filters(state: HistoryUi, viewModel: HistoryViewModel) {
 
 @Composable
 private fun DayCard(group: DayGroup, target: Int?, onOpenMeal: (Long) -> Unit) {
-    HawCard {
+    val over = target != null && group.calories > target * 1.1
+    val color = if (over) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+    HawCard(contentPadding = 14.dp) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(Format.relativeDay(group.date), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-                val over = target != null && group.calories > target * 1.1
-                Text(
-                    Format.kcal(group.calories),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = if (over) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                )
+                Column(Modifier.weight(1f)) {
+                    Text(Format.relativeDay(group.date), style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        "${group.meals.size} catatan" + (target?.let { " · ${(group.calories / it * 100).toInt()}% target" } ?: ""),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Pill(Format.kcal(group.calories), color)
             }
-            group.meals.forEach { meal -> MealRow(meal, onClick = { onOpenMeal(meal.id) }) }
+            if (target != null) {
+                Spacer(Modifier.height(10.dp))
+                SoftProgress((group.calories / target).toFloat(), color, height = 6.dp)
+            }
+            Spacer(Modifier.height(4.dp))
+            group.meals.forEachIndexed { i, meal ->
+                if (i > 0) HorizontalDivider(color = HawTheme.colors.cardBorder)
+                MealRow(meal, onClick = { onOpenMeal(meal.id) })
+            }
         }
     }
 }

@@ -23,6 +23,11 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import com.hawdietpro.app.ui.components.IconBadge
+import com.hawdietpro.app.ui.theme.HawTheme
+import com.hawdietpro.app.ui.theme.MacroColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -137,38 +142,48 @@ fun OnboardingScreen(viewModel: ProfileFormViewModel = hiltViewModel()) {
 
 @Composable
 private fun Welcome() {
+    val hc = HawTheme.colors
     Column(
-        Modifier.fillMaxWidth().padding(top = 48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        Modifier.fillMaxWidth().padding(top = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         Box(
-            Modifier.size(112.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary),
-            contentAlignment = Alignment.Center,
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(32.dp)).background(hc.heroGradient).padding(28.dp),
         ) {
-            Image(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, modifier = Modifier.size(112.dp))
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Box(
+                    Modifier.size(96.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.18f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Image(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, modifier = Modifier.size(110.dp))
+                }
+                Spacer(Modifier.height(16.dp))
+                Text("Haw Diet Pro", style = MaterialTheme.typography.headlineLarge, color = hc.heroContent)
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    "Foto makananmu, langsung tahu kalori & gizinya. Paham masakan Indonesia.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = hc.heroContentSub,
+                )
+            }
         }
-        Text("Haw Diet Pro", style = MaterialTheme.typography.headlineLarge)
-        Text(
-            "Foto makanan, langsung tahu kalori & gizinya — paham masakan Indonesia.",
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(Modifier.height(8.dp))
-        Feature(Icons.Filled.CameraAlt, "Foto → menu & elemen piring dikenali otomatis")
-        Feature(Icons.Filled.AutoAwesome, "Skor gizi A–E dan saran yang realistis")
-        Feature(Icons.Filled.BarChart, "Analisa harian, mingguan & bulanan")
-        Feature(Icons.Filled.Lock, "100% gratis, tanpa akun, data tersimpan di HP")
+        Feature(Icons.Filled.CameraAlt, MaterialTheme.colorScheme.primary, "Foto → menu dikenali", "Nasi, lauk, sayur & sambal dihitung per elemen")
+        Feature(Icons.Filled.AutoAwesome, MaterialTheme.colorScheme.tertiary, "Skor gizi A–E", "Lengkap dengan saran yang realistis")
+        Feature(Icons.Filled.BarChart, MaterialTheme.colorScheme.secondary, "Analisa & perkiraan berat", "Harian, mingguan, bulanan + grafik")
+        Feature(Icons.Filled.Lock, MacroColors.Fat, "Gratis & privat", "Tanpa akun, semua data tersimpan di HP")
     }
 }
 
 @Composable
-private fun Feature(icon: ImageVector, text: String) {
+private fun Feature(icon: ImageVector, tint: Color, title: String, subtitle: String) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Icon(icon, null, tint = MaterialTheme.colorScheme.primary)
-        Spacer(Modifier.width(12.dp))
-        Text(text, style = MaterialTheme.typography.bodyLarge)
+        IconBadge(icon, tint, size = 44.dp)
+        Spacer(Modifier.width(14.dp))
+        Column {
+            Text(title, style = MaterialTheme.typography.titleSmall)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 
