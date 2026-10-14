@@ -1,0 +1,78 @@
+package com.hawdietpro.app.domain.nutrition
+
+import com.hawdietpro.app.domain.TestFixtures
+import com.hawdietpro.app.domain.model.FoodItem
+import com.hawdietpro.app.domain.model.NutritionSource
+import com.hawdietpro.app.domain.model.Nutrients
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+class NutritionCalculatorTest {
+
+    private val rice = TestFixtures.references.first { it.id == "nasi_putih" }
+
+    @Test
+    fun `gizi dihitung dari gram kali nilai per 100 g`() {
+        val n = NutritionCalculator.fromReference(rice, 150.0)
+        assertEquals(270.0, n.calories, 0.01) // 180 × 1.5
+        assertEquals(4.5, n.protein, 0.01)
+        assertEquals(59.7, n.carbs, 0.01)
+    }
+
+    @Test
+    fun `menerapkan referensi DB mengganti angka AI dan menyimpan angka asli`() {
+        val ai = FoodItem(name = "Nasi putih", grams = 200.0, nutrients = Nutrients(300.0, 5.0, 65.0, 1.0, 0.5))
+        val applied = NutritionCalculator.applyReference(ai, rice)
+        assertEquals(NutritionSource.DB, applied.source)
+        assertEquals(360.0, applied.nutrients.calories, 0.01)
+        assertEquals(300.0, applied.aiNutrients!!.calories, 0.01)
+        assertEquals("nasi_putih", applied.foodRefId)
+    }
+
+    @Test
+    fun `ubah gram elemen DB dihitung ulang dari referensi`() {
+        val item = NutritionCalculator.applyReference(
+            FoodItem(name = "Nasi", grams = 100.0, nutrients = Nutrients.ZERO), rice,
+        )
+        val half = NutritionCalculator.rescale(item, 50.0, rice)
+        assertEquals(90.0, half.nutrients.calories, 0.01)
+    }
+
+    @Test
+    fun `ubah gram elemen AI diskalakan proporsional`() {
+        val item = FoodItem(name = "Rendang", grams = 80.0, nutrients = Nutrients(200.0, 18.0, 6.0, 12.0, 1.0))
+        val doubled = NutritionCalculator.rescale(item, 160.0, null)
+        assertEquals(400.0, doubled.nutrients.calories, 0.01)
+        assertEquals(36.0, doubled.nutrients.protein, 0.01)
+    }
+
+    @Test
+    fun `gram nol tidak menghasilkan pembagian nol`() {
+        val item = FoodItem(name = "X", grams = 0.0, nutrients = Nutrients(10.0))
+        val r = NutritionCalculator.rescale(item, 50.0, null)
+        assertEquals(10.0, r.nutrients.calories, 0.01)
+    }
+
+    @Test
+    fun `persentase energi makro`() {
+        val split = Nutrients(calories = 0.0, protein = 25.0, carbs = 50.0, fat = 10.0).macroEnergy
+        // 100 + 200 + 90 = 390
+        assertEquals(25.64, split.proteinPct, 0.01)
+        assertEquals(51.28, split.carbsPct, 0.01)
+        assertEquals(23.08, split.fatPct, 0.01)
+    }
+
+    @Test
+    fun `referensi tersedia untuk makanan Indonesia populer`() {
+        val matcher = FoodMatcher(TestFixtures.references)
+        listOf("Rendang", "Soto ayam", "Pecel", "Tempe goreng", "Nasi uduk", "Ayam geprek", "Bakwan", "Nasi kuning", "Gado-gado")
+            .forEach { assertNotNull("tidak cocok: $it", matcher.match(it)) }
+    }
+
+    @Test
+    fun `nama tak dikenal tidak dipaksakan cocok`() {
+        assertNull(FoodMatcher(TestFixtures.references).match("Kue misterius planet mars"))
+    }
+}

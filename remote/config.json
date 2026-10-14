@@ -1,7 +1,23 @@
 {
   "version": 1,
   "minAppVersionCode": 1,
-  "latestRecommendedVersionCode": 1,
-  "features": {},
-  "announcement": null
+  "minSupportedVersionCode": 1,
+  "updateCheckIntervalHours": 6,
+  "features": {
+    "ai_analysis": true,
+    "insights": true,
+    "weight_log": true,
+    "manual_input": true,
+    "offline_queue": true
+  },
+  "announcement": null,
+  "tips": [
+    "Foto dari atas (tegak lurus) dengan pencahayaan cukup membuat estimasi porsi lebih akurat.",
+    "Letakkan sendok atau garpu di samping piring sebagai pembanding ukuran.",
+    "Satu centong nasi sekitar 100–150 gram (±180–270 kkal).",
+    "Pilih lauk bakar atau rebus untuk mengurangi lemak dari minyak goreng.",
+    "Isi setengah piring dengan sayur dan buah sesuai pedoman Isi Piringku.",
+    "Air putih adalah minuman terbaik — minuman manis bisa menyumbang 100–200 kkal per gelas."
+  ],
+  "texts": {}
 }
