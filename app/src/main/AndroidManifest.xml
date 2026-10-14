@@ -33,6 +33,10 @@
             </intent-filter>
         </activity>
 
+        <receiver
+            android:name=".data.update.InstallResultReceiver"
+            android:exported="false" />
+
         <!-- WorkManager diinisialisasi manual agar bisa memakai HiltWorkerFactory -->
         <provider
             android:name="androidx.startup.InitializationProvider"
