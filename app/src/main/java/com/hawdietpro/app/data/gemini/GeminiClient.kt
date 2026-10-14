@@ -69,13 +69,17 @@ class GeminiClient @Inject constructor(
         val models = (listOfNotNull(override) + config.model + config.fallbackModels).distinct()
 
         var lastError: GeminiError? = null
+        // Model sibuk (503), kuota per-model habis (429), atau tidak tersedia (404) → coba model cadangan.
         for (model in models) {
             try {
                 val text = callWithRetry(model, apiKey, body)
                 return parseResult(text)
             } catch (e: GeminiError.ModelNotFound) {
+                if (lastError == null) lastError = e
+            } catch (e: GeminiError.Server) {
                 lastError = e
-                continue
+            } catch (e: GeminiError.RateLimited) {
+                lastError = e
             }
         }
         throw lastError ?: GeminiError.Other("tidak ada model")
@@ -115,7 +119,7 @@ class GeminiClient @Inject constructor(
         }
     }
 
-    private fun backoff(attempt: Int): Long = min(2L shl attempt, 16L) // 2, 4, 8 detik
+    private fun backoff(attempt: Int): Long = min(2L shl attempt, 16L) // 2, 4 detik
 
     private suspend fun call(model: String, apiKey: String, body: String): String = withContext(Dispatchers.IO) {
         val req = Request.Builder()
@@ -173,7 +177,7 @@ class GeminiClient @Inject constructor(
     private companion object {
         const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
         val JSON_MEDIA = "application/json; charset=utf-8".toMediaType()
-        const val MAX_RETRIES = 3
+        const val MAX_RETRIES = 2
         const val MAX_WAIT_SECONDS = 30L
     }
 }
