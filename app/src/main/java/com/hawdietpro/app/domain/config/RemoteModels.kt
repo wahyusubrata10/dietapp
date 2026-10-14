@@ -43,6 +43,10 @@ data class GeminiPromptConfig(
     val model: String,
     val fallbackModels: List<String> = emptyList(),
     val temperature: Double = 0.2,
+    /** 0 = matikan thinking (Gemini 2.5). Null = default model. */
+    val thinkingBudget: Int? = 0,
+    /** Untuk Gemini 3+: "minimal"/"low"/... Null = tidak dikirim. Jangan diisi bersamaan dengan thinkingBudget. */
+    val thinkingLevel: String? = null,
     val maxImageSize: Int = 1024,
     val jpegQuality: Int = 80,
     val systemPrompt: String,

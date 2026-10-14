@@ -129,16 +129,21 @@ class MealEditorViewModel @Inject constructor(
 
     private fun hourOf(millis: Long) = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).hour
 
+    private var analysisJob: kotlinx.coroutines.Job? = null
+
     fun analyze() {
         val s = _state.value
         val photo = s.meal.photoPath ?: return
         _state.update { it.copy(phase = EditorPhase.Analyzing) }
-        viewModelScope.launch {
+        analysisJob?.cancel()
+        analysisJob = viewModelScope.launch {
             try {
                 val result = analyzer.analyze(photo, s.meal.mealType, s.meal.eatenAt, s.hint)
                 _state.update { it.copy(meal = result.copy(id = it.meal.id, userNote = it.meal.userNote), phase = EditorPhase.Ready, dirty = true) }
             } catch (e: GeminiError) {
                 _state.update { it.copy(phase = EditorPhase.Error(e.message ?: "Analisa gagal", e.retryable, e.queueable && pendingId == null)) }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 val offline = !network.isOnline()
                 _state.update {
@@ -155,6 +160,18 @@ class MealEditorViewModel @Inject constructor(
     }
 
     fun setHint(value: String) = _state.update { it.copy(hint = value) }
+
+    /** Hentikan penantian: foto dianalisa di background, hasil tercatat otomatis + notifikasi. */
+    fun continueInBackground() {
+        analysisJob?.cancel()
+        val m = _state.value.meal
+        val photo = m.photoPath ?: return
+        viewModelScope.launch {
+            pending.enqueue(photo, m.mealType, m.eatenAt)
+            committed = true
+            _state.update { it.copy(finishedMessage = "Dianalisa di background. Anda akan dapat notifikasi saat selesai.") }
+        }
+    }
 
     /** Simpan foto ke antrian offline, diproses otomatis saat online. */
     fun queueForLater() {

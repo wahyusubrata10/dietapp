@@ -33,6 +33,14 @@ data class GenerationConfig(
     val temperature: Double? = null,
     val responseMimeType: String? = null,
     val responseSchema: JsonObject? = null,
+    val thinkingConfig: ThinkingConfig? = null,
+)
+
+/** Mengatur "thinking" model. Untuk mengenali makanan cukup minimal agar jauh lebih cepat. */
+@Serializable
+data class ThinkingConfig(
+    val thinkingBudget: Int? = null,
+    val thinkingLevel: String? = null,
 )
 
 // ---------- Response ----------

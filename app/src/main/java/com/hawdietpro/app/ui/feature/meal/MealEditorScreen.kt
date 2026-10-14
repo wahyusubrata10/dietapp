@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -132,7 +134,10 @@ fun MealEditorScreen(
         Box(Modifier.padding(padding).fillMaxSize()) {
             when (val phase = state.phase) {
                 EditorPhase.Loading -> LoadingBox()
-                EditorPhase.Analyzing -> AnalyzingView(state.meal.photoPath)
+                EditorPhase.Analyzing -> AnalyzingView(
+                    photoPath = state.meal.photoPath,
+                    onBackground = if (state.mode == EditorMode.PHOTO) viewModel::continueInBackground else null,
+                )
                 is EditorPhase.Error -> ErrorView(
                     photoPath = state.meal.photoPath,
                     phase = phase,
@@ -262,23 +267,45 @@ private fun PhotoHeader(path: String?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun AnalyzingView(photoPath: String?) {
+private fun AnalyzingView(photoPath: String?, onBackground: (() -> Unit)?) {
     val transition = rememberInfiniteTransition(label = "pulse")
     val scale by transition.animateFloat(0.96f, 1.02f, infiniteRepeatable(tween(900), RepeatMode.Reverse), label = "scale")
-    Column(Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    var seconds by remember { mutableStateOf(0) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            kotlinx.coroutines.delay(1000)
+            seconds++
+        }
+    }
+    Column(
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Box(Modifier.scale(scale)) { PhotoHeader(photoPath) }
         Spacer(Modifier.height(24.dp))
         Icon(Icons.Filled.AutoAwesome, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(36.dp))
         Spacer(Modifier.height(8.dp))
-        Text("Menganalisa makanan…", style = MaterialTheme.typography.titleLarge)
+        Text("Menganalisa makanan… ${seconds}s", style = MaterialTheme.typography.titleLarge)
         Text(
-            "AI sedang mengenali menu & memecah setiap elemen di piring",
+            when {
+                seconds < 8 -> "AI sedang mengenali menu & memecah setiap elemen di piring"
+                seconds < 20 -> "Masih memproses… server Gemini gratis kadang sedang ramai"
+                else -> "Server sedang lambat. Anda bisa lanjut di background dan dapat notifikasi saat selesai."
+            },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(16.dp))
         LinearProgressIndicator(Modifier.fillMaxWidth(0.6f))
+        if (onBackground != null) {
+            Spacer(Modifier.height(24.dp))
+            OutlinedButton(onClick = onBackground, shape = MaterialTheme.shapes.large) {
+                Icon(Icons.Filled.CloudQueue, null)
+                Spacer(Modifier.width(8.dp))
+                Text("Lanjutkan di background")
+            }
+        }
     }
 }
 

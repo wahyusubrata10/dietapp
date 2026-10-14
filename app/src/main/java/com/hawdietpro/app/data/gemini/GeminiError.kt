@@ -32,5 +32,7 @@ sealed class GeminiError(message: String, val retryable: Boolean, val queueable:
     class BadResponse(detail: String) : GeminiError(
         "Jawaban AI tidak bisa dibaca ($detail). Coba lagi.", retryable = true, queueable = true,
     )
+    /** Model tidak menerima pengaturan thinking → dicoba ulang tanpa pengaturan itu. */
+    class UnsupportedThinking : GeminiError("Pengaturan thinking tidak didukung model", retryable = true, queueable = true)
     class Other(detail: String) : GeminiError("Analisa gagal: $detail", retryable = true, queueable = true)
 }

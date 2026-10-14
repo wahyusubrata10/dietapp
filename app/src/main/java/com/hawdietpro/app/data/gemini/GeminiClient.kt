@@ -46,6 +46,9 @@ class GeminiClient @Inject constructor(
             .replace("{user_hint}", vars.userHint?.takeIf { it.isNotBlank() }?.let { "Catatan pengguna: $it" } ?: "")
             .replace("{reference_names}", vars.referenceNames.joinToString(", "))
 
+        val thinking = if (config.thinkingBudget != null || config.thinkingLevel != null) {
+            ThinkingConfig(thinkingBudget = config.thinkingBudget, thinkingLevel = config.thinkingLevel)
+        } else null
         val request = GenerateContentRequest(
             systemInstruction = Content(parts = listOf(Part(text = config.systemPrompt))),
             contents = listOf(
@@ -61,9 +64,14 @@ class GeminiClient @Inject constructor(
                 temperature = config.temperature,
                 responseMimeType = "application/json",
                 responseSchema = config.responseSchema,
+                thinkingConfig = thinking,
             ),
         )
         val body = json.encodeToString(GenerateContentRequest.serializer(), request)
+        val bodyWithoutThinking = if (thinking == null) body else json.encodeToString(
+            GenerateContentRequest.serializer(),
+            request.copy(generationConfig = request.generationConfig?.copy(thinkingConfig = null)),
+        )
 
         val override = prefs.current().geminiModelOverride
         val models = (listOfNotNull(override) + config.model + config.fallbackModels).distinct()
@@ -72,7 +80,11 @@ class GeminiClient @Inject constructor(
         // Model sibuk (503), kuota per-model habis (429), atau tidak tersedia (404) → coba model cadangan.
         for (model in models) {
             try {
-                val text = callWithRetry(model, apiKey, body)
+                val text = try {
+                    callWithRetry(model, apiKey, body)
+                } catch (e: GeminiError.UnsupportedThinking) {
+                    callWithRetry(model, apiKey, bodyWithoutThinking)
+                }
                 return parseResult(text)
             } catch (e: GeminiError.ModelNotFound) {
                 if (lastError == null) lastError = e
@@ -119,7 +131,7 @@ class GeminiClient @Inject constructor(
         }
     }
 
-    private fun backoff(attempt: Int): Long = min(2L shl attempt, 16L) // 2, 4 detik
+    private fun backoff(attempt: Int): Long = min(1L shl attempt, 4L) // 1, 2 detik; selebihnya pindah ke model cadangan
 
     private suspend fun call(model: String, apiKey: String, body: String): String = withContext(Dispatchers.IO) {
         val req = Request.Builder()
@@ -159,6 +171,7 @@ class GeminiClient @Inject constructor(
         return when {
             code == 429 -> GeminiError.RateLimited(retryDelaySeconds(error))
             code == 404 -> GeminiError.ModelNotFound(model)
+            code == 400 && message.contains("thinking", ignoreCase = true) -> GeminiError.UnsupportedThinking()
             code == 401 || code == 403 -> GeminiError.InvalidApiKey(message.take(80).ifBlank { "HTTP $code" })
             code == 400 && (message.contains("API key", ignoreCase = true) || body.contains("API_KEY_INVALID")) ->
                 GeminiError.InvalidApiKey(message.take(80))
@@ -177,7 +190,7 @@ class GeminiClient @Inject constructor(
     private companion object {
         const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
         val JSON_MEDIA = "application/json; charset=utf-8".toMediaType()
-        const val MAX_RETRIES = 2
-        const val MAX_WAIT_SECONDS = 30L
+        const val MAX_RETRIES = 1
+        const val MAX_WAIT_SECONDS = 10L
     }
 }
