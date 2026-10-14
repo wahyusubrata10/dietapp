@@ -16,7 +16,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Lapis 2 auto-update: mengambil /remote/*.json dari raw.githubusercontent.com.
+ * Lapis 2 auto-update: mengambil file JSON di folder remote dari raw.githubusercontent.com.
  * Hanya versi yang lebih baru & valid yang dipakai; bila gagal, cache/bundel tetap dipakai.
  */
 @Singleton

@@ -59,8 +59,13 @@ jobs:
             echo "signed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Buang spasi/baris baru yang ikut tertempel saat mengisi secret.
-          if ! printf '%s' "$KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d > "$KS" 2>/dev/null; then
+          # Buang spasi/baris baru yang ikut tertempel; bila ada teks lain ikut tertempel,
+          # ambil potongan base64 terpanjang.
+          CLEAN=$(printf '%s' "$KEYSTORE_BASE64" | tr -d '[:space:]')
+          if ! printf '%s' "$CLEAN" | base64 -d > "$KS" 2>/dev/null; then
+            CLEAN=$(printf '%s' "$KEYSTORE_BASE64" | tr -d '\r' | grep -oE '[A-Za-z0-9+/]{200,}={0,2}' | awk '{ print length, $0 }' | sort -rn | head -n1 | cut -d' ' -f2)
+          fi
+          if ! printf '%s' "$CLEAN" | base64 -d > "$KS" 2>/dev/null; then
             echo "::error::KEYSTORE_BASE64 bukan base64 yang valid. Tempel ulang HANYA string base64 (satu baris) ke secret."
             echo "signed=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -75,7 +80,7 @@ jobs:
           echo "Keystore OK"
 
       - name: Unit test
-        run: ./gradlew --stacktrace testReleaseUnitTest
+        run: ./gradlew testReleaseUnitTest
 
       - name: Build release APK
         env:
@@ -85,7 +90,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew --stacktrace assembleRelease
+        run: ./gradlew assembleRelease
 
       - name: Rapikan nama APK
         id: apk
