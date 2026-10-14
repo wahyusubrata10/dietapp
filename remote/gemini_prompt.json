@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "minAppVersionCode": 1,
+  "model": "gemini-flash-latest",
+  "fallbackModels": [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash"
+  ],
+  "temperature": 0.2,
+  "maxImageSize": 1024,
+  "jpegQuality": 80,
+  "systemPrompt": "Kamu adalah ahli gizi Indonesia yang menganalisis foto makanan untuk aplikasi diet. Kamu sangat paham makanan Indonesia (nasi padang, warteg, soto, pecel, gado-gado, nasi uduk, nasi kuning, ayam geprek, gorengan, jajanan pasar, dll) maupun makanan internasional.\n\nTugas:\n1. Kenali nama menu secara keseluruhan dengan nama yang lazim di Indonesia (contoh: \"Nasi Padang Rendang\", \"Nasi Uduk Komplit\", \"Pecel Lele\").\n2. Pecah SETIAP elemen yang terlihat di piring/mangkuk sebagai item terpisah: makanan pokok (nasi, lontong, mie), lauk hewani, lauk nabati, sayur, sambal, kuah/santan, kerupuk/peyek, gorengan, buah, dan minuman jika terlihat.\n3. Perkirakan berat tiap elemen dalam gram berdasarkan ukuran wadah dan alat makan sebagai pembanding (piring makan ±24 cm, mangkuk ±15 cm, sendok makan ±15 g nasi). Satu centong nasi ±100–150 g.\n4. Hitung kalori, protein, karbohidrat, lemak, dan serat untuk porsi tersebut (BUKAN per 100 g). Perhitungkan minyak goreng yang terserap, santan, gula, dan kecap.\n5. Isi metode_masak dengan salah satu: goreng, bakar, rebus, kukus, tumis, santan, panggang, mentah, berkuah, lainnya.\n6. Jumlahkan total dari semua elemen.\n7. catatan: 1–2 kalimat penting tentang komposisi gizi (contoh: \"Kuah santan dan rendang menambah lemak cukup tinggi\").\n\nAturan:\n- Gunakan nama elemen dalam Bahasa Indonesia yang umum dan singkat. Bila cocok, pakai nama dari daftar referensi yang diberikan.\n- Jangan menggabungkan elemen berbeda (nasi dan lauk harus terpisah). Bumbu/sambal yang terlihat jelas dijadikan elemen sendiri.\n- Jika ragu antara dua tebakan, pilih yang paling umum di Indonesia dan turunkan nilai confidence.\n- Jika foto bukan makanan/minuman, set adalah_makanan = false, elemen kosong, dan total 0.\n- Angka harus realistis. Jangan mengarang elemen yang tidak terlihat.",
+  "userPrompt": "Analisa foto makanan ini.\nWaktu makan: {meal_type} (pukul {time}).\n{user_hint}\nDaftar nama referensi makanan (pakai bila cocok): {reference_names}",
+  "responseSchema": {
+    "type": "OBJECT",
+    "properties": {
+      "adalah_makanan": {
+        "type": "BOOLEAN",
+        "description": "true jika foto berisi makanan/minuman"
+      },
+      "nama_menu": {
+        "type": "STRING",
+        "description": "Nama menu keseluruhan"
+      },
+      "confidence": {
+        "type": "NUMBER",
+        "description": "Keyakinan 0 sampai 1"
+      },
+      "elemen": {
+        "type": "ARRAY",
+        "items": {
+          "type": "OBJECT",
+          "properties": {
+            "nama": {
+              "type": "STRING"
+            },
+            "estimasi_gram": {
+              "type": "NUMBER",
+              "description": "Perkiraan berat dalam gram"
+            },
+            "kalori": {
+              "type": "NUMBER",
+              "description": "kkal untuk porsi ini"
+            },
+            "protein_g": {
+              "type": "NUMBER",
+              "description": "gram"
+            },
+            "karbo_g": {
+              "type": "NUMBER",
+              "description": "gram"
+            },
+            "lemak_g": {
+              "type": "NUMBER",
+              "description": "gram"
+            },
+            "serat_g": {
+              "type": "NUMBER",
+              "description": "gram"
+            },
+            "metode_masak": {
+              "type": "STRING"
+            }
+          },
+          "required": [
+            "nama",
+            "estimasi_gram",
+            "kalori",
+            "protein_g",
+            "karbo_g",
+            "lemak_g",
+            "serat_g",
+            "metode_masak"
+          ],
+          "propertyOrdering": [
+            "nama",
+            "estimasi_gram",
+            "kalori",
+            "protein_g",
+            "karbo_g",
+            "lemak_g",
+            "serat_g",
+            "metode_masak"
+          ]
+        }
+      },
+      "total_kalori": {
+        "type": "NUMBER",
+        "description": "kkal"
+      },
+      "total_protein_g": {
+        "type": "NUMBER",
+        "description": "gram"
+      },
+      "total_karbo_g": {
+        "type": "NUMBER",
+        "description": "gram"
+      },
+      "total_lemak_g": {
+        "type": "NUMBER",
+        "description": "gram"
+      },
+      "total_serat_g": {
+        "type": "NUMBER",
+        "description": "gram"
+      },
+      "catatan": {
+        "type": "STRING"
+      }
+    },
+    "required": [
+      "adalah_makanan",
+      "nama_menu",
+      "confidence",
+      "elemen",
+      "total_kalori",
+      "total_protein_g",
+      "total_karbo_g",
+      "total_lemak_g",
+      "total_serat_g",
+      "catatan"
+    ],
+    "propertyOrdering": [
+      "adalah_makanan",
+      "nama_menu",
+      "confidence",
+      "elemen",
+      "total_kalori",
+      "total_protein_g",
+      "total_karbo_g",
+      "total_lemak_g",
+      "total_serat_g",
+      "catatan"
+    ]
+  }
+}
