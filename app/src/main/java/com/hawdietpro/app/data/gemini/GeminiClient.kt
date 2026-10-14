@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -39,14 +40,48 @@ class GeminiClient @Inject constructor(
     )
 
     suspend fun analyzeFood(jpeg: ByteArray, vars: PromptVars): GeminiFoodResult {
-        val apiKey = secure.getApiKey()?.takeIf { it.isNotBlank() } ?: throw GeminiError.MissingApiKey()
         val config = store.geminiPrompt.value
         val userPrompt = config.userPrompt
             .replace("{meal_type}", vars.mealType)
             .replace("{time}", vars.time)
             .replace("{user_hint}", vars.userHint?.takeIf { it.isNotBlank() }?.let { "Catatan pengguna: $it" } ?: "")
             .replace("{reference_names}", vars.referenceNames.joinToString(", "))
+        val text = generate(
+            systemPrompt = config.systemPrompt,
+            parts = listOf(
+                Part(inlineData = InlineData("image/jpeg", Base64.encodeToString(jpeg, Base64.NO_WRAP))),
+                Part(text = userPrompt),
+            ),
+            schema = config.responseSchema,
+            temperature = config.temperature,
+        )
+        return parseResult(text)
+    }
 
+    /** true bila remote config menyediakan prompt analisa mendalam. */
+    fun reviewAvailable(): Boolean = store.geminiPrompt.value.let {
+        it.reviewSystemPrompt != null && it.reviewPrompt != null && it.reviewSchema != null
+    }
+
+    /** Analisa mendalam periode (teks saja, tanpa foto) dari ringkasan statistik [statsJson]. */
+    suspend fun generateReview(statsJson: String): GeminiReview {
+        val config = store.geminiPrompt.value
+        val system = config.reviewSystemPrompt ?: throw GeminiError.Other("fitur belum tersedia")
+        val prompt = (config.reviewPrompt ?: "{stats}").replace("{stats}", statsJson)
+        val schema = config.reviewSchema ?: throw GeminiError.Other("fitur belum tersedia")
+        val text = generate(system, listOf(Part(text = prompt)), schema, temperature = 0.4)
+        val cleaned = text.trim().removePrefix("```json").removePrefix("```").removeSuffix("```").trim()
+        return runCatching { json.decodeFromString(GeminiReview.serializer(), cleaned) }
+            .getOrElse { throw GeminiError.BadResponse("JSON analisa") }
+    }
+
+    /**
+     * Memanggil generateContent dengan rantai model (override → utama → cadangan).
+     * Model sibuk (503), kuota per-model habis (429), atau tidak tersedia (404) → coba model berikutnya.
+     */
+    private suspend fun generate(systemPrompt: String, parts: List<Part>, schema: JsonObject, temperature: Double): String {
+        val apiKey = secure.getApiKey()?.takeIf { it.isNotBlank() } ?: throw GeminiError.MissingApiKey()
+        val config = store.geminiPrompt.value
         val settings = prefs.current()
         val fast = settings.analysisMode == AnalysisMode.CEPAT
         // Mode Teliti: thinking bawaan model (kualitas maksimal). Mode Cepat: thinking diperkecil sesuai remote config.
@@ -54,20 +89,12 @@ class GeminiClient @Inject constructor(
             ThinkingConfig(thinkingBudget = config.fastThinkingBudget, thinkingLevel = config.fastThinkingLevel)
         } else null
         val request = GenerateContentRequest(
-            systemInstruction = Content(parts = listOf(Part(text = config.systemPrompt))),
-            contents = listOf(
-                Content(
-                    role = "user",
-                    parts = listOf(
-                        Part(inlineData = InlineData("image/jpeg", Base64.encodeToString(jpeg, Base64.NO_WRAP))),
-                        Part(text = userPrompt),
-                    ),
-                ),
-            ),
+            systemInstruction = Content(parts = listOf(Part(text = systemPrompt))),
+            contents = listOf(Content(role = "user", parts = parts)),
             generationConfig = GenerationConfig(
-                temperature = config.temperature,
+                temperature = temperature,
                 responseMimeType = "application/json",
-                responseSchema = config.responseSchema,
+                responseSchema = schema,
                 thinkingConfig = thinking,
             ),
         )
@@ -83,15 +110,13 @@ class GeminiClient @Inject constructor(
         val models = (listOfNotNull(override) + config.model + fallbacks).distinct()
 
         var lastError: GeminiError? = null
-        // Model sibuk (503), kuota per-model habis (429), atau tidak tersedia (404) → coba model cadangan.
         for (model in models) {
             try {
-                val text = try {
+                return try {
                     callWithRetry(model, apiKey, body)
                 } catch (e: GeminiError.UnsupportedThinking) {
                     callWithRetry(model, apiKey, bodyWithoutThinking)
                 }
-                return parseResult(text)
             } catch (e: GeminiError.ModelNotFound) {
                 if (lastError == null) lastError = e
             } catch (e: GeminiError.Server) {

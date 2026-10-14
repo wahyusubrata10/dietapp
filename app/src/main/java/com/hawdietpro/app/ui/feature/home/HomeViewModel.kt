@@ -6,6 +6,8 @@ import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.PendingRepository
 import com.hawdietpro.app.data.repository.ProfileRepository
+import com.hawdietpro.app.data.repository.WeightProjectionRepository
+import com.hawdietpro.app.domain.nutrition.WeightProjection
 import com.hawdietpro.app.data.prefs.SecureStorage
 import com.hawdietpro.app.domain.insight.Insight
 import com.hawdietpro.app.domain.insight.InsightEngine
@@ -39,6 +41,7 @@ data class HomeState(
     val pendingCount: Int = 0,
     val tip: String? = null,
     val hasApiKey: Boolean = true,
+    val projection: WeightProjection? = null,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -49,6 +52,7 @@ class HomeViewModel @Inject constructor(
     pending: PendingRepository,
     secure: SecureStorage,
     private val store: RemoteConfigStore,
+    projections: WeightProjectionRepository,
 ) : ViewModel() {
 
     private val today = MutableStateFlow(LocalDate.now())
@@ -77,7 +81,8 @@ class HomeViewModel @Inject constructor(
             tip = tips.takeIf { it.isNotEmpty() }?.let { it[date.dayOfYear % it.size] },
             hasApiKey = hasKey,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState())
+    }.combine(projections.observe()) { home, proj -> home.copy(projection = proj) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState())
 
     /** Dipanggil saat layar tampil agar "hari ini" selalu benar setelah lewat tengah malam. */
     fun refreshDate() {

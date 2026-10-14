@@ -61,6 +61,7 @@ import com.hawdietpro.app.ui.components.LoadingBox
 import com.hawdietpro.app.ui.components.MacroProgress
 import com.hawdietpro.app.ui.components.MealRow
 import com.hawdietpro.app.ui.components.macroSpecs
+import com.hawdietpro.app.ui.feature.weight.WeightEstimateCompact
 import kotlin.math.roundToInt
 
 @Composable
@@ -72,6 +73,7 @@ fun HomeScreen(
     onOpenQueue: () -> Unit,
     onOpenUpdate: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenWeight: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -151,6 +153,10 @@ fun HomeScreen(
         }
 
         item { SummaryCard(state) }
+
+        state.projection?.takeIf { it.days.isNotEmpty() || it.latestActual != null }?.let { proj ->
+            item { WeightEstimateCompact(proj, onClick = onOpenWeight) }
+        }
 
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

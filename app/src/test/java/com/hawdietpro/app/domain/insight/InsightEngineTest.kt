@@ -45,7 +45,9 @@ class InsightEngineTest {
         assertEquals(0, stats.daysOver) // 1950 masih dalam toleransi 10% dari 1800 (≤1980)
         assertEquals(7, stats.daysOnTarget)
         assertEquals(700.0 / 1950 * 100, stats.metrics["mealTypeShare.CAMILAN"]!!, 0.01)
-        assertEquals("Nasi padang", stats.topMenus.first().name) // jumlah sama, kalori terbesar menang
+        assertEquals("Nasi padang", stats.topMenus.first().name)
+        assertEquals(7, stats.currentStreak)
+        assertEquals(7, stats.weekdayAverages.size) // jumlah sama, kalori terbesar menang
     }
 
     @Test

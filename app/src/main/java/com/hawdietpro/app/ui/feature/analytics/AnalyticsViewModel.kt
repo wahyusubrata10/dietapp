@@ -2,25 +2,34 @@ package com.hawdietpro.app.ui.feature.analytics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hawdietpro.app.data.gemini.GeminiError
 import com.hawdietpro.app.data.remote.RemoteConfigStore
+import com.hawdietpro.app.data.repository.CachedReview
 import com.hawdietpro.app.data.repository.MealRepository
+import com.hawdietpro.app.data.repository.PeriodReviewRepository
 import com.hawdietpro.app.data.repository.ProfileRepository
+import com.hawdietpro.app.data.repository.WeightProjectionRepository
 import com.hawdietpro.app.data.repository.WeightRepository
 import com.hawdietpro.app.domain.insight.Insight
 import com.hawdietpro.app.domain.insight.InsightEngine
 import com.hawdietpro.app.domain.insight.Period
 import com.hawdietpro.app.domain.insight.PeriodStats
 import com.hawdietpro.app.domain.insight.PeriodStatsCalculator
-import com.hawdietpro.app.domain.model.WeightEntry
+import com.hawdietpro.app.domain.model.UserProfile
 import com.hawdietpro.app.domain.nutrition.DailyTarget
+import com.hawdietpro.app.domain.nutrition.TdeeCalculator
+import com.hawdietpro.app.domain.nutrition.WeightProjection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
@@ -32,11 +41,21 @@ data class AnalyticsUi(
     val start: LocalDate = LocalDate.now(),
     val end: LocalDate = LocalDate.now(),
     val stats: PeriodStats? = null,
+    val previous: PeriodStats? = null,
     val insights: List<Insight> = emptyList(),
+    val profile: UserProfile? = null,
     val target: DailyTarget? = null,
-    val weights: List<WeightEntry> = emptyList(),
+    val projection: WeightProjection? = null,
     val loading: Boolean = true,
 )
+
+sealed interface ReviewState {
+    data object Unavailable : ReviewState
+    data object Idle : ReviewState
+    data object Loading : ReviewState
+    data class Ready(val cached: CachedReview, val outdated: Boolean) : ReviewState
+    data class Error(val message: String) : ReviewState
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -44,62 +63,112 @@ class AnalyticsViewModel @Inject constructor(
     meals: MealRepository,
     profiles: ProfileRepository,
     weights: WeightRepository,
+    projections: WeightProjectionRepository,
+    private val reviews: PeriodReviewRepository,
     private val store: RemoteConfigStore,
 ) : ViewModel() {
 
-    private data class Range(val period: Period, val offset: Int, val start: LocalDate, val end: LocalDate)
-
-    private val selection = MutableStateFlow(Period.WEEK to 0)
+    private data class Range(val period: Period, val offset: Int, val start: LocalDate, val end: LocalDate, val prevStart: LocalDate, val prevEnd: LocalDate)
 
     private val range = MutableStateFlow(computeRange(Period.WEEK, 0))
 
+    private val _tab = MutableStateFlow(0)
+    val tab: StateFlow<Int> = _tab.asStateFlow()
+
+    private val _review = MutableStateFlow<ReviewState>(ReviewState.Idle)
+    val review: StateFlow<ReviewState> = _review.asStateFlow()
+
     val state: StateFlow<AnalyticsUi> = range.flatMapLatest { r ->
         combine(
-            meals.observeRange(r.start, r.end),
-            profiles.observeTarget(),
+            meals.observeRange(r.prevStart, r.end),
+            profiles.observeProfile(),
             weights.observeAll(),
+            projections.observe(),
             store.insightRules,
-        ) { list, target, w, rules ->
+        ) { list, profile, w, projection, rules ->
             val today = LocalDate.now()
+            val target = profile?.let(TdeeCalculator::calculate)
+            val calc = PeriodStatsCalculator(rules)
             val effectiveEnd = if (r.end.isAfter(today)) today else r.end
-            val stats = PeriodStatsCalculator(rules).compute(list, r.start, effectiveEnd, target?.calories, w)
+            val stats = calc.compute(list, r.start, effectiveEnd, target?.calories, w)
+            val prev = calc.compute(list, r.prevStart, r.prevEnd, target?.calories, w)
             AnalyticsUi(
                 period = r.period,
                 offset = r.offset,
                 start = r.start,
                 end = r.end,
                 stats = stats,
+                previous = prev,
                 insights = if (store.appConfig.value.isEnabled("insights")) InsightEngine(rules).evaluate(stats, r.period) else emptyList(),
+                profile = profile,
                 target = target,
-                weights = w,
+                projection = projection,
                 loading = false,
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AnalyticsUi())
+
+    init {
+        viewModelScope.launch {
+            state.collect { ui -> refreshCachedReview(ui) }
+        }
+    }
+
+    private suspend fun refreshCachedReview(ui: AnalyticsUi) {
+        val stats = ui.stats ?: return
+        if (!reviews.available()) {
+            _review.value = ReviewState.Unavailable
+            return
+        }
+        if (_review.value is ReviewState.Loading) return
+        val cached = reviews.cached(ui.period, stats)
+        _review.value = if (cached == null) ReviewState.Idle else ReviewState.Ready(cached, cached.dataHash != reviews.dataHash(stats))
+    }
+
+    fun generateReview() {
+        val ui = state.value
+        val stats = ui.stats ?: return
+        _review.value = ReviewState.Loading
+        viewModelScope.launch {
+            _review.value = try {
+                ReviewState.Ready(reviews.generate(ui.period, stats, ui.previous, ui.target, ui.profile, ui.projection), outdated = false)
+            } catch (e: GeminiError) {
+                ReviewState.Error(e.message ?: "Analisa gagal")
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                ReviewState.Error("Analisa gagal: ${e.message ?: e.javaClass.simpleName}")
+            }
+        }
+    }
+
+    fun setTab(index: Int) {
+        _tab.value = index
+    }
 
     private fun computeRange(period: Period, offset: Int): Range {
         val today = LocalDate.now()
         return when (period) {
             Period.MONTH -> {
                 val first = today.withDayOfMonth(1).plusMonths(offset.toLong())
-                Range(period, offset, first, first.with(TemporalAdjusters.lastDayOfMonth()))
+                val prevFirst = first.minusMonths(1)
+                Range(period, offset, first, first.with(TemporalAdjusters.lastDayOfMonth()), prevFirst, first.minusDays(1))
             }
             else -> {
                 val monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).plusWeeks(offset.toLong())
-                Range(Period.WEEK, offset, monday, monday.plusDays(6))
+                Range(Period.WEEK, offset, monday, monday.plusDays(6), monday.minusWeeks(1), monday.minusDays(1))
             }
         }
     }
 
     fun setPeriod(period: Period) {
-        selection.value = period to 0
+        _review.update { if (it is ReviewState.Loading) it else ReviewState.Idle }
         range.value = computeRange(period, 0)
     }
 
     fun shift(delta: Int) {
-        val (p, o) = selection.value
-        val next = (o + delta).coerceAtMost(0)
-        selection.value = p to next
-        range.value = computeRange(p, next)
+        val r = range.value
+        _review.update { if (it is ReviewState.Loading) it else ReviewState.Idle }
+        range.value = computeRange(r.period, (r.offset + delta).coerceAtMost(0))
     }
 }

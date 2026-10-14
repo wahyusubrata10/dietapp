@@ -156,6 +156,7 @@ private fun MainScaffold(
                         onOpenQueue = { navController.navigate(Routes.QUEUE) },
                         onOpenUpdate = { navController.navigate(Routes.UPDATE) },
                         onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                        onOpenWeight = { navController.navigate(Routes.WEIGHT) },
                     )
                 }
                 composable(Routes.HISTORY) {

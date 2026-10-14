@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
+import com.hawdietpro.app.data.local.entity.CalorieEntry
 import com.hawdietpro.app.data.local.entity.FoodElementEntity
 import com.hawdietpro.app.data.local.entity.FoodReferenceEntity
 import com.hawdietpro.app.data.local.entity.MealEntryEntity
@@ -71,6 +72,9 @@ abstract class MealDao {
         """,
     )
     abstract fun searchMeals(query: String, limit: Int = 200): Flow<List<MealWithElements>>
+
+    @Query("SELECT eaten_at AS eatenAt, total_calories AS calories FROM meal_entry ORDER BY eaten_at ASC")
+    abstract fun observeCalorieEntries(): Flow<List<CalorieEntry>>
 
     @Query("SELECT eaten_at FROM meal_entry WHERE eaten_at >= :start AND eaten_at < :end")
     abstract fun observeMealTimes(start: Long, end: Long): Flow<List<Long>>

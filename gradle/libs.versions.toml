@@ -19,7 +19,6 @@ okhttp = "4.12.0"
 serialization = "1.8.1"
 coroutines = "1.10.2"
 coil = "2.7.0"
-vico = "2.1.2"
 exifinterface = "1.4.1"
 junit = "4.13.2"
 
@@ -67,7 +66,6 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
-vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 

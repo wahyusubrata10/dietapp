@@ -14,23 +14,30 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.MonitorWeight
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,22 +51,39 @@ import com.hawdietpro.app.core.Format
 import com.hawdietpro.app.domain.insight.Period
 import com.hawdietpro.app.domain.insight.PeriodStats
 import com.hawdietpro.app.domain.insight.RankedItem
+import com.hawdietpro.app.domain.model.Grade
 import com.hawdietpro.app.domain.model.MealType
-import com.hawdietpro.app.ui.components.CalorieTrendChart
+import com.hawdietpro.app.domain.nutrition.DailyTarget
+import com.hawdietpro.app.ui.components.BarChart
+import com.hawdietpro.app.ui.components.Banner
+import com.hawdietpro.app.ui.components.ChartLegend
+import com.hawdietpro.app.ui.components.DivergingBarChart
+import com.hawdietpro.app.ui.components.DonutChart
+import com.hawdietpro.app.ui.components.DonutSlice
+import com.hawdietpro.app.ui.components.GradeBadge
 import com.hawdietpro.app.ui.components.HawCard
 import com.hawdietpro.app.ui.components.HawScaffold
-import com.hawdietpro.app.ui.components.LineTrendChart
 import com.hawdietpro.app.ui.components.LoadingBox
-import com.hawdietpro.app.ui.components.SectionHeader
+import com.hawdietpro.app.ui.components.StackedBarChart
 import com.hawdietpro.app.ui.components.StatTile
+import com.hawdietpro.app.ui.components.gradeColor
 import com.hawdietpro.app.ui.feature.home.InsightCard
+import com.hawdietpro.app.ui.feature.weight.WeightProjectionSection
 import com.hawdietpro.app.ui.theme.MacroColors
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.format.TextStyle
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
+private val TABS = listOf("Ringkasan", "Nutrisi", "Pola", "Berat")
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalyticsScreen(onOpenWeight: () -> Unit, viewModel: AnalyticsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val tab by viewModel.tab.collectAsStateWithLifecycle()
+    val review by viewModel.review.collectAsStateWithLifecycle()
 
     HawScaffold(title = "Analisa", topLevel = true) { padding ->
         val stats = state.stats
@@ -67,99 +91,54 @@ fun AnalyticsScreen(onOpenWeight: () -> Unit, viewModel: AnalyticsViewModel = hi
             LoadingBox(Modifier.padding(padding))
             return@HawScaffold
         }
-        LazyColumn(
-            Modifier.padding(padding).fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            item {
-                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                    listOf(Period.WEEK to "Mingguan", Period.MONTH to "Bulanan").forEachIndexed { i, (p, label) ->
-                        SegmentedButton(
-                            selected = state.period == p,
-                            onClick = { viewModel.setPeriod(p) },
-                            shape = SegmentedButtonDefaults.itemShape(i, 2),
-                        ) { Text(label) }
-                    }
+        Column(Modifier.padding(padding).fillMaxSize()) {
+            PrimaryTabRow(selectedTabIndex = tab, containerColor = MaterialTheme.colorScheme.background) {
+                TABS.forEachIndexed { i, title ->
+                    Tab(selected = tab == i, onClick = { viewModel.setTab(i) }, text = { Text(title) })
                 }
             }
-            item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { viewModel.shift(-1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Sebelumnya") }
-                    Text(
-                        rangeLabel(state.period, state.start, state.end, state.offset),
-                        style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.weight(1f),
-                    )
-                    IconButton(onClick = { viewModel.shift(1) }, enabled = state.offset < 0) {
-                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Berikutnya")
-                    }
+            LazyColumn(
+                Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                if (tab != 3) periodHeader(state, viewModel)
+                when (tab) {
+                    0 -> summaryTab(state, stats, review, viewModel)
+                    1 -> nutritionTab(stats, state.target)
+                    2 -> patternTab(stats, state.period)
+                    else -> weightTab(state, onOpenWeight)
                 }
             }
+        }
+    }
+}
 
-            item { SummaryTiles(stats, state.target?.calories) }
+// ------------------------------------------- Header --------------------------------------------
 
-            item {
-                HawCard {
-                    Column {
-                        Text("Tren kalori harian", style = MaterialTheme.typography.titleMedium)
-                        Text(
-                            state.target?.let { "Batang = kalori masuk · garis = target ${Format.grouped(it.calories)} kkal" } ?: "Kalori masuk per hari",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        val labels = remember(stats.days, state.period) {
-                            stats.days.map { if (state.period == Period.WEEK) Format.dayName(it.date) else it.date.dayOfMonth.toString() }
-                        }
-                        CalorieTrendChart(
-                            values = stats.days.map { it.nutrients.calories },
-                            labels = labels,
-                            target = state.target?.calories,
-                        )
-                    }
-                }
+private fun LazyListScope.periodHeader(state: AnalyticsUi, viewModel: AnalyticsViewModel) {
+    item {
+        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+            listOf(Period.WEEK to "Mingguan", Period.MONTH to "Bulanan").forEachIndexed { i, (p, label) ->
+                SegmentedButton(
+                    selected = state.period == p,
+                    onClick = { viewModel.setPeriod(p) },
+                    shape = SegmentedButtonDefaults.itemShape(i, 2),
+                ) { Text(label) }
             }
-
-            if (stats.daysLogged > 0) {
-                item { MacroCard(stats, state.target?.fiberG) }
-                item { MealTypeCard(stats) }
-                item { HourCard(stats) }
-                if (stats.topMenus.isNotEmpty()) item { RankCard("Menu paling sering", stats.topMenus, showCount = true) }
-                if (stats.topSources.isNotEmpty()) item { RankCard("Sumber kalori terbesar", stats.topSources, showCount = false) }
-            }
-
-            if (state.insights.isNotEmpty()) {
-                item { SectionHeader("Insight otomatis") }
-                items(state.insights, key = { it.id }) { InsightCard(it) }
-            }
-
-            item {
-                HawCard {
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Tren berat badan", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                            stats.weightChangeKg?.let {
-                                val sign = if (it > 0) "+" else ""
-                                Text("$sign${Format.oneDecimal(it)} kg", style = MaterialTheme.typography.labelLarge)
-                            }
-                        }
-                        Spacer(Modifier.height(8.dp))
-                        val recent = state.weights.takeLast(30)
-                        LineTrendChart(
-                            values = recent.map { it.weightKg },
-                            labels = recent.map { Format.dayMonth(LocalDate.ofEpochDay(it.epochDay)) },
-                            emptyText = "Belum ada catatan berat",
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        FilledTonalButton(onClick = onOpenWeight, modifier = Modifier.fillMaxWidth()) {
-                            Icon(Icons.Filled.MonitorWeight, null)
-                            Spacer(Modifier.width(8.dp))
-                            Text("Log berat badan")
-                        }
-                    }
-                }
+        }
+    }
+    item {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { viewModel.shift(-1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Sebelumnya") }
+            Text(
+                rangeLabel(state.period, state.start, state.end, state.offset),
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f),
+            )
+            IconButton(onClick = { viewModel.shift(1) }, enabled = state.offset < 0) {
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Berikutnya")
             }
         }
     }
@@ -170,28 +149,390 @@ private fun rangeLabel(period: Period, start: LocalDate, end: LocalDate, offset:
     else -> "${Format.dayMonth(start)} – ${Format.shortDate(end)}" + if (offset == 0) "\n(minggu ini)" else ""
 }
 
+private fun dayLabels(stats: PeriodStats, period: Period) =
+    stats.days.map { if (period == Period.WEEK) Format.dayName(it.date) else it.date.dayOfMonth.toString() }
+
+private fun dayTooltips(stats: PeriodStats) = stats.days.map { Format.dayName(it.date) + " " + Format.dayMonth(it.date) }
+
+// ------------------------------------------ Ringkasan ------------------------------------------
+
+private fun LazyListScope.summaryTab(state: AnalyticsUi, stats: PeriodStats, review: ReviewState, viewModel: AnalyticsViewModel) {
+    val target = state.target
+    item { SummaryTiles(stats, state.previous, target?.calories) }
+
+    item {
+        HawCard {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Kalori harian", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    target?.let { "Garis putus-putus = target ${Format.grouped(it.calories)} kkal · merah = >10% di atas target" } ?: "Kalori masuk per hari",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                BarChart(
+                    values = stats.days.map { it.nutrients.calories },
+                    labels = dayLabels(stats, state.period),
+                    tooltipLabels = dayTooltips(stats),
+                    target = target?.calories?.toDouble(),
+                    targetLabel = "Target",
+                    valueFormat = { Format.grouped(it.roundToInt()) },
+                    emptyText = "Belum ada catatan di periode ini",
+                )
+            }
+        }
+    }
+
+    if (target != null && stats.daysLogged > 0) {
+        item {
+            HawCard {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Selisih terhadap target", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        "Hijau = di bawah target · merah = di atas target. Hari tanpa catatan dikosongkan.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    DivergingBarChart(
+                        values = stats.days.map { if (it.mealCount > 0) it.nutrients.calories - target.calories else null },
+                        labels = dayLabels(stats, state.period),
+                        tooltipLabels = dayTooltips(stats),
+                    )
+                    val total = stats.days.filter { it.mealCount > 0 }.sumOf { it.nutrients.calories - target.calories }
+                    Text(
+                        if (total <= 0) "Total ${Format.grouped((-total).roundToInt())} kkal di bawah target pada hari tercatat (≈ ${Format.oneDecimal(-total / 7700)} kg)."
+                        else "Total ${Format.grouped(total.roundToInt())} kkal di atas target pada hari tercatat (≈ ${Format.oneDecimal(total / 7700)} kg).",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
+        }
+    }
+
+    item { ReviewCard(review, stats.daysLogged, viewModel) }
+
+    if (state.insights.isNotEmpty()) {
+        item { Text("Insight otomatis", style = MaterialTheme.typography.titleMedium) }
+        items(state.insights, key = { it.id }) { InsightCard(it) }
+    }
+}
+
 @Composable
-private fun SummaryTiles(stats: PeriodStats, target: Int?) {
+private fun SummaryTiles(stats: PeriodStats, prev: PeriodStats?, target: Int?) {
+    val avg = stats.averagePerDay.calories
+    val prevAvg = prev?.takeIf { it.daysLogged > 0 }?.averagePerDay?.calories
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             StatTile(
                 "Rata-rata/hari",
-                Format.grouped(stats.averagePerDay.calories.roundToInt()),
+                Format.grouped(avg.roundToInt()),
                 Modifier.weight(1f),
-                sub = target?.let { "kkal · target ${Format.grouped(it)}" } ?: "kkal",
+                sub = buildString {
+                    append("kkal")
+                    target?.let { append(" · target ").append(Format.grouped(it)) }
+                },
                 color = MaterialTheme.colorScheme.primaryContainer,
             )
-            StatTile("Hari tercatat", "${stats.daysLogged}/${stats.days.size}", Modifier.weight(1f), sub = "hari")
+            StatTile(
+                "vs periode lalu",
+                if (prevAvg != null && prevAvg > 0 && stats.daysLogged > 0) {
+                    val pct = (avg - prevAvg) / prevAvg * 100
+                    (if (pct > 0) "+" else "") + "${pct.roundToInt()}%"
+                } else "-",
+                Modifier.weight(1f),
+                sub = prevAvg?.let { "lalu ${Format.grouped(it.roundToInt())} kkal" } ?: "belum ada data",
+            )
         }
-        if (target != null) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                StatTile("Sesuai target", "${stats.daysOnTarget}", Modifier.weight(1f), sub = "hari (±10%)")
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            StatTile("Tercatat", "${stats.daysLogged}/${stats.days.size}", Modifier.weight(1f), sub = "hari")
+            if (target != null) {
+                StatTile("Sesuai", "${stats.daysOnTarget}", Modifier.weight(1f), sub = "hari (±10%)")
                 StatTile("Lebih", "${stats.daysOver}", Modifier.weight(1f), sub = "hari", color = MaterialTheme.colorScheme.errorContainer)
                 StatTile("Kurang", "${stats.daysUnder}", Modifier.weight(1f), sub = "hari", color = MaterialTheme.colorScheme.tertiaryContainer)
             }
         }
     }
 }
+
+@Composable
+private fun ReviewCard(review: ReviewState, daysLogged: Int, viewModel: AnalyticsViewModel) {
+    if (review is ReviewState.Unavailable) return
+    HawCard(color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.45f)) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.AutoAwesome, null, tint = MaterialTheme.colorScheme.tertiary)
+                Spacer(Modifier.width(8.dp))
+                Text("Analisa mendalam AI", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                if (review is ReviewState.Ready) {
+                    IconButton(onClick = viewModel::generateReview) { Icon(Icons.Filled.Refresh, contentDescription = "Buat ulang") }
+                }
+            }
+            when (review) {
+                ReviewState.Idle -> {
+                    Text(
+                        "Gemini membaca ringkasan angka periode ini (tanpa foto), lalu memberi evaluasi, rekomendasi, dan contoh menu yang sesuai target Anda.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Button(onClick = viewModel::generateReview, enabled = daysLogged > 0) {
+                        Text(if (daysLogged > 0) "Buat analisa" else "Belum ada data")
+                    }
+                }
+                ReviewState.Loading -> {
+                    Text("Gemini sedang menganalisa pola makan Anda…", style = MaterialTheme.typography.bodyMedium)
+                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                }
+                is ReviewState.Error -> {
+                    Text(review.message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+                    FilledTonalButton(onClick = viewModel::generateReview) { Text("Coba lagi") }
+                }
+                is ReviewState.Ready -> ReviewContent(review)
+                ReviewState.Unavailable -> Unit
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReviewContent(state: ReviewState.Ready) {
+    val r = state.cached.review
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        if (state.outdated) {
+            Text(
+                "Ada catatan baru sejak analisa ini dibuat. Ketuk ↻ untuk memperbarui.",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.tertiary,
+            )
+        }
+        r.periodScore?.takeIf { it.isNotBlank() }?.let { score ->
+            val grade = Grade.parse(score.trim().take(1).uppercase())
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                grade?.let {
+                    GradeBadge(it, size = 40.dp)
+                    Spacer(Modifier.width(10.dp))
+                }
+                Text(score, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+            }
+        }
+        Text(r.summary, style = MaterialTheme.typography.bodyLarge)
+        BulletSection("👍 Sudah baik", r.positives)
+        BulletSection("⚠️ Perlu diperbaiki", r.improvements)
+        if (r.recommendations.isNotEmpty()) {
+            Text("💡 Rekomendasi", style = MaterialTheme.typography.titleSmall)
+            r.recommendations.forEachIndexed { i, rec ->
+                Column {
+                    Text("${i + 1}. ${rec.title}", style = MaterialTheme.typography.labelLarge)
+                    Text(rec.detail, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+        BulletSection("🍽️ Contoh menu sehari", r.sampleMenu)
+        r.nextFocus?.takeIf { it.isNotBlank() }?.let {
+            Banner(text = it, title = "🎯 Fokus periode berikutnya", container = MaterialTheme.colorScheme.primaryContainer, content = MaterialTheme.colorScheme.onPrimaryContainer)
+        }
+        Text(
+            "Dibuat ${Format.time(state.cached.createdAt)} · bukan nasihat medis",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun BulletSection(title: String, items: List<String>) {
+    if (items.isEmpty()) return
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(title, style = MaterialTheme.typography.titleSmall)
+        items.forEach { Row { Text("•  ", color = MaterialTheme.colorScheme.primary); Text(it, style = MaterialTheme.typography.bodyMedium) } }
+    }
+}
+
+// ------------------------------------------- Nutrisi -------------------------------------------
+
+private fun LazyListScope.nutritionTab(stats: PeriodStats, target: DailyTarget?) {
+    if (stats.daysLogged == 0) {
+        item { Text("Belum ada catatan di periode ini.", color = Color.Gray) }
+        return
+    }
+    val avg = stats.averagePerDay
+    item {
+        HawCard {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("Komposisi energi rata-rata", style = MaterialTheme.typography.titleMedium)
+                DonutChart(
+                    slices = listOf(
+                        DonutSlice("Protein", avg.protein * 4, MacroColors.Protein),
+                        DonutSlice("Karbohidrat", avg.carbs * 4, MacroColors.Carbs),
+                        DonutSlice("Lemak", avg.fat * 9, MacroColors.Fat),
+                    ),
+                    centerTitle = Format.grouped(avg.calories.roundToInt()),
+                    centerSubtitle = "kkal/hari",
+                )
+                Text(
+                    "Acuan seimbang: protein 20–30%, karbo 45–60%, lemak 20–35% energi.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+    item {
+        HawCard {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Kalori dari makro per hari", style = MaterialTheme.typography.titleMedium)
+                StackedBarChart(
+                    stacks = stats.days.map { listOf(it.nutrients.protein * 4, it.nutrients.carbs * 4, it.nutrients.fat * 9) },
+                    colors = listOf(MacroColors.Protein, MacroColors.Carbs, MacroColors.Fat),
+                    names = listOf("P", "K", "L"),
+                    labels = stats.days.map { it.date.dayOfMonth.toString() },
+                    tooltipLabels = dayTooltips(stats),
+                    valueFormat = { Format.grouped(it.roundToInt()) },
+                )
+                ChartLegend(listOf("Protein" to MacroColors.Protein, "Karbo" to MacroColors.Carbs, "Lemak" to MacroColors.Fat))
+            }
+        }
+    }
+    if (target != null) {
+        item {
+            val logged = stats.days.filter { it.mealCount > 0 }
+            val proteinHit = logged.count { it.nutrients.protein >= target.proteinG * 0.9 }
+            val fiberHit = logged.count { it.nutrients.fiber >= target.fiberG * 0.9 }
+            val calHit = logged.count { abs(it.nutrients.calories - target.calories) <= target.calories * 0.1 }
+            HawCard {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("Target tercapai", style = MaterialTheme.typography.titleMedium)
+                    HitBar("Kalori sesuai target (±10%)", calHit, logged.size, MaterialTheme.colorScheme.primary)
+                    HitBar("Protein ≥ ${target.proteinG} g", proteinHit, logged.size, MacroColors.Protein)
+                    HitBar("Serat ≥ ${target.fiberG} g", fiberHit, logged.size, MacroColors.Fiber)
+                    Text(
+                        "Rata-rata protein ${avg.protein.roundToInt()} g (target ${target.proteinG} g) · serat ${avg.fiber.roundToInt()} g (target ${target.fiberG} g)",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
+    item { GradeCard(stats) }
+    if (stats.topSources.isNotEmpty()) item { RankCard("Sumber kalori terbesar", stats.topSources, showCount = false) }
+}
+
+@Composable
+private fun HitBar(label: String, hit: Int, total: Int, color: Color) {
+    ShareBar(label, "$hit/$total hari", if (total > 0) hit / total.toFloat() else 0f, color)
+}
+
+@Composable
+private fun GradeCard(stats: PeriodStats) {
+    val total = stats.gradeCounts.values.sum()
+    if (total == 0) return
+    val avgScore = stats.gradeCounts.entries.sumOf { (g, c) -> (4 - g.ordinal) * c } / total.toDouble()
+    val avgGrade = Grade.entries[(4 - avgScore.roundToInt()).coerceIn(0, 4)]
+    HawCard {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Distribusi skor gizi", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Text("rata-rata ", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                GradeBadge(avgGrade, size = 28.dp)
+            }
+            Grade.entries.forEach { g ->
+                val c = stats.gradeCounts[g] ?: 0
+                ShareBar("Skor ${g.name}", "$c makan", c / total.toFloat(), gradeColor(g))
+            }
+        }
+    }
+}
+
+// --------------------------------------------- Pola --------------------------------------------
+
+private fun LazyListScope.patternTab(stats: PeriodStats, period: Period) {
+    if (stats.daysLogged == 0) {
+        item { Text("Belum ada catatan di periode ini.", color = Color.Gray) }
+        return
+    }
+    item {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            StatTile("Streak", "${stats.currentStreak}", Modifier.weight(1f), sub = "hari berturut-turut", color = MaterialTheme.colorScheme.primaryContainer)
+            StatTile("Konsistensi", "${(stats.daysLogged * 100 / stats.days.size.coerceAtLeast(1))}%", Modifier.weight(1f), sub = "hari tercatat")
+            StatTile("Larut malam", "${(stats.metrics["lateNightShare"] ?: 0.0).roundToInt()}%", Modifier.weight(1f), sub = "kalori ≥ 21.00")
+        }
+    }
+    item {
+        val colors = listOf(Color(0xFFF2A93B), Color(0xFF2E7D5B), Color(0xFF4F5BB8), Color(0xFFE5635A))
+        HawCard {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("Kalori per waktu makan", style = MaterialTheme.typography.titleMedium)
+                DonutChart(
+                    slices = MealType.entries.mapIndexed { i, t -> DonutSlice(t.label, stats.mealTypeCalories[t] ?: 0.0, colors[i]) },
+                    centerTitle = Format.grouped(stats.totalCalories.roundToInt()),
+                    centerSubtitle = "kkal total",
+                    legendValue = { s, pct -> "${pct.roundToInt()}% · ${Format.grouped((s.value / stats.daysLogged).roundToInt())}/hr" },
+                )
+            }
+        }
+    }
+    item {
+        HawCard {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Pola jam makan", style = MaterialTheme.typography.titleMedium)
+                Text("Total kalori per jam dalam periode ini", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                BarChart(
+                    values = stats.hourlyCalories,
+                    labels = (0 until 24).map { if (it % 3 == 0) "$it" else "" },
+                    tooltipLabels = (0 until 24).map { "Jam %02d.00".format(it) },
+                    barColor = MaterialTheme.colorScheme.tertiary,
+                    overColor = null,
+                    valueFormat = { Format.grouped(it.roundToInt()) },
+                    height = 180.dp,
+                )
+            }
+        }
+    }
+    if (period == Period.MONTH || stats.weekdayAverages.size >= 3) {
+        item {
+            val order = DayOfWeek.entries
+            HawCard {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Rata-rata per hari dalam seminggu", style = MaterialTheme.typography.titleMedium)
+                    BarChart(
+                        values = order.map { stats.weekdayAverages[it] ?: 0.0 },
+                        labels = order.map { it.getDisplayName(TextStyle.SHORT, Format.locale) },
+                        barColor = MaterialTheme.colorScheme.secondary,
+                        overColor = null,
+                        valueFormat = { Format.grouped(it.roundToInt()) },
+                        height = 180.dp,
+                    )
+                    val maxDay = stats.weekdayAverages.maxByOrNull { it.value }
+                    maxDay?.let {
+                        Text(
+                            "Kalori tertinggi biasanya di hari ${it.key.getDisplayName(TextStyle.FULL, Format.locale)} (${Format.kcal(it.value)}).",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
+            }
+        }
+    }
+    if (stats.topMenus.isNotEmpty()) item { RankCard("Menu paling sering", stats.topMenus, showCount = true) }
+}
+
+// --------------------------------------------- Berat -------------------------------------------
+
+private fun LazyListScope.weightTab(state: AnalyticsUi, onOpenWeight: () -> Unit) {
+    item {
+        FilledTonalButton(onClick = onOpenWeight, modifier = Modifier.fillMaxWidth()) {
+            Icon(Icons.Filled.MonitorWeight, null)
+            Spacer(Modifier.width(8.dp))
+            Text("Catat timbangan")
+        }
+    }
+    val p = state.projection
+    if (p == null) {
+        item { Text("Lengkapi profil untuk melihat perkiraan berat.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+    } else {
+        item { WeightProjectionSection(p) }
+    }
+}
+
+// ------------------------------------------- Shared --------------------------------------------
 
 @Composable
 private fun ShareBar(label: String, value: String, fraction: Float, color: Color) {
@@ -201,94 +542,33 @@ private fun ShareBar(label: String, value: String, fraction: Float, color: Color
             Text(value, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Spacer(Modifier.height(4.dp))
-        Box(
-            Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(5.dp)).background(color.copy(alpha = 0.15f)),
-        ) {
+        Box(Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(5.dp)).background(color.copy(alpha = 0.15f))) {
             Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f)).fillMaxHeight().clip(RoundedCornerShape(5.dp)).background(color))
         }
     }
 }
 
 @Composable
-private fun MacroCard(stats: PeriodStats, fiberTarget: Int?) {
-    val avg = stats.averagePerDay
-    val split = avg.macroEnergy
-    HawCard {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Rata-rata makro per hari", style = MaterialTheme.typography.titleMedium)
-            ShareBar("Protein", "${avg.protein.roundToInt()} g · ${split.proteinPct.roundToInt()}% energi", (split.proteinPct / 100).toFloat(), MacroColors.Protein)
-            ShareBar("Karbohidrat", "${avg.carbs.roundToInt()} g · ${split.carbsPct.roundToInt()}% energi", (split.carbsPct / 100).toFloat(), MacroColors.Carbs)
-            ShareBar("Lemak", "${avg.fat.roundToInt()} g · ${split.fatPct.roundToInt()}% energi", (split.fatPct / 100).toFloat(), MacroColors.Fat)
-            ShareBar(
-                "Serat",
-                "${avg.fiber.roundToInt()} g" + (fiberTarget?.let { " dari $it g" } ?: ""),
-                ((avg.fiber / (fiberTarget ?: 30)).toFloat()),
-                MacroColors.Fiber,
-            )
-            Text(
-                "Acuan seimbang: protein 20–30%, karbo 45–60%, lemak 20–35% energi.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun MealTypeCard(stats: PeriodStats) {
-    val total = stats.totalCalories.takeIf { it > 0 } ?: 1.0
-    HawCard {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Kalori per waktu makan", style = MaterialTheme.typography.titleMedium)
-            val colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.tertiary, MacroColors.Carbs)
-            MealType.entries.forEachIndexed { i, type ->
-                val kcal = stats.mealTypeCalories[type] ?: 0.0
-                ShareBar(
-                    "${type.emoji} ${type.label}",
-                    "${Format.kcal(kcal / stats.daysLogged.coerceAtLeast(1))}/hari · ${(kcal / total * 100).roundToInt()}%",
-                    (kcal / total).toFloat(),
-                    colors[i],
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun HourCard(stats: PeriodStats) {
-    val buckets = listOf(
-        "Pagi (04–10)" to (4 until 10),
-        "Siang (10–15)" to (10 until 15),
-        "Sore (15–18)" to (15 until 18),
-        "Malam (18–21)" to (18 until 21),
-        "Larut (21–04)" to ((21 until 24) + (0 until 4)),
-    )
-    val total = stats.hourlyCalories.sum().takeIf { it > 0 } ?: 1.0
-    HawCard {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Pola jam makan", style = MaterialTheme.typography.titleMedium)
-            buckets.forEach { (label, hours) ->
-                val kcal = hours.sumOf { stats.hourlyCalories[it] }
-                ShareBar(label, "${(kcal / total * 100).roundToInt()}%", (kcal / total).toFloat(), MaterialTheme.colorScheme.tertiary)
-            }
-        }
-    }
-}
-
-@Composable
 private fun RankCard(title: String, items: List<RankedItem>, showCount: Boolean) {
+    val max = items.maxOfOrNull { it.calories }?.takeIf { it > 0 } ?: 1.0
     HawCard {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(title, style = MaterialTheme.typography.titleMedium)
             items.forEachIndexed { i, item ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("${i + 1}.", style = MaterialTheme.typography.labelLarge, modifier = Modifier.width(24.dp))
-                    Text(item.name, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(
-                        if (showCount) "${item.count}× · ${Format.kcal(item.calories)}" else "${Format.kcal(item.calories)} · ${item.sharePct.roundToInt()}%",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("${i + 1}.", style = MaterialTheme.typography.labelLarge, modifier = Modifier.width(24.dp))
+                        Text(item.name, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(
+                            if (showCount) "${item.count}× · ${Format.kcal(item.calories)}" else "${Format.kcal(item.calories)} · ${item.sharePct.roundToInt()}%",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Box(Modifier.padding(start = 24.dp).fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)).background(MaterialTheme.colorScheme.surfaceContainerHighest)) {
+                        Box(Modifier.fillMaxWidth((item.calories / max).toFloat()).fillMaxHeight().clip(RoundedCornerShape(3.dp)).background(MaterialTheme.colorScheme.primary))
+                    }
                 }
             }
         }

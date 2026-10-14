@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "minAppVersionCode": 1,
   "model": "gemini-flash-latest",
   "fallbackModels": [
@@ -135,6 +135,83 @@
       "total_lemak_g",
       "total_serat_g",
       "catatan"
+    ]
+  },
+  "reviewSystemPrompt": "Kamu adalah ahli gizi dan pelatih diet Indonesia yang hangat, jujur, dan praktis. Kamu menerima ringkasan statistik pola makan seseorang dalam satu periode (minggu/bulan) dari aplikasi diet, dalam format JSON. Tugasmu memberi analisa mendalam yang personal dan bisa langsung dipraktikkan.\n\nAturan:\n- Gunakan Bahasa Indonesia yang santai tapi sopan, sapa dengan nama bila ada.\n- Dasarkan setiap pernyataan pada angka di data. Sebutkan angkanya (mis. \"rata-rata 2.150 kkal, 12% di atas target\").\n- Kaitkan dengan tujuan pengguna (turun/jaga/naik berat) dan perkiraan berat.\n- Bandingkan dengan periode sebelumnya bila datanya ada.\n- Rekomendasi harus spesifik untuk kebiasaan makan Indonesia (warteg, nasi padang, gorengan, kopi susu, dll), realistis, dan bertahap. Jangan menyarankan diet ekstrem, puasa berkepanjangan, atau target di bawah batas aman.\n- Bila data sedikit (hari tercatat < 3), katakan bahwa analisa masih terbatas dan fokus pada saran mencatat lebih konsisten.\n- Ini bukan nasihat medis; bila ada indikasi masalah serius, sarankan konsultasi tenaga kesehatan.",
+  "reviewPrompt": "Berikut statistik periode saya (JSON):\n{stats}\n\nBuat analisa mendalam: ringkasan kondisi, nilai periode (A–E beserta alasan singkat), hal yang sudah baik, hal yang perlu diperbaiki, 3–5 rekomendasi konkret, 3 contoh menu sehari yang cocok dengan target kalori saya (gaya makanan Indonesia), dan satu fokus utama untuk periode berikutnya.",
+  "reviewSchema": {
+    "type": "OBJECT",
+    "properties": {
+      "ringkasan": {
+        "type": "STRING",
+        "description": "2–4 kalimat ringkasan kondisi periode ini"
+      },
+      "nilai_periode": {
+        "type": "STRING",
+        "description": "Nilai A–E diikuti alasan singkat"
+      },
+      "hal_baik": {
+        "type": "ARRAY",
+        "items": {
+          "type": "STRING"
+        }
+      },
+      "perlu_diperbaiki": {
+        "type": "ARRAY",
+        "items": {
+          "type": "STRING"
+        }
+      },
+      "rekomendasi": {
+        "type": "ARRAY",
+        "items": {
+          "type": "OBJECT",
+          "properties": {
+            "judul": {
+              "type": "STRING"
+            },
+            "detail": {
+              "type": "STRING"
+            }
+          },
+          "required": [
+            "judul",
+            "detail"
+          ],
+          "propertyOrdering": [
+            "judul",
+            "detail"
+          ]
+        }
+      },
+      "contoh_menu": {
+        "type": "ARRAY",
+        "items": {
+          "type": "STRING",
+          "description": "Contoh menu sehari: sarapan, siang, malam, camilan + perkiraan kkal"
+        }
+      },
+      "fokus_berikutnya": {
+        "type": "STRING"
+      }
+    },
+    "required": [
+      "ringkasan",
+      "nilai_periode",
+      "hal_baik",
+      "perlu_diperbaiki",
+      "rekomendasi",
+      "contoh_menu",
+      "fokus_berikutnya"
+    ],
+    "propertyOrdering": [
+      "ringkasan",
+      "nilai_periode",
+      "hal_baik",
+      "perlu_diperbaiki",
+      "rekomendasi",
+      "contoh_menu",
+      "fokus_berikutnya"
     ]
   }
 }

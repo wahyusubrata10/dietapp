@@ -1,12 +1,14 @@
 package com.hawdietpro.app.domain.insight
 
 import com.hawdietpro.app.domain.config.InsightRulesFile
+import com.hawdietpro.app.domain.model.Grade
 import com.hawdietpro.app.domain.model.Meal
 import com.hawdietpro.app.domain.model.MealType
 import com.hawdietpro.app.domain.model.Nutrients
 import com.hawdietpro.app.domain.model.WeightEntry
 import com.hawdietpro.app.domain.model.sum
 import com.hawdietpro.app.domain.scoring.FoodClassifier
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -39,6 +41,12 @@ data class PeriodStats(
     val topMenus: List<RankedItem>,
     val topSources: List<RankedItem>,
     val weightChangeKg: Double?,
+    /** Jumlah makan per grade skor gizi. */
+    val gradeCounts: Map<Grade, Int>,
+    /** Rata-rata kalori per hari dalam seminggu (hanya hari tercatat). */
+    val weekdayAverages: Map<DayOfWeek, Double>,
+    /** Hari berturut-turut tercatat sampai akhir periode. */
+    val currentStreak: Int,
     val metrics: Map<String, Double>,
     val texts: Map<String, String>,
 )
@@ -129,6 +137,14 @@ class PeriodStatsCalculator(private val rules: InsightRulesFile, private val zon
             .sortedBy { it.epochDay }
         val weightChange = if (weightsInRange.size >= 2) weightsInRange.last().weightKg - weightsInRange.first().weightKg else null
 
+        val gradeCounts = Grade.entries.associateWith { g -> inRange.count { it.grade == g } }
+        val weekdayAverages = logged.groupBy { it.date.dayOfWeek }
+            .mapValues { (_, list) -> list.map { it.nutrients.calories }.average() }
+        var streak = 0
+        for (d in days.asReversed()) {
+            if (d.mealCount > 0) streak++ else if (streak > 0 || d.date != endInclusive) break
+        }
+
         val split = avg.macroEnergy
         val metrics = buildMap {
             put("daysLogged", daysLogged.toDouble())
@@ -153,6 +169,7 @@ class PeriodStatsCalculator(private val rules: InsightRulesFile, private val zon
             put("breakfastSkipDays", breakfastSkip.toDouble())
             put("topSourceShare", topSources.firstOrNull()?.sharePct ?: 0.0)
             put("topMenuCount", topMenus.firstOrNull()?.count?.toDouble() ?: 0.0)
+            put("currentStreak", streak.toDouble())
             weightChange?.let { put("weightChange", it) }
         }
         val texts = buildMap {
@@ -175,6 +192,9 @@ class PeriodStatsCalculator(private val rules: InsightRulesFile, private val zon
             topMenus = topMenus,
             topSources = topSources,
             weightChangeKg = weightChange,
+            gradeCounts = gradeCounts,
+            weekdayAverages = weekdayAverages,
+            currentStreak = streak,
             metrics = metrics,
             texts = texts,
         )

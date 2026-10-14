@@ -34,6 +34,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.core.Format
 import com.hawdietpro.app.data.repository.ProfileRepository
+import com.hawdietpro.app.data.repository.WeightProjectionRepository
+import com.hawdietpro.app.domain.nutrition.WeightProjection
 import com.hawdietpro.app.data.repository.WeightRepository
 import com.hawdietpro.app.domain.model.WeightEntry
 import com.hawdietpro.app.domain.nutrition.TdeeCalculator
@@ -55,15 +57,17 @@ data class WeightUi(
     val entries: List<WeightEntry> = emptyList(),
     val heightCm: Double? = null,
     val targetKg: Double? = null,
+    val projection: WeightProjection? = null,
 )
 
 @HiltViewModel
 class WeightViewModel @Inject constructor(
     private val weights: WeightRepository,
     profiles: ProfileRepository,
+    projections: WeightProjectionRepository,
 ) : ViewModel() {
-    val state: StateFlow<WeightUi> = combine(weights.observeAll(), profiles.observeProfile()) { w, p ->
-        WeightUi(w, p?.heightCm, p?.targetWeightKg)
+    val state: StateFlow<WeightUi> = combine(weights.observeAll(), profiles.observeProfile(), projections.observe()) { w, p, proj ->
+        WeightUi(w, p?.heightCm, p?.targetWeightKg, proj)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), WeightUi())
 
     fun log(kg: Double) {
@@ -120,19 +124,11 @@ fun WeightScreen(onBack: () -> Unit, viewModel: WeightViewModel = hiltViewModel(
                     )
                 }
             }
-            item {
-                HawCard {
-                    Column {
-                        Text("Tren", style = MaterialTheme.typography.titleMedium)
-                        Spacer(Modifier.height(8.dp))
-                        val recent = state.entries.takeLast(60)
-                        LineTrendChart(
-                            values = recent.map { it.weightKg },
-                            labels = recent.map { Format.dayMonth(LocalDate.ofEpochDay(it.epochDay)) },
-                            emptyText = "Belum ada catatan berat",
-                        )
-                    }
-                }
+            state.projection?.let { proj ->
+                item { WeightProjectionSection(proj) }
+            }
+            if (state.entries.isNotEmpty()) {
+                item { Text("Riwayat timbangan", style = MaterialTheme.typography.titleMedium) }
             }
             items(state.entries.reversed(), key = { it.id }) { e ->
                 ListItem(

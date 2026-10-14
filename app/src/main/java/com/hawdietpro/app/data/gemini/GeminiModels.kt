@@ -98,3 +98,22 @@ data class GeminiElement(
     @SerialName("serat_g") val fiber: Double = 0.0,
     @SerialName("metode_masak") val cookingMethod: String? = null,
 )
+
+// ---------- Analisa mendalam periode (sesuai reviewSchema) ----------
+
+@Serializable
+data class GeminiReview(
+    @SerialName("ringkasan") val summary: String = "",
+    @SerialName("nilai_periode") val periodScore: String? = null,
+    @SerialName("hal_baik") val positives: List<String> = emptyList(),
+    @SerialName("perlu_diperbaiki") val improvements: List<String> = emptyList(),
+    @SerialName("rekomendasi") val recommendations: List<GeminiRecommendation> = emptyList(),
+    @SerialName("contoh_menu") val sampleMenu: List<String> = emptyList(),
+    @SerialName("fokus_berikutnya") val nextFocus: String? = null,
+)
+
+@Serializable
+data class GeminiRecommendation(
+    @SerialName("judul") val title: String = "",
+    @SerialName("detail") val detail: String = "",
+)

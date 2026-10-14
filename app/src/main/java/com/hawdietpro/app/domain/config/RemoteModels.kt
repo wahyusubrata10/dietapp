@@ -52,6 +52,10 @@ data class GeminiPromptConfig(
     val systemPrompt: String,
     val userPrompt: String,
     val responseSchema: JsonObject,
+    /** Analisa mendalam periode (opsional; fitur tersembunyi bila kosong). */
+    val reviewSystemPrompt: String? = null,
+    val reviewPrompt: String? = null,
+    val reviewSchema: JsonObject? = null,
 ) : VersionedConfig
 
 @Serializable

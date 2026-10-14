@@ -133,3 +133,9 @@ data class PendingAnalysisEntity(
     @ColumnInfo(name = "last_error") val lastError: String?,
     @ColumnInfo(name = "created_at") val createdAt: Long,
 )
+
+/** Proyeksi ringan untuk perhitungan kalori harian (tanpa elemen). */
+data class CalorieEntry(
+    val eatenAt: Long,
+    val calories: Double,
+)
