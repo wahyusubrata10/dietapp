@@ -75,4 +75,26 @@ class NutritionCalculatorTest {
     fun `nama tak dikenal tidak dipaksakan cocok`() {
         assertNull(FoodMatcher(TestFixtures.references).match("Kue misterius planet mars"))
     }
+
+    @Test
+    fun `gula dan natrium dari DB bila tersedia`() {
+        val kecap = TestFixtures.references.first { it.id == "kecap_manis" }
+        val item = NutritionCalculator.applyReference(
+            FoodItem(name = "Kecap", grams = 15.0, nutrients = Nutrients(40.0, sugar = 1.0, sodium = 10.0)), kecap,
+        )
+        assertEquals(7.5, item.nutrients.sugar, 0.01) // 50 g/100 g × 15 g
+        assertEquals(570.0, item.nutrients.sodium, 0.01)
+    }
+
+    @Test
+    fun `gula dan natrium tetap estimasi AI bila DB belum punya data`() {
+        val ref = TestFixtures.references.first { !it.hasSugarSodium }
+        val ai = Nutrients(100.0, sugar = 3.0, sodium = 400.0)
+        val item = NutritionCalculator.applyReference(FoodItem(name = ref.name, grams = 100.0, nutrients = ai), ref)
+        assertEquals(3.0, item.nutrients.sugar, 0.0)
+        assertEquals(400.0, item.nutrients.sodium, 0.0)
+        // diskalakan proporsional saat gram diubah
+        val half = NutritionCalculator.rescale(item, 50.0, ref)
+        assertEquals(200.0, half.nutrients.sodium, 0.01)
+    }
 }

@@ -33,6 +33,8 @@ class MealScorer(private val rules: InsightRulesFile) {
             "carbsG" to total.carbs,
             "fatG" to total.fat,
             "fiberG" to total.fiber,
+            "sugarG" to total.sugar,
+            "sodiumMg" to total.sodium,
             "proteinPct" to split.proteinPct,
             "carbsPct" to split.carbsPct,
             "fatPct" to split.fatPct,

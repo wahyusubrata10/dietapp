@@ -1,5 +1,6 @@
 package com.hawdietpro.app.ui.feature.weight
 
+import com.hawdietpro.app.ui.components.StatRow
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -81,7 +82,7 @@ fun WeightProjectionSection(p: WeightProjection) {
     var range by rememberSaveable { mutableIntStateOf(30) }
     val cs = MaterialTheme.colorScheme
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        StatRow {
             StatTile(
                 "Perkiraan hari ini",
                 Format.kg(p.estimatedToday),
@@ -96,7 +97,7 @@ fun WeightProjectionSection(p: WeightProjection) {
                 sub = p.actualChange?.let { "${signed(it, " kg")} sejak awal" } ?: "belum ada catatan",
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        StatRow {
             StatTile(
                 "Total surplus/defisit",
                 (if (p.cumulativeBalance > 0) "+" else "") + Format.grouped(p.cumulativeBalance.roundToInt()),

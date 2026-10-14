@@ -39,7 +39,7 @@ abstract class HawDatabase : RoomDatabase() {
     abstract fun pendingAnalysisDao(): PendingAnalysisDao
 
     companion object {
-        const val DATABASE_VERSION = 1
+        const val DATABASE_VERSION = 2
         const val DATABASE_NAME = "haw_diet.db"
     }
 }

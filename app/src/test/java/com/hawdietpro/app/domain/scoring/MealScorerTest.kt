@@ -73,4 +73,15 @@ class MealScorerTest {
         assertTrue(RuleOps.evaluate(4.0, ">=", 4.0))
         assertTrue(!RuleOps.evaluate(4.0, "??", 4.0))
     }
+
+    @Test
+    fun `makanan asin dan manis diberi label`() {
+        val items = listOf(
+            FoodItem(name = "Mie instan", grams = 200.0, nutrients = Nutrients(300.0, 7.0, 42.0, 12.0, 1.8, sugar = 5.0, sodium = 1300.0)),
+            FoodItem(name = "Es teh manis", grams = 400.0, nutrients = Nutrients(128.0, 0.0, 32.0, 0.0, 0.0, sugar = 32.0, sodium = 10.0), category = "minuman"),
+        )
+        val result = scorer.analyze(items, MealType.MAKAN_MALAM, 2000)
+        assertTrue(result.labels.contains("Tinggi garam"))
+        assertTrue(result.labels.contains("Tinggi gula"))
+    }
 }

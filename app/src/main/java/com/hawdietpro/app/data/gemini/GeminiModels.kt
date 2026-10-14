@@ -84,6 +84,8 @@ data class GeminiFoodResult(
     @SerialName("total_karbo_g") val totalCarbs: Double = 0.0,
     @SerialName("total_lemak_g") val totalFat: Double = 0.0,
     @SerialName("total_serat_g") val totalFiber: Double = 0.0,
+    @SerialName("total_gula_g") val totalSugar: Double = 0.0,
+    @SerialName("total_natrium_mg") val totalSodium: Double = 0.0,
     @SerialName("catatan") val notes: String? = null,
 )
 
@@ -96,6 +98,8 @@ data class GeminiElement(
     @SerialName("karbo_g") val carbs: Double = 0.0,
     @SerialName("lemak_g") val fat: Double = 0.0,
     @SerialName("serat_g") val fiber: Double = 0.0,
+    @SerialName("gula_g") val sugar: Double = 0.0,
+    @SerialName("natrium_mg") val sodium: Double = 0.0,
     @SerialName("metode_masak") val cookingMethod: String? = null,
 )
 

@@ -1,11 +1,89 @@
 {
-  "version": 1,
+  "version": 2,
   "minAppVersionCode": 1,
-  "vegetableCategories": ["sayur"],
-  "vegetableKeywords": ["sayur", "sayuran", "lalapan", "lalap", "kangkung", "bayam", "brokoli", "wortel", "buncis", "kol", "kubis", "sawi", "selada", "timun", "mentimun", "tauge", "toge", "terong", "labu", "daun singkong", "daun pepaya", "kacang panjang", "capcay", "urap", "pecel", "gado gado", "karedok", "salad", "tomat", "jamur", "pare"],
-  "friedKeywords": ["goreng", "gorengan", "crispy", "krispi", "tepung", "deep fried", "penyet", "geprek", "kerupuk", "keripik", "bakwan", "mendoan", "cireng", "risoles", "rempeyek", "peyek", "emping"],
-  "santanKeywords": ["santan", "gulai", "opor", "lodeh", "rendang", "kari", "kare", "kuah santan", "soto betawi"],
-  "sweetDrinkKeywords": ["teh manis", "es teh", "boba", "soda", "sirup", "es campur", "cendol", "dawet", "kopi susu", "milk tea", "thai tea", "jus", "susu coklat", "minuman manis", "es jeruk"],
+  "vegetableCategories": [
+    "sayur"
+  ],
+  "vegetableKeywords": [
+    "sayur",
+    "sayuran",
+    "lalapan",
+    "lalap",
+    "kangkung",
+    "bayam",
+    "brokoli",
+    "wortel",
+    "buncis",
+    "kol",
+    "kubis",
+    "sawi",
+    "selada",
+    "timun",
+    "mentimun",
+    "tauge",
+    "toge",
+    "terong",
+    "labu",
+    "daun singkong",
+    "daun pepaya",
+    "kacang panjang",
+    "capcay",
+    "urap",
+    "pecel",
+    "gado gado",
+    "karedok",
+    "salad",
+    "tomat",
+    "jamur",
+    "pare"
+  ],
+  "friedKeywords": [
+    "goreng",
+    "gorengan",
+    "crispy",
+    "krispi",
+    "tepung",
+    "deep fried",
+    "penyet",
+    "geprek",
+    "kerupuk",
+    "keripik",
+    "bakwan",
+    "mendoan",
+    "cireng",
+    "risoles",
+    "rempeyek",
+    "peyek",
+    "emping"
+  ],
+  "santanKeywords": [
+    "santan",
+    "gulai",
+    "opor",
+    "lodeh",
+    "rendang",
+    "kari",
+    "kare",
+    "kuah santan",
+    "soto betawi"
+  ],
+  "sweetDrinkKeywords": [
+    "teh manis",
+    "es teh",
+    "boba",
+    "soda",
+    "sirup",
+    "es campur",
+    "cendol",
+    "dawet",
+    "kopi susu",
+    "milk tea",
+    "thai tea",
+    "jus",
+    "susu coklat",
+    "minuman manis",
+    "es jeruk"
+  ],
   "targetTolerancePct": 10,
   "lateNightHour": 21,
   "mealScoring": {
@@ -13,43 +91,423 @@
     "balancedLabel": "Seimbang",
     "maxSuggestions": 3,
     "grades": [
-      {"grade": "A", "min": 85},
-      {"grade": "B", "min": 70},
-      {"grade": "C", "min": 55},
-      {"grade": "D", "min": 40},
-      {"grade": "E", "min": 0}
+      {
+        "grade": "A",
+        "min": 85
+      },
+      {
+        "grade": "B",
+        "min": 70
+      },
+      {
+        "grade": "C",
+        "min": 55
+      },
+      {
+        "grade": "D",
+        "min": 40
+      },
+      {
+        "grade": "E",
+        "min": 0
+      }
     ],
     "rules": [
-      {"id": "tinggi_karbo", "metric": "carbsPct", "op": ">", "value": 60, "points": -15, "minCalories": 150, "label": "Tinggi karbo", "suggestion": "Kurangi nasi/mie jadi setengah porsi, ganti dengan lauk protein atau sayur."},
-      {"id": "tinggi_lemak", "metric": "fatPct", "op": ">", "value": 40, "points": -15, "minCalories": 150, "label": "Tinggi lemak", "suggestion": "Pilih lauk bakar, rebus, atau kukus daripada goreng/bersantan."},
-      {"id": "kurang_protein", "metric": "proteinPct", "op": "<", "value": 12, "points": -12, "minCalories": 200, "label": "Kurang protein", "suggestion": "Tambah lauk protein: telur, tahu, tempe, ikan, atau ayam tanpa kulit."},
-      {"id": "kurang_sayur", "metric": "vegGrams", "op": "<", "value": 50, "points": -12, "minCalories": 300, "mealTypes": ["MAKAN_SIANG", "MAKAN_MALAM"], "label": "Kurang sayur", "suggestion": "Tambah sayur minimal 1 mangkuk kecil (±100 g) atau lalapan."},
-      {"id": "porsi_besar", "metric": "targetShare", "op": ">", "value": 45, "points": -10, "label": "Porsi besar", "suggestion": "Porsi ini lebih dari 45% target harian. Sisakan sebagian atau kurangi porsi berikutnya."},
-      {"id": "banyak_gorengan", "metric": "friedCount", "op": ">=", "value": 2, "points": -8, "label": "Banyak gorengan", "suggestion": "Batasi gorengan maksimal 1 jenis per makan."},
-      {"id": "bersantan", "metric": "santanCount", "op": ">=", "value": 2, "points": -5, "label": "Banyak santan", "suggestion": "Ambil lauknya saja, kurangi kuah santan."},
-      {"id": "minuman_manis", "metric": "sweetDrinkCount", "op": ">=", "value": 1, "points": -6, "label": "Minuman manis", "suggestion": "Ganti minuman manis dengan air putih atau teh tawar."},
-      {"id": "kaya_serat", "metric": "fiberG", "op": ">=", "value": 7, "points": 5, "label": "Kaya serat"},
-      {"id": "protein_baik", "metric": "proteinPct", "op": ">=", "value": 22, "points": 5, "minCalories": 150, "label": "Protein baik"}
+      {
+        "id": "tinggi_karbo",
+        "metric": "carbsPct",
+        "op": ">",
+        "value": 60,
+        "points": -15,
+        "minCalories": 150,
+        "label": "Tinggi karbo",
+        "suggestion": "Kurangi nasi/mie jadi setengah porsi, ganti dengan lauk protein atau sayur."
+      },
+      {
+        "id": "tinggi_lemak",
+        "metric": "fatPct",
+        "op": ">",
+        "value": 40,
+        "points": -15,
+        "minCalories": 150,
+        "label": "Tinggi lemak",
+        "suggestion": "Pilih lauk bakar, rebus, atau kukus daripada goreng/bersantan."
+      },
+      {
+        "id": "kurang_protein",
+        "metric": "proteinPct",
+        "op": "<",
+        "value": 12,
+        "points": -12,
+        "minCalories": 200,
+        "label": "Kurang protein",
+        "suggestion": "Tambah lauk protein: telur, tahu, tempe, ikan, atau ayam tanpa kulit."
+      },
+      {
+        "id": "kurang_sayur",
+        "metric": "vegGrams",
+        "op": "<",
+        "value": 50,
+        "points": -12,
+        "minCalories": 300,
+        "mealTypes": [
+          "MAKAN_SIANG",
+          "MAKAN_MALAM"
+        ],
+        "label": "Kurang sayur",
+        "suggestion": "Tambah sayur minimal 1 mangkuk kecil (±100 g) atau lalapan."
+      },
+      {
+        "id": "porsi_besar",
+        "metric": "targetShare",
+        "op": ">",
+        "value": 45,
+        "points": -10,
+        "label": "Porsi besar",
+        "suggestion": "Porsi ini lebih dari 45% target harian. Sisakan sebagian atau kurangi porsi berikutnya."
+      },
+      {
+        "id": "banyak_gorengan",
+        "metric": "friedCount",
+        "op": ">=",
+        "value": 2,
+        "points": -8,
+        "label": "Banyak gorengan",
+        "suggestion": "Batasi gorengan maksimal 1 jenis per makan."
+      },
+      {
+        "id": "tinggi_gula",
+        "metric": "sugarG",
+        "op": ">",
+        "value": 25,
+        "points": -8,
+        "label": "Tinggi gula",
+        "suggestion": "Kurangi kecap manis, saus & minuman manis; pilih teh tawar atau air putih."
+      },
+      {
+        "id": "tinggi_garam",
+        "metric": "sodiumMg",
+        "op": ">",
+        "value": 900,
+        "points": -8,
+        "label": "Tinggi garam",
+        "suggestion": "Kurangi kuah, sambal botol, kerupuk & ikan asin. Minum air putih yang cukup."
+      },
+      {
+        "id": "bersantan",
+        "metric": "santanCount",
+        "op": ">=",
+        "value": 2,
+        "points": -5,
+        "label": "Banyak santan",
+        "suggestion": "Ambil lauknya saja, kurangi kuah santan."
+      },
+      {
+        "id": "minuman_manis",
+        "metric": "sweetDrinkCount",
+        "op": ">=",
+        "value": 1,
+        "points": -6,
+        "label": "Minuman manis",
+        "suggestion": "Ganti minuman manis dengan air putih atau teh tawar."
+      },
+      {
+        "id": "kaya_serat",
+        "metric": "fiberG",
+        "op": ">=",
+        "value": 7,
+        "points": 5,
+        "label": "Kaya serat"
+      },
+      {
+        "id": "protein_baik",
+        "metric": "proteinPct",
+        "op": ">=",
+        "value": 22,
+        "points": 5,
+        "minCalories": 150,
+        "label": "Protein baik"
+      }
     ]
   },
   "maxInsights": 5,
   "insights": [
-    {"id": "camilan_share", "metric": "mealTypeShare.CAMILAN", "op": ">=", "value": 25, "periods": ["WEEK", "MONTH"], "severity": "warning", "priority": 80, "minDaysLogged": 3, "template": "Camilan menyumbang {value}% kalori {period}. Coba ganti dengan buah, yogurt, atau kacang rebus."},
-    {"id": "malam_share", "metric": "lateNightShare", "op": ">=", "value": 20, "periods": ["WEEK", "MONTH"], "severity": "warning", "priority": 75, "minDaysLogged": 3, "template": "{value}% kalori {period} dimakan setelah jam 21.00. Usahakan makan terakhir 2–3 jam sebelum tidur."},
-    {"id": "hari_over", "metric": "daysOverTarget", "op": ">=", "value": 3, "periods": ["WEEK"], "severity": "warning", "priority": 70, "template": "Ada {value} hari {period} yang melebihi target kalori."},
-    {"id": "hari_over_bulan", "metric": "daysOverTarget", "op": ">=", "value": 10, "periods": ["MONTH"], "severity": "warning", "priority": 70, "template": "Ada {value} hari {period} yang melebihi target kalori."},
-    {"id": "sesuai_target", "metric": "daysOnTargetPct", "op": ">=", "value": 70, "periods": ["WEEK", "MONTH"], "severity": "positive", "priority": 65, "minDaysLogged": 3, "template": "Hebat! {value}% hari tercatat {period} sesuai target kalori."},
-    {"id": "protein_rendah", "metric": "avgProteinPct", "op": "<", "value": 15, "periods": ["WEEK", "MONTH"], "severity": "warning", "priority": 60, "minDaysLogged": 3, "template": "Protein rata-rata hanya {value}% energi. Targetkan 20–30% dengan menambah lauk."},
-    {"id": "serat_rendah", "metric": "avgFiberG", "op": "<", "value": 15, "periods": ["WEEK", "MONTH"], "severity": "info", "priority": 55, "minDaysLogged": 3, "template": "Serat rata-rata {value} g/hari, masih di bawah anjuran 25–30 g. Perbanyak sayur & buah."},
-    {"id": "gorengan_share", "metric": "friedShare", "op": ">=", "value": 25, "periods": ["WEEK", "MONTH"], "severity": "warning", "priority": 58, "minDaysLogged": 2, "template": "Makanan goreng menyumbang {value}% kalori {period}."},
-    {"id": "minuman_manis", "metric": "sweetDrinkShare", "op": ">=", "value": 10, "periods": ["WEEK", "MONTH"], "severity": "warning", "priority": 57, "minDaysLogged": 2, "template": "Minuman manis menyumbang {value}% kalori {period}. Air putih adalah pilihan terbaik."},
-    {"id": "lewat_sarapan", "metric": "breakfastSkipDays", "op": ">=", "value": 3, "periods": ["WEEK"], "severity": "info", "priority": 40, "template": "Anda tidak mencatat sarapan selama {value} hari {period}."},
-    {"id": "sayur_jarang", "metric": "vegDaysPct", "op": "<", "value": 50, "periods": ["WEEK", "MONTH"], "severity": "info", "priority": 50, "minDaysLogged": 3, "template": "Hanya {value}% hari {period} yang ada sayurnya."},
-    {"id": "konsisten", "metric": "daysLogged", "op": ">=", "value": 6, "periods": ["WEEK"], "severity": "positive", "priority": 35, "template": "Konsisten! {value} hari tercatat {period}. Pertahankan!"},
-    {"id": "berat_turun", "metric": "weightChange", "op": "<=", "value": -0.2, "periods": ["WEEK", "MONTH"], "severity": "positive", "priority": 68, "template": "Berat badan turun {absValue} kg {period}."},
-    {"id": "berat_naik", "metric": "weightChange", "op": ">=", "value": 0.5, "periods": ["WEEK", "MONTH"], "severity": "info", "priority": 45, "template": "Berat badan naik {absValue} kg {period}."},
-    {"id": "sumber_terbesar", "metric": "topSourceShare", "op": ">=", "value": 15, "periods": ["WEEK", "MONTH"], "severity": "info", "priority": 30, "minDaysLogged": 2, "template": "Sumber kalori terbesar {period}: {topSource} ({value}% kalori)."},
-    {"id": "menu_favorit", "metric": "topMenuCount", "op": ">=", "value": 3, "periods": ["WEEK", "MONTH"], "severity": "info", "priority": 20, "template": "Menu paling sering {period}: {topMenu} ({value} kali)."},
-    {"id": "sisa_kalori_hari", "metric": "mealTypeShare.CAMILAN", "op": ">=", "value": 30, "periods": ["DAY"], "severity": "info", "priority": 40, "template": "Camilan sudah {value}% kalori {period}."}
+    {
+      "id": "camilan_share",
+      "metric": "mealTypeShare.CAMILAN",
+      "op": ">=",
+      "value": 25,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "warning",
+      "priority": 80,
+      "minDaysLogged": 3,
+      "template": "Camilan menyumbang {value}% kalori {period}. Coba ganti dengan buah, yogurt, atau kacang rebus."
+    },
+    {
+      "id": "malam_share",
+      "metric": "lateNightShare",
+      "op": ">=",
+      "value": 20,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "warning",
+      "priority": 75,
+      "minDaysLogged": 3,
+      "template": "{value}% kalori {period} dimakan setelah jam 21.00. Usahakan makan terakhir 2–3 jam sebelum tidur."
+    },
+    {
+      "id": "hari_over",
+      "metric": "daysOverTarget",
+      "op": ">=",
+      "value": 3,
+      "periods": [
+        "WEEK"
+      ],
+      "severity": "warning",
+      "priority": 70,
+      "template": "Ada {value} hari {period} yang melebihi target kalori."
+    },
+    {
+      "id": "hari_over_bulan",
+      "metric": "daysOverTarget",
+      "op": ">=",
+      "value": 10,
+      "periods": [
+        "MONTH"
+      ],
+      "severity": "warning",
+      "priority": 70,
+      "template": "Ada {value} hari {period} yang melebihi target kalori."
+    },
+    {
+      "id": "sesuai_target",
+      "metric": "daysOnTargetPct",
+      "op": ">=",
+      "value": 70,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "positive",
+      "priority": 65,
+      "minDaysLogged": 3,
+      "template": "Hebat! {value}% hari tercatat {period} sesuai target kalori."
+    },
+    {
+      "id": "protein_rendah",
+      "metric": "avgProteinPct",
+      "op": "<",
+      "value": 15,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "warning",
+      "priority": 60,
+      "minDaysLogged": 3,
+      "template": "Protein rata-rata hanya {value}% energi. Targetkan 20–30% dengan menambah lauk."
+    },
+    {
+      "id": "serat_rendah",
+      "metric": "avgFiberG",
+      "op": "<",
+      "value": 15,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "info",
+      "priority": 55,
+      "minDaysLogged": 3,
+      "template": "Serat rata-rata {value} g/hari, masih di bawah anjuran 25–30 g. Perbanyak sayur & buah."
+    },
+    {
+      "id": "gorengan_share",
+      "metric": "friedShare",
+      "op": ">=",
+      "value": 25,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "warning",
+      "priority": 58,
+      "minDaysLogged": 2,
+      "template": "Makanan goreng menyumbang {value}% kalori {period}."
+    },
+    {
+      "id": "gula_tinggi",
+      "metric": "avgSugarG",
+      "op": ">",
+      "value": 50,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "warning",
+      "priority": 62,
+      "minDaysLogged": 3,
+      "template": "Rata-rata gula {value} g/hari, melebihi batas 50 g (±4 sdm) dari Kemenkes."
+    },
+    {
+      "id": "garam_tinggi",
+      "metric": "avgSodiumMg",
+      "op": ">",
+      "value": 2000,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "warning",
+      "priority": 61,
+      "minDaysLogged": 3,
+      "template": "Rata-rata natrium {value} mg/hari, di atas batas 2.000 mg (±5 g garam). Kurangi kuah, kecap & gorengan."
+    },
+    {
+      "id": "minuman_manis",
+      "metric": "sweetDrinkShare",
+      "op": ">=",
+      "value": 10,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "warning",
+      "priority": 57,
+      "minDaysLogged": 2,
+      "template": "Minuman manis menyumbang {value}% kalori {period}. Air putih adalah pilihan terbaik."
+    },
+    {
+      "id": "lewat_sarapan",
+      "metric": "breakfastSkipDays",
+      "op": ">=",
+      "value": 3,
+      "periods": [
+        "WEEK"
+      ],
+      "severity": "info",
+      "priority": 40,
+      "template": "Anda tidak mencatat sarapan selama {value} hari {period}."
+    },
+    {
+      "id": "sayur_jarang",
+      "metric": "vegDaysPct",
+      "op": "<",
+      "value": 50,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "info",
+      "priority": 50,
+      "minDaysLogged": 3,
+      "template": "Hanya {value}% hari {period} yang ada sayurnya."
+    },
+    {
+      "id": "konsisten",
+      "metric": "daysLogged",
+      "op": ">=",
+      "value": 6,
+      "periods": [
+        "WEEK"
+      ],
+      "severity": "positive",
+      "priority": 35,
+      "template": "Konsisten! {value} hari tercatat {period}. Pertahankan!"
+    },
+    {
+      "id": "berat_turun",
+      "metric": "weightChange",
+      "op": "<=",
+      "value": -0.2,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "positive",
+      "priority": 68,
+      "template": "Berat badan turun {absValue} kg {period}."
+    },
+    {
+      "id": "berat_naik",
+      "metric": "weightChange",
+      "op": ">=",
+      "value": 0.5,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "info",
+      "priority": 45,
+      "template": "Berat badan naik {absValue} kg {period}."
+    },
+    {
+      "id": "sumber_terbesar",
+      "metric": "topSourceShare",
+      "op": ">=",
+      "value": 15,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "info",
+      "priority": 30,
+      "minDaysLogged": 2,
+      "template": "Sumber kalori terbesar {period}: {topSource} ({value}% kalori)."
+    },
+    {
+      "id": "menu_favorit",
+      "metric": "topMenuCount",
+      "op": ">=",
+      "value": 3,
+      "periods": [
+        "WEEK",
+        "MONTH"
+      ],
+      "severity": "info",
+      "priority": 20,
+      "template": "Menu paling sering {period}: {topMenu} ({value} kali)."
+    },
+    {
+      "id": "sisa_kalori_hari",
+      "metric": "mealTypeShare.CAMILAN",
+      "op": ">=",
+      "value": 30,
+      "periods": [
+        "DAY"
+      ],
+      "severity": "info",
+      "priority": 40,
+      "template": "Camilan sudah {value}% kalori {period}."
+    },
+    {
+      "id": "garam_hari_ini",
+      "metric": "avgSodiumMg",
+      "op": ">",
+      "value": 2000,
+      "periods": [
+        "DAY"
+      ],
+      "severity": "warning",
+      "priority": 45,
+      "template": "Natrium hari ini sudah {value} mg, melewati batas 2.000 mg."
+    },
+    {
+      "id": "gula_hari_ini",
+      "metric": "avgSugarG",
+      "op": ">",
+      "value": 50,
+      "periods": [
+        "DAY"
+      ],
+      "severity": "warning",
+      "priority": 44,
+      "template": "Gula hari ini sudah {value} g, melewati batas 50 g."
+    }
   ]
 }

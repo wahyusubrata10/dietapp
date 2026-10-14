@@ -1,5 +1,6 @@
 package com.hawdietpro.app.ui.feature.settings
 
+import com.hawdietpro.app.ui.components.hawSegmentedColors
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -232,6 +233,7 @@ fun SettingsScreen(
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                 AnalysisMode.entries.forEachIndexed { i, mode ->
                     SegmentedButton(
+                        colors = hawSegmentedColors(),
                         selected = settings.analysisMode == mode,
                         onClick = { viewModel.setAnalysisMode(mode) },
                         shape = SegmentedButtonDefaults.itemShape(i, AnalysisMode.entries.size),
@@ -267,6 +269,7 @@ fun SettingsScreen(
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                 ThemeMode.entries.forEachIndexed { i, mode ->
                     SegmentedButton(
+                        colors = hawSegmentedColors(),
                         selected = settings.themeMode == mode,
                         onClick = { viewModel.setTheme(mode) },
                         shape = SegmentedButtonDefaults.itemShape(i, ThemeMode.entries.size),

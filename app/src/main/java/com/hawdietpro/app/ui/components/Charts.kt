@@ -526,24 +526,24 @@ fun DivergingBarChart(
 
 data class DonutSlice(val label: String, val value: Double, val color: Color)
 
-@OptIn(ExperimentalLayoutApi::class)
+/** Donut di tengah, legenda rapi di bawahnya (tidak berdesakan di layar sempit). */
 @Composable
 fun DonutChart(
     slices: List<DonutSlice>,
     centerTitle: String,
     centerSubtitle: String,
     modifier: Modifier = Modifier,
-    size: Dp = 150.dp,
+    size: Dp = 168.dp,
     showLegend: Boolean = true,
     legendValue: (DonutSlice, Double) -> String = { _, pct -> "${pct.roundToInt()}%" },
 ) {
     val total = slices.sumOf { it.value }
     val progress = rememberEntrance(slices)
     val track = MaterialTheme.colorScheme.surfaceContainerHighest
-    Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(size), contentAlignment = Alignment.Center) {
             Canvas(Modifier.size(size)) {
-                val stroke = this.size.minDimension * 0.16f
+                val stroke = this.size.minDimension * 0.15f
                 val inset = stroke / 2
                 val arcSize = Size(this.size.width - stroke, this.size.height - stroke)
                 drawArc(track, 0f, 360f, false, Offset(inset, inset), arcSize, style = Stroke(stroke))
@@ -564,15 +564,15 @@ fun DonutChart(
             }
         }
         if (showLegend) {
-            Spacer(Modifier.width(16.dp))
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.weight(1f)) {
+            Spacer(Modifier.height(16.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                 slices.forEach { s ->
                     val pct = if (total > 0) s.value / total * 100 else 0.0
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(10.dp).clip(CircleShape).background(s.color))
-                        Spacer(Modifier.width(8.dp))
-                        Text(s.label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                        Text(legendValue(s, pct), style = MaterialTheme.typography.labelLarge)
+                        Spacer(Modifier.width(10.dp))
+                        Text(s.label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), maxLines = 1)
+                        Text(legendValue(s, pct), style = MaterialTheme.typography.labelLarge, maxLines = 1)
                     }
                 }
             }

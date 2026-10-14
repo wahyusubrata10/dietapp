@@ -1,7 +1,7 @@
 {
- "version": 1,
+ "version": 2,
  "minAppVersionCode": 1,
- "note": "Nilai per 100 g bagian dapat dimakan. Sumber: TKPI (Tabel Komposisi Pangan Indonesia) dan perkiraan untuk makanan olahan populer.",
+ "note": "Nilai per 100 g bagian dapat dimakan. Sumber: TKPI (Tabel Komposisi Pangan Indonesia) dan perkiraan untuk makanan olahan populer. sugar = gula (g), sodium = natrium (mg); bila kosong, aplikasi memakai estimasi AI.",
  "categories": {
   "karbo": "Makanan pokok",
   "lauk_hewani": "Lauk hewani",
@@ -33,6 +33,8 @@
    "carbs": 39.8,
    "fat": 0.3,
    "fiber": 0.2,
+   "sugar": 0.1,
+   "sodium": 1,
    "servingG": 150,
    "servingLabel": "1 piring sedang",
    "source": "TKPI"
@@ -50,6 +52,8 @@
    "carbs": 32.5,
    "fat": 0.4,
    "fiber": 0.3,
+   "sugar": 0.3,
+   "sodium": 2,
    "servingG": 150,
    "servingLabel": "1 piring sedang",
    "source": "TKPI"
@@ -66,6 +70,8 @@
    "carbs": 36.0,
    "fat": 5.5,
    "fiber": 0.5,
+   "sugar": 0.5,
+   "sodium": 250,
    "servingG": 150,
    "servingLabel": "1 piring",
    "source": "POPULER"
@@ -82,6 +88,8 @@
    "carbs": 35.0,
    "fat": 4.8,
    "fiber": 0.5,
+   "sugar": 0.6,
+   "sodium": 260,
    "servingG": 150,
    "servingLabel": "1 piring",
    "source": "POPULER"
@@ -100,6 +108,8 @@
    "carbs": 28.0,
    "fat": 6.5,
    "fiber": 0.8,
+   "sugar": 2.5,
+   "sodium": 450,
    "servingG": 250,
    "servingLabel": "1 piring",
    "source": "POPULER"
@@ -116,6 +126,8 @@
    "carbs": 36.0,
    "fat": 4.0,
    "fiber": 0.4,
+   "sugar": 0.4,
+   "sodium": 220,
    "servingG": 150,
    "servingLabel": "1 piring",
    "source": "POPULER"
@@ -149,6 +161,8 @@
    "carbs": 26.5,
    "fat": 0.3,
    "fiber": 0.2,
+   "sugar": 0.1,
+   "sodium": 5,
    "servingG": 200,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -197,6 +211,8 @@
    "carbs": 32.6,
    "fat": 0.2,
    "fiber": 0.4,
+   "sugar": 0.1,
+   "sodium": 5,
    "servingG": 100,
    "servingLabel": "1 buah",
    "source": "TKPI"
@@ -214,6 +230,8 @@
    "carbs": 15.8,
    "fat": 0.1,
    "fiber": 0.1,
+   "sugar": 0.1,
+   "sodium": 5,
    "servingG": 250,
    "servingLabel": "1 mangkuk",
    "source": "TKPI"
@@ -230,6 +248,8 @@
    "carbs": 14.0,
    "fat": 3.0,
    "fiber": 0.3,
+   "sugar": 1.0,
+   "sodium": 320,
    "servingG": 350,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -247,6 +267,8 @@
    "carbs": 20.1,
    "fat": 0.1,
    "fiber": 1.8,
+   "sugar": 0.9,
+   "sodium": 5,
    "servingG": 150,
    "servingLabel": "1 buah sedang",
    "source": "TKPI"
@@ -264,6 +286,8 @@
    "carbs": 41.0,
    "fat": 15.0,
    "fiber": 3.8,
+   "sugar": 0.3,
+   "sodium": 210,
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -299,6 +323,8 @@
    "carbs": 36.8,
    "fat": 0.3,
    "fiber": 0.9,
+   "sugar": 1.7,
+   "sodium": 10,
    "servingG": 100,
    "servingLabel": "1 potong",
    "source": "TKPI"
@@ -316,6 +342,8 @@
    "carbs": 37.0,
    "fat": 12.0,
    "fiber": 1.5,
+   "sugar": 1.5,
+   "sodium": 150,
    "servingG": 100,
    "servingLabel": "2 potong",
    "source": "POPULER"
@@ -335,6 +363,8 @@
    "carbs": 27.0,
    "fat": 0.2,
    "fiber": 2.5,
+   "sugar": 6.0,
+   "sodium": 30,
    "servingG": 150,
    "servingLabel": "1 buah sedang",
    "source": "TKPI"
@@ -367,6 +397,8 @@
    "carbs": 22.0,
    "fat": 1.3,
    "fiber": 2.4,
+   "sugar": 4.5,
+   "sodium": 5,
    "servingG": 150,
    "servingLabel": "1 tongkol",
    "source": "TKPI"
@@ -381,6 +413,8 @@
    "carbs": 23.0,
    "fat": 2.5,
    "fiber": 2.6,
+   "sugar": 5.0,
+   "sodium": 120,
    "servingG": 150,
    "servingLabel": "1 tongkol",
    "source": "POPULER"
@@ -399,6 +433,8 @@
    "carbs": 50.0,
    "fat": 1.2,
    "fiber": 2.4,
+   "sugar": 5.0,
+   "sodium": 450,
    "servingG": 40,
    "servingLabel": "2 lembar",
    "source": "TKPI"
@@ -416,6 +452,8 @@
    "carbs": 41.0,
    "fat": 3.4,
    "fiber": 6.0,
+   "sugar": 5.0,
+   "sodium": 400,
    "servingG": 40,
    "servingLabel": "2 lembar",
    "source": "POPULER"
@@ -433,6 +471,8 @@
    "carbs": 45.0,
    "fat": 13.0,
    "fiber": 2.0,
+   "sugar": 18.0,
+   "sodium": 350,
    "servingG": 120,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -451,6 +491,8 @@
    "carbs": 48.0,
    "fat": 9.0,
    "fiber": 2.0,
+   "sugar": 15.0,
+   "sodium": 350,
    "servingG": 70,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -472,6 +514,8 @@
    "carbs": 21.0,
    "fat": 6.0,
    "fiber": 0.9,
+   "sugar": 2.5,
+   "sodium": 450,
    "servingG": 200,
    "servingLabel": "1 bungkus matang",
    "source": "POPULER"
@@ -490,6 +534,8 @@
    "carbs": 25.0,
    "fat": 7.5,
    "fiber": 1.2,
+   "sugar": 4.0,
+   "sodium": 500,
    "servingG": 250,
    "servingLabel": "1 piring",
    "source": "POPULER"
@@ -508,6 +554,8 @@
    "carbs": 18.5,
    "fat": 4.5,
    "fiber": 0.8,
+   "sugar": 4.0,
+   "sodium": 420,
    "servingG": 300,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -542,6 +590,8 @@
    "carbs": 25.0,
    "fat": 2.1,
    "fiber": 1.2,
+   "sugar": 0.5,
+   "sodium": 120,
    "servingG": 150,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -558,6 +608,8 @@
    "carbs": 26.0,
    "fat": 6.0,
    "fiber": 0.6,
+   "sugar": 3.0,
+   "sodium": 450,
    "servingG": 200,
    "servingLabel": "1 piring",
    "source": "POPULER"
@@ -576,6 +628,8 @@
    "carbs": 23.0,
    "fat": 7.0,
    "fiber": 0.8,
+   "sugar": 4.0,
+   "sodium": 500,
    "servingG": 250,
    "servingLabel": "1 piring",
    "source": "POPULER"
@@ -594,6 +648,8 @@
    "carbs": 31.0,
    "fat": 0.9,
    "fiber": 1.8,
+   "sugar": 0.6,
+   "sodium": 5,
    "servingG": 150,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -612,6 +668,8 @@
    "carbs": 12.0,
    "fat": 1.5,
    "fiber": 1.7,
+   "sugar": 0.5,
+   "sodium": 50,
    "servingG": 250,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -629,6 +687,8 @@
    "carbs": 19.0,
    "fat": 2.5,
    "fiber": 1.0,
+   "sugar": 9.0,
+   "sodium": 130,
    "servingG": 250,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -699,6 +759,8 @@
    "carbs": 3.0,
    "fat": 15.0,
    "fiber": 0.0,
+   "sugar": 0.5,
+   "sodium": 450,
    "servingG": 100,
    "servingLabel": "1 potong sedang",
    "source": "POPULER"
@@ -719,6 +781,8 @@
    "carbs": 12.0,
    "fat": 18.0,
    "fiber": 0.5,
+   "sugar": 0.5,
+   "sodium": 650,
    "servingG": 120,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -735,6 +799,8 @@
    "carbs": 11.0,
    "fat": 18.0,
    "fiber": 1.0,
+   "sugar": 1.5,
+   "sodium": 650,
    "servingG": 150,
    "servingLabel": "1 potong + sambal",
    "source": "POPULER"
@@ -754,6 +820,8 @@
    "carbs": 5.0,
    "fat": 8.0,
    "fiber": 0.2,
+   "sugar": 6.0,
+   "sodium": 520,
    "servingG": 120,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -774,6 +842,8 @@
    "carbs": 0.0,
    "fat": 3.6,
    "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 70,
    "servingG": 100,
    "servingLabel": "1 potong",
    "source": "TKPI"
@@ -788,6 +858,8 @@
    "carbs": 1.0,
    "fat": 9.0,
    "fiber": 0.0,
+   "sugar": 0.5,
+   "sodium": 450,
    "servingG": 120,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -805,6 +877,8 @@
    "carbs": 2.5,
    "fat": 10.5,
    "fiber": 0.3,
+   "sugar": 2.0,
+   "sodium": 420,
    "servingG": 150,
    "servingLabel": "1 potong + kuah",
    "source": "POPULER"
@@ -822,6 +896,8 @@
    "carbs": 4.0,
    "fat": 10.0,
    "fiber": 0.5,
+   "sugar": 2.0,
+   "sodium": 450,
    "servingG": 150,
    "servingLabel": "1 potong + kuah",
    "source": "POPULER"
@@ -853,6 +929,8 @@
    "carbs": 4.0,
    "fat": 12.0,
    "fiber": 0.8,
+   "sugar": 3.0,
+   "sodium": 550,
    "servingG": 120,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -869,6 +947,8 @@
    "carbs": 7.0,
    "fat": 10.0,
    "fiber": 0.3,
+   "sugar": 8.0,
+   "sodium": 620,
    "servingG": 120,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -887,6 +967,8 @@
    "carbs": 2.0,
    "fat": 24.0,
    "fiber": 0.0,
+   "sugar": 0.5,
+   "sodium": 450,
    "servingG": 150,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -905,6 +987,8 @@
    "carbs": 4.0,
    "fat": 11.0,
    "fiber": 0.0,
+   "sugar": 0.5,
+   "sodium": 400,
    "servingG": 60,
    "servingLabel": "1 tusuk/potong",
    "source": "POPULER"
@@ -924,6 +1008,8 @@
    "carbs": 7.0,
    "fat": 10.0,
    "fiber": 1.0,
+   "sugar": 3.0,
+   "sodium": 500,
    "servingG": 80,
    "servingLabel": "1 potong",
    "source": "TKPI"
@@ -941,6 +1027,8 @@
    "carbs": 6.0,
    "fat": 10.0,
    "fiber": 0.3,
+   "sugar": 8.0,
+   "sodium": 560,
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -959,6 +1047,8 @@
    "carbs": 6.0,
    "fat": 14.0,
    "fiber": 0.0,
+   "sugar": 6.0,
+   "sodium": 500,
    "servingG": 60,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -977,6 +1067,8 @@
    "carbs": 18.0,
    "fat": 15.0,
    "fiber": 1.0,
+   "sugar": 10.0,
+   "sodium": 900,
    "servingG": 50,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -996,6 +1088,8 @@
    "carbs": 0.0,
    "fat": 15.0,
    "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 70,
    "servingG": 100,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -1013,6 +1107,8 @@
    "carbs": 3.0,
    "fat": 22.0,
    "fiber": 0.0,
+   "sugar": 8.0,
+   "sodium": 600,
    "servingG": 150,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -1030,6 +1126,8 @@
    "carbs": 4.0,
    "fat": 10.0,
    "fiber": 0.3,
+   "sugar": 2.0,
+   "sodium": 450,
    "servingG": 150,
    "servingLabel": "1 porsi + kuah",
    "source": "POPULER"
@@ -1046,6 +1144,8 @@
    "carbs": 5.0,
    "fat": 9.0,
    "fiber": 0.6,
+   "sugar": 6.0,
+   "sodium": 480,
    "servingG": 200,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -1064,6 +1164,8 @@
    "carbs": 5.0,
    "fat": 13.0,
    "fiber": 0.0,
+   "sugar": 6.0,
+   "sodium": 500,
    "servingG": 80,
    "servingLabel": "5 tusuk (tanpa bumbu)",
    "source": "POPULER"
@@ -1081,6 +1183,8 @@
    "carbs": 4.0,
    "fat": 17.0,
    "fiber": 0.0,
+   "sugar": 6.0,
+   "sodium": 500,
    "servingG": 80,
    "servingLabel": "5 tusuk",
    "source": "POPULER"
@@ -1097,6 +1201,8 @@
    "carbs": 13.0,
    "fat": 8.0,
    "fiber": 0.5,
+   "sugar": 3.0,
+   "sodium": 520,
    "servingG": 200,
    "servingLabel": "1 porsi + kuah",
    "source": "POPULER"
@@ -1111,6 +1217,8 @@
    "carbs": 7.0,
    "fat": 15.0,
    "fiber": 0.0,
+   "sugar": 7.0,
+   "sodium": 500,
    "servingG": 80,
    "servingLabel": "5 tusuk",
    "source": "POPULER"
@@ -1125,6 +1233,8 @@
    "carbs": 1.5,
    "fat": 8.0,
    "fiber": 0.0,
+   "sugar": 0.5,
+   "sodium": 420,
    "servingG": 80,
    "servingLabel": "5 tusuk",
    "source": "POPULER"
@@ -1145,6 +1255,8 @@
    "carbs": 9.0,
    "fat": 12.0,
    "fiber": 0.3,
+   "sugar": 1.0,
+   "sodium": 700,
    "servingG": 75,
    "servingLabel": "5 butir sedang",
    "source": "POPULER"
@@ -1164,6 +1276,8 @@
    "carbs": 8.0,
    "fat": 3.5,
    "fiber": 0.4,
+   "sugar": 0.5,
+   "sodium": 350,
    "servingG": 400,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -1185,6 +1299,8 @@
    "carbs": 1.0,
    "fat": 13.0,
    "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 400,
    "servingG": 100,
    "servingLabel": "1 ekor/potong sedang",
    "source": "POPULER"
@@ -1205,6 +1321,8 @@
    "carbs": 2.0,
    "fat": 6.0,
    "fiber": 0.0,
+   "sugar": 4.0,
+   "sodium": 450,
    "servingG": 120,
    "servingLabel": "1 ekor/potong",
    "source": "POPULER"
@@ -1223,6 +1341,8 @@
    "carbs": 3.0,
    "fat": 18.0,
    "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 450,
    "servingG": 100,
    "servingLabel": "1 ekor",
    "source": "POPULER"
@@ -1241,6 +1361,8 @@
    "carbs": 3.0,
    "fat": 9.0,
    "fiber": 0.5,
+   "sugar": 3.0,
+   "sodium": 550,
    "servingG": 100,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -1258,6 +1380,8 @@
    "carbs": 3.0,
    "fat": 5.0,
    "fiber": 0.5,
+   "sugar": 1.0,
+   "sodium": 450,
    "servingG": 100,
    "servingLabel": "1 bungkus",
    "source": "POPULER"
@@ -1276,6 +1400,8 @@
    "carbs": 3.0,
    "fat": 3.5,
    "fiber": 0.4,
+   "sugar": 1.0,
+   "sodium": 380,
    "servingG": 200,
    "servingLabel": "1 porsi + kuah",
    "source": "POPULER"
@@ -1293,6 +1419,8 @@
    "carbs": 0.0,
    "fat": 13.0,
    "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 3000,
    "servingG": 20,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -1311,6 +1439,8 @@
    "carbs": 5.0,
    "fat": 17.0,
    "fiber": 0.5,
+   "sugar": 6.0,
+   "sodium": 2500,
    "servingG": 20,
    "servingLabel": "1 sdm",
    "source": "POPULER"
@@ -1327,6 +1457,8 @@
    "carbs": 0.0,
    "fat": 12.0,
    "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 60,
    "servingG": 100,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -1346,6 +1478,8 @@
    "carbs": 28.0,
    "fat": 6.0,
    "fiber": 0.5,
+   "sugar": 1.0,
+   "sodium": 400,
    "servingG": 150,
    "servingLabel": "1 porsi + cuko",
    "source": "POPULER"
@@ -1362,6 +1496,8 @@
    "carbs": 19.0,
    "fat": 8.0,
    "fiber": 0.5,
+   "sugar": 2.0,
+   "sodium": 600,
    "servingG": 50,
    "servingLabel": "3 buah",
    "source": "POPULER"
@@ -1381,6 +1517,8 @@
    "carbs": 0.7,
    "fat": 10.8,
    "fiber": 0.0,
+   "sugar": 0.4,
+   "sodium": 140,
    "servingG": 55,
    "servingLabel": "1 butir",
    "source": "TKPI"
@@ -1399,6 +1537,8 @@
    "carbs": 0.8,
    "fat": 15.0,
    "fiber": 0.0,
+   "sugar": 0.4,
+   "sodium": 300,
    "servingG": 60,
    "servingLabel": "1 butir",
    "source": "POPULER"
@@ -1418,6 +1558,8 @@
    "carbs": 2.0,
    "fat": 16.0,
    "fiber": 0.2,
+   "sugar": 0.8,
+   "sodium": 400,
    "servingG": 70,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -1435,6 +1577,8 @@
    "carbs": 4.0,
    "fat": 13.0,
    "fiber": 0.5,
+   "sugar": 3.0,
+   "sodium": 450,
    "servingG": 70,
    "servingLabel": "1 butir + bumbu",
    "source": "POPULER"
@@ -1451,6 +1595,8 @@
    "carbs": 1.4,
    "fat": 13.3,
    "fiber": 0.0,
+   "sugar": 0.5,
+   "sodium": 1500,
    "servingG": 60,
    "servingLabel": "1 butir",
    "source": "TKPI"
@@ -1469,6 +1615,8 @@
    "carbs": 17.0,
    "fat": 14.0,
    "fiber": 0.5,
+   "sugar": 1.0,
+   "sodium": 550,
    "servingG": 80,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -1486,6 +1634,8 @@
    "carbs": 0.2,
    "fat": 0.3,
    "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 230,
    "servingG": 80,
    "servingLabel": "1 porsi",
    "source": "TKPI"
@@ -1503,6 +1653,8 @@
    "carbs": 4.0,
    "fat": 7.0,
    "fiber": 0.5,
+   "sugar": 3.0,
+   "sodium": 600,
    "servingG": 80,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -1521,6 +1673,8 @@
    "carbs": 20.0,
    "fat": 13.0,
    "fiber": 0.5,
+   "sugar": 1.0,
+   "sodium": 550,
    "servingG": 80,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -1539,6 +1693,8 @@
    "carbs": 6.0,
    "fat": 7.0,
    "fiber": 0.5,
+   "sugar": 3.0,
+   "sodium": 600,
    "servingG": 80,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -1574,6 +1730,8 @@
    "carbs": 5.0,
    "fat": 26.0,
    "fiber": 0.0,
+   "sugar": 2.0,
+   "sodium": 900,
    "servingG": 50,
    "servingLabel": "2 buah",
    "source": "POPULER"
@@ -1591,6 +1749,8 @@
    "carbs": 18.0,
    "fat": 18.0,
    "fiber": 0.8,
+   "sugar": 2.0,
+   "sodium": 600,
    "servingG": 60,
    "servingLabel": "3 potong",
    "source": "POPULER"
@@ -1608,6 +1768,8 @@
    "carbs": 1.5,
    "fat": 15.0,
    "fiber": 0.0,
+   "sugar": 0.5,
+   "sodium": 900,
    "servingG": 40,
    "servingLabel": "2 sdm",
    "source": "POPULER"
@@ -1625,6 +1787,8 @@
    "carbs": 25.0,
    "fat": 25.0,
    "fiber": 1.0,
+   "sugar": 20.0,
+   "sodium": 1500,
    "servingG": 15,
    "servingLabel": "1 sdm",
    "source": "POPULER"
@@ -1642,6 +1806,8 @@
    "carbs": 4.0,
    "fat": 8.0,
    "fiber": 0.3,
+   "sugar": 2.0,
+   "sodium": 450,
    "servingG": 50,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -1727,6 +1893,8 @@
    "carbs": 2.5,
    "fat": 8.5,
    "fiber": 0.1,
+   "sugar": 0.5,
+   "sodium": 250,
    "servingG": 50,
    "servingLabel": "1 potong besar",
    "source": "TKPI"
@@ -1744,6 +1912,8 @@
    "carbs": 0.8,
    "fat": 4.7,
    "fiber": 0.1,
+   "sugar": 0.5,
+   "sodium": 10,
    "servingG": 50,
    "servingLabel": "1 potong besar",
    "source": "TKPI"
@@ -1760,6 +1930,8 @@
    "carbs": 10.0,
    "fat": 8.0,
    "fiber": 0.2,
+   "sugar": 10.0,
+   "sodium": 450,
    "servingG": 50,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -1778,6 +1950,8 @@
    "carbs": 12.0,
    "fat": 18.0,
    "fiber": 2.0,
+   "sugar": 0.5,
+   "sodium": 200,
    "servingG": 50,
    "servingLabel": "2 potong sedang",
    "source": "TKPI"
@@ -1794,6 +1968,8 @@
    "carbs": 13.0,
    "fat": 8.0,
    "fiber": 1.5,
+   "sugar": 12.0,
+   "sodium": 450,
    "servingG": 50,
    "servingLabel": "2 potong",
    "source": "POPULER"
@@ -1810,6 +1986,8 @@
    "carbs": 17.0,
    "fat": 15.0,
    "fiber": 1.5,
+   "sugar": 0.5,
+   "sodium": 350,
    "servingG": 60,
    "servingLabel": "2 lembar",
    "source": "POPULER"
@@ -1829,6 +2007,8 @@
    "carbs": 16.0,
    "fat": 14.0,
    "fiber": 1.5,
+   "sugar": 15.0,
+   "sodium": 550,
    "servingG": 50,
    "servingLabel": "2 sdm",
    "source": "POPULER"
@@ -1847,6 +2027,8 @@
    "carbs": 19.0,
    "fat": 14.0,
    "fiber": 1.5,
+   "sugar": 1.0,
+   "sodium": 350,
    "servingG": 60,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -1864,6 +2046,8 @@
    "carbs": 22.0,
    "fat": 12.0,
    "fiber": 1.5,
+   "sugar": 1.0,
+   "sodium": 350,
    "servingG": 50,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -1881,6 +2065,8 @@
    "carbs": 27.0,
    "fat": 14.0,
    "fiber": 2.0,
+   "sugar": 3.0,
+   "sodium": 350,
    "servingG": 50,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -1897,6 +2083,8 @@
    "carbs": 11.0,
    "fat": 12.0,
    "fiber": 1.5,
+   "sugar": 8.0,
+   "sodium": 450,
    "servingG": 200,
    "servingLabel": "1 porsi + bumbu kacang",
    "source": "POPULER"
@@ -1911,6 +2099,8 @@
    "carbs": 5.0,
    "fat": 6.0,
    "fiber": 0.5,
+   "sugar": 1.0,
+   "sodium": 400,
    "servingG": 80,
    "servingLabel": "1 bungkus",
    "source": "POPULER"
@@ -1980,6 +2170,8 @@
    "carbs": 3.5,
    "fat": 0.3,
    "fiber": 1.0,
+   "sugar": 0.5,
+   "sodium": 150,
    "servingG": 150,
    "servingLabel": "1 mangkuk kecil",
    "source": "POPULER"
@@ -1999,6 +2191,8 @@
    "carbs": 6.0,
    "fat": 5.0,
    "fiber": 2.0,
+   "sugar": 1.0,
+   "sodium": 450,
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2018,6 +2212,8 @@
    "carbs": 6.0,
    "fat": 4.0,
    "fiber": 1.8,
+   "sugar": 2.0,
+   "sodium": 400,
    "servingG": 150,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2035,6 +2231,8 @@
    "carbs": 6.0,
    "fat": 0.5,
    "fiber": 1.2,
+   "sugar": 3.0,
+   "sodium": 350,
    "servingG": 200,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2052,6 +2250,8 @@
    "carbs": 5.0,
    "fat": 5.5,
    "fiber": 1.8,
+   "sugar": 1.5,
+   "sodium": 350,
    "servingG": 200,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2070,6 +2270,8 @@
    "carbs": 5.0,
    "fat": 1.0,
    "fiber": 1.2,
+   "sugar": 1.0,
+   "sodium": 300,
    "servingG": 200,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2087,6 +2289,8 @@
    "carbs": 3.0,
    "fat": 2.0,
    "fiber": 0.5,
+   "sugar": 0.8,
+   "sodium": 350,
    "servingG": 250,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2104,6 +2308,8 @@
    "carbs": 11.0,
    "fat": 8.0,
    "fiber": 3.0,
+   "sugar": 8.0,
+   "sodium": 350,
    "servingG": 250,
    "servingLabel": "1 piring (tanpa lontong)",
    "source": "POPULER"
@@ -2122,6 +2328,8 @@
    "carbs": 12.0,
    "fat": 7.0,
    "fiber": 3.5,
+   "sugar": 10.0,
+   "sodium": 350,
    "servingG": 150,
    "servingLabel": "1 porsi + bumbu",
    "source": "POPULER"
@@ -2136,6 +2344,8 @@
    "carbs": 10.0,
    "fat": 7.0,
    "fiber": 3.0,
+   "sugar": 8.0,
+   "sodium": 300,
    "servingG": 150,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2154,6 +2364,8 @@
    "carbs": 12.0,
    "fat": 6.0,
    "fiber": 4.0,
+   "sugar": 3.0,
+   "sodium": 250,
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2176,6 +2388,8 @@
    "carbs": 3.5,
    "fat": 0.2,
    "fiber": 1.2,
+   "sugar": 2.0,
+   "sodium": 5,
    "servingG": 50,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2193,6 +2407,8 @@
    "carbs": 6.0,
    "fat": 4.5,
    "fiber": 2.4,
+   "sugar": 2.0,
+   "sodium": 400,
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2211,6 +2427,8 @@
    "carbs": 5.0,
    "fat": 3.0,
    "fiber": 1.4,
+   "sugar": 1.0,
+   "sodium": 380,
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2229,6 +2447,8 @@
    "carbs": 9.0,
    "fat": 9.0,
    "fiber": 2.5,
+   "sugar": 4.0,
+   "sodium": 400,
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2246,6 +2466,8 @@
    "carbs": 7.0,
    "fat": 1.2,
    "fiber": 2.4,
+   "sugar": 0.5,
+   "sodium": 15,
    "servingG": 80,
    "servingLabel": "1 porsi",
    "source": "TKPI"
@@ -2264,6 +2486,8 @@
    "carbs": 5.0,
    "fat": 7.0,
    "fiber": 2.5,
+   "sugar": 1.0,
+   "sodium": 350,
    "servingG": 80,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2282,6 +2506,8 @@
    "carbs": 10.0,
    "fat": 7.0,
    "fiber": 3.0,
+   "sugar": 3.0,
+   "sodium": 350,
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2299,6 +2525,8 @@
    "carbs": 20.0,
    "fat": 6.0,
    "fiber": 2.5,
+   "sugar": 15.0,
+   "sodium": 250,
    "servingG": 150,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2317,6 +2545,8 @@
    "carbs": 7.0,
    "fat": 0.4,
    "fiber": 3.3,
+   "sugar": 1.4,
+   "sodium": 40,
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2334,6 +2564,8 @@
    "carbs": 8.2,
    "fat": 0.2,
    "fiber": 3.0,
+   "sugar": 3.5,
+   "sodium": 60,
    "servingG": 80,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2352,6 +2584,8 @@
    "carbs": 3.0,
    "fat": 0.2,
    "fiber": 1.5,
+   "sugar": 2.0,
+   "sodium": 20,
    "servingG": 100,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2371,6 +2605,8 @@
    "carbs": 5.5,
    "fat": 4.0,
    "fiber": 2.0,
+   "sugar": 2.5,
+   "sodium": 380,
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -2575,6 +2811,8 @@
    "carbs": 3.0,
    "fat": 3.5,
    "fiber": 0.4,
+   "sugar": 0.5,
+   "sodium": 350,
    "servingG": 350,
    "servingLabel": "1 mangkuk (tanpa nasi)",
    "source": "POPULER"
@@ -2592,6 +2830,8 @@
    "carbs": 4.0,
    "fat": 7.5,
    "fiber": 0.4,
+   "sugar": 1.5,
+   "sodium": 400,
    "servingG": 350,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2610,6 +2850,8 @@
    "carbs": 3.0,
    "fat": 4.5,
    "fiber": 0.4,
+   "sugar": 0.5,
+   "sodium": 380,
    "servingG": 350,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2626,6 +2868,8 @@
    "carbs": 4.0,
    "fat": 6.0,
    "fiber": 0.5,
+   "sugar": 1.0,
+   "sodium": 420,
    "servingG": 350,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2643,6 +2887,8 @@
    "carbs": 3.0,
    "fat": 8.0,
    "fiber": 0.4,
+   "sugar": 3.0,
+   "sodium": 450,
    "servingG": 350,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2659,6 +2905,8 @@
    "carbs": 3.0,
    "fat": 4.5,
    "fiber": 0.6,
+   "sugar": 1.0,
+   "sodium": 380,
    "servingG": 350,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2678,6 +2926,8 @@
    "carbs": 2.0,
    "fat": 5.5,
    "fiber": 0.6,
+   "sugar": 1.0,
+   "sodium": 350,
    "servingG": 350,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2696,6 +2946,8 @@
    "carbs": 13.0,
    "fat": 5.0,
    "fiber": 1.0,
+   "sugar": 1.5,
+   "sodium": 360,
    "servingG": 350,
    "servingLabel": "1 piring",
    "source": "POPULER"
@@ -2710,6 +2962,8 @@
    "carbs": 17.0,
    "fat": 7.0,
    "fiber": 2.0,
+   "sugar": 6.0,
+   "sodium": 400,
    "servingG": 300,
    "servingLabel": "1 piring",
    "source": "POPULER"
@@ -2727,6 +2981,8 @@
    "carbs": 16.0,
    "fat": 6.0,
    "fiber": 2.0,
+   "sugar": 6.0,
+   "sodium": 400,
    "servingG": 300,
    "servingLabel": "1 piring",
    "source": "POPULER"
@@ -2743,6 +2999,8 @@
    "carbs": 18.0,
    "fat": 8.0,
    "fiber": 1.0,
+   "sugar": 2.0,
+   "sodium": 650,
    "servingG": 250,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2764,6 +3022,8 @@
    "carbs": 4.0,
    "fat": 11.0,
    "fiber": 0.5,
+   "sugar": 1.0,
+   "sodium": 450,
    "servingG": 50,
    "servingLabel": "3 sdm",
    "source": "POPULER"
@@ -2784,6 +3044,8 @@
    "carbs": 1.5,
    "fat": 1.2,
    "fiber": 0.0,
+   "sugar": 0.3,
+   "sodium": 400,
    "servingG": 200,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -2887,6 +3149,8 @@
    "carbs": 28.0,
    "fat": 17.0,
    "fiber": 2.0,
+   "sugar": 1.5,
+   "sodium": 400,
    "servingG": 50,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -2906,6 +3170,8 @@
    "carbs": 36.0,
    "fat": 10.0,
    "fiber": 2.0,
+   "sugar": 12.0,
+   "sodium": 50,
    "servingG": 70,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -2922,6 +3188,8 @@
    "carbs": 40.0,
    "fat": 10.0,
    "fiber": 0.5,
+   "sugar": 0.5,
+   "sodium": 450,
    "servingG": 50,
    "servingLabel": "2 buah",
    "source": "POPULER"
@@ -2940,6 +3208,8 @@
    "carbs": 28.0,
    "fat": 12.0,
    "fiber": 1.0,
+   "sugar": 2.0,
+   "sodium": 350,
    "servingG": 60,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -2958,6 +3228,8 @@
    "carbs": 28.0,
    "fat": 15.0,
    "fiber": 1.5,
+   "sugar": 2.0,
+   "sodium": 400,
    "servingG": 60,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -3009,6 +3281,8 @@
    "carbs": 66.0,
    "fat": 25.0,
    "fiber": 0.6,
+   "sugar": 1.0,
+   "sodium": 1200,
    "servingG": 10,
    "servingLabel": "1 buah besar",
    "source": "POPULER"
@@ -3026,6 +3300,8 @@
    "carbs": 64.0,
    "fat": 24.0,
    "fiber": 0.5,
+   "sugar": 2.0,
+   "sodium": 1100,
    "servingG": 10,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -3061,6 +3337,8 @@
    "carbs": 60.0,
    "fat": 25.0,
    "fiber": 4.0,
+   "sugar": 0.5,
+   "sodium": 300,
    "servingG": 15,
    "servingLabel": "1 genggam",
    "source": "POPULER"
@@ -3080,6 +3358,8 @@
    "carbs": 45.0,
    "fat": 30.0,
    "fiber": 3.0,
+   "sugar": 2.0,
+   "sodium": 600,
    "servingG": 20,
    "servingLabel": "1 keping",
    "source": "POPULER"
@@ -3158,6 +3438,8 @@
    "carbs": 21.0,
    "fat": 14.0,
    "fiber": 1.5,
+   "sugar": 6.0,
+   "sodium": 450,
    "servingG": 150,
    "servingLabel": "1 porsi + bumbu",
    "source": "POPULER"
@@ -3175,6 +3457,8 @@
    "carbs": 17.0,
    "fat": 8.0,
    "fiber": 1.5,
+   "sugar": 6.0,
+   "sodium": 450,
    "servingG": 200,
    "servingLabel": "1 porsi + bumbu",
    "source": "POPULER"
@@ -3192,6 +3476,8 @@
    "carbs": 19.0,
    "fat": 18.0,
    "fiber": 1.0,
+   "sugar": 1.0,
+   "sodium": 500,
    "servingG": 100,
    "servingLabel": "2 potong",
    "source": "POPULER"
@@ -3210,6 +3496,8 @@
    "carbs": 50.0,
    "fat": 13.0,
    "fiber": 1.0,
+   "sugar": 25.0,
+   "sodium": 250,
    "servingG": 100,
    "servingLabel": "2 potong",
    "source": "POPULER"
@@ -3228,6 +3516,8 @@
    "carbs": 38.0,
    "fat": 5.0,
    "fiber": 0.8,
+   "sugar": 6.0,
+   "sodium": 400,
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "POPULER"
@@ -3251,6 +3541,8 @@
    "carbs": 9.0,
    "fat": 8.0,
    "fiber": 2.5,
+   "sugar": 6.0,
+   "sodium": 1100,
    "servingG": 20,
    "servingLabel": "1 sdm",
    "source": "POPULER"
@@ -3269,6 +3561,8 @@
    "carbs": 7.0,
    "fat": 10.0,
    "fiber": 2.5,
+   "sugar": 2.0,
+   "sodium": 900,
    "servingG": 20,
    "servingLabel": "1 sdm",
    "source": "POPULER"
@@ -3286,6 +3580,8 @@
    "carbs": 7.0,
    "fat": 11.0,
    "fiber": 2.0,
+   "sugar": 2.0,
+   "sodium": 600,
    "servingG": 20,
    "servingLabel": "1 sdm",
    "source": "POPULER"
@@ -3306,6 +3602,8 @@
    "carbs": 22.0,
    "fat": 22.0,
    "fiber": 4.0,
+   "sugar": 15.0,
+   "sodium": 500,
    "servingG": 40,
    "servingLabel": "2 sdm",
    "source": "POPULER"
@@ -3322,6 +3620,8 @@
    "carbs": 62.0,
    "fat": 0.3,
    "fiber": 0.0,
+   "sugar": 50.0,
+   "sodium": 3800,
    "servingG": 15,
    "servingLabel": "1 sdm",
    "source": "POPULER"
@@ -3339,6 +3639,8 @@
    "carbs": 23.0,
    "fat": 0.5,
    "fiber": 1.0,
+   "sugar": 18.0,
+   "sodium": 1200,
    "servingG": 15,
    "servingLabel": "1 sdm",
    "source": "POPULER"
@@ -3356,6 +3658,8 @@
    "carbs": 26.0,
    "fat": 0.2,
    "fiber": 0.5,
+   "sugar": 22.0,
+   "sodium": 900,
    "servingG": 15,
    "servingLabel": "1 sdm",
    "source": "POPULER"
@@ -3373,6 +3677,8 @@
    "carbs": 1.0,
    "fat": 75.0,
    "fiber": 0.0,
+   "sugar": 3.0,
+   "sodium": 600,
    "servingG": 15,
    "servingLabel": "1 sdm",
    "source": "POPULER"
@@ -3390,6 +3696,8 @@
    "carbs": 30.0,
    "fat": 0.2,
    "fiber": 0.3,
+   "sugar": 28.0,
+   "sodium": 1100,
    "servingG": 50,
    "servingLabel": "1 mangkuk kecil",
    "source": "POPULER"
@@ -3408,6 +3716,8 @@
    "carbs": 0.0,
    "fat": 100.0,
    "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 0,
    "servingG": 10,
    "servingLabel": "1 sdm",
    "source": "TKPI"
@@ -3424,6 +3734,8 @@
    "carbs": 3.3,
    "fat": 24.0,
    "fiber": 0.0,
+   "sugar": 3.3,
+   "sodium": 15,
    "servingG": 30,
    "servingLabel": "2 sdm",
    "source": "POPULER"
@@ -3442,6 +3754,8 @@
    "carbs": 0.1,
    "fat": 81.0,
    "fiber": 0.0,
+   "sugar": 0.1,
+   "sodium": 600,
    "servingG": 10,
    "servingLabel": "1 sdm",
    "source": "POPULER"
@@ -3460,6 +3774,8 @@
    "carbs": 3.0,
    "fat": 33.0,
    "fiber": 0.0,
+   "sugar": 1.0,
+   "sodium": 1200,
    "servingG": 20,
    "servingLabel": "1 lembar",
    "source": "POPULER"
@@ -3480,6 +3796,8 @@
    "carbs": 23.0,
    "fat": 0.3,
    "fiber": 1.9,
+   "sugar": 12.0,
+   "sodium": 1,
    "servingG": 100,
    "servingLabel": "1 buah sedang",
    "source": "TKPI"
@@ -3497,6 +3815,8 @@
    "carbs": 14.0,
    "fat": 0.2,
    "fiber": 2.4,
+   "sugar": 10.4,
+   "sodium": 1,
    "servingG": 150,
    "servingLabel": "1 buah",
    "source": "TKPI"
@@ -3516,6 +3836,8 @@
    "carbs": 12.0,
    "fat": 0.1,
    "fiber": 2.4,
+   "sugar": 9.0,
+   "sodium": 0,
    "servingG": 130,
    "servingLabel": "1 buah",
    "source": "TKPI"
@@ -3533,6 +3855,8 @@
    "carbs": 12.0,
    "fat": 0.1,
    "fiber": 1.7,
+   "sugar": 7.8,
+   "sodium": 8,
    "servingG": 150,
    "servingLabel": "1 potong besar",
    "source": "TKPI"
@@ -3549,6 +3873,8 @@
    "carbs": 7.6,
    "fat": 0.2,
    "fiber": 0.4,
+   "sugar": 6.2,
+   "sodium": 1,
    "servingG": 200,
    "servingLabel": "1 potong",
    "source": "TKPI"
@@ -3567,6 +3893,8 @@
    "carbs": 15.0,
    "fat": 0.4,
    "fiber": 1.6,
+   "sugar": 13.7,
+   "sodium": 1,
    "servingG": 150,
    "servingLabel": "1/2 buah",
    "source": "TKPI"
@@ -3581,6 +3909,8 @@
    "carbs": 8.0,
    "fat": 0.2,
    "fiber": 0.9,
+   "sugar": 8.0,
+   "sodium": 18,
    "servingG": 150,
    "servingLabel": "1 potong",
    "source": "TKPI"
@@ -3598,6 +3928,8 @@
    "carbs": 13.0,
    "fat": 0.1,
    "fiber": 1.4,
+   "sugar": 9.9,
+   "sodium": 1,
    "servingG": 120,
    "servingLabel": "2 potong",
    "source": "TKPI"
@@ -3615,6 +3947,8 @@
    "carbs": 7.7,
    "fat": 6.5,
    "fiber": 1.4,
+   "sugar": 0.7,
+   "sodium": 7,
    "servingG": 100,
    "servingLabel": "1/2 buah",
    "source": "TKPI"
@@ -3631,6 +3965,8 @@
    "carbs": 20.9,
    "fat": 0.4,
    "fiber": 4.2,
+   "sugar": 15.0,
+   "sodium": 1,
    "servingG": 70,
    "servingLabel": "2 buah",
    "source": "TKPI"
@@ -3645,6 +3981,8 @@
    "carbs": 18.1,
    "fat": 0.1,
    "fiber": 0.8,
+   "sugar": 13.0,
+   "sodium": 11,
    "servingG": 80,
    "servingLabel": "5 buah",
    "source": "TKPI"
@@ -3661,6 +3999,8 @@
    "carbs": 18.0,
    "fat": 0.2,
    "fiber": 0.9,
+   "sugar": 15.5,
+   "sodium": 2,
    "servingG": 100,
    "servingLabel": "1 genggam",
    "source": "POPULER"
@@ -3678,6 +4018,8 @@
    "carbs": 12.2,
    "fat": 0.3,
    "fiber": 5.4,
+   "sugar": 8.9,
+   "sodium": 2,
    "servingG": 100,
    "servingLabel": "1 buah kecil",
    "source": "TKPI"
@@ -3694,6 +4036,8 @@
    "carbs": 11.8,
    "fat": 0.2,
    "fiber": 1.0,
+   "sugar": 8.0,
+   "sodium": 1,
    "servingG": 100,
    "servingLabel": "3 buah",
    "source": "TKPI"
@@ -3710,6 +4054,8 @@
    "carbs": 11.0,
    "fat": 0.4,
    "fiber": 3.0,
+   "sugar": 8.0,
+   "sodium": 1,
    "servingG": 150,
    "servingLabel": "1/2 buah",
    "source": "POPULER"
@@ -3741,6 +4087,8 @@
    "carbs": 75.0,
    "fat": 0.4,
    "fiber": 8.0,
+   "sugar": 63.0,
+   "sodium": 2,
    "servingG": 21,
    "servingLabel": "3 butir",
    "source": "POPULER"
@@ -3757,6 +4105,8 @@
    "carbs": 7.7,
    "fat": 0.3,
    "fiber": 2.0,
+   "sugar": 4.9,
+   "sodium": 1,
    "servingG": 100,
    "servingLabel": "7 buah",
    "source": "POPULER"
@@ -3789,6 +4139,8 @@
    "carbs": 15.6,
    "fat": 0.6,
    "fiber": 1.8,
+   "sugar": 14.0,
+   "sodium": 7,
    "servingG": 100,
    "servingLabel": "3 buah",
    "source": "TKPI"
@@ -3806,6 +4158,8 @@
    "carbs": 15.0,
    "fat": 0.1,
    "fiber": 1.1,
+   "sugar": 14.0,
+   "sodium": 0,
    "servingG": 100,
    "servingLabel": "1 genggam",
    "source": "POPULER"
@@ -3823,6 +4177,8 @@
    "carbs": 27.6,
    "fat": 0.3,
    "fiber": 1.5,
+   "sugar": 19.0,
+   "sodium": 2,
    "servingG": 100,
    "servingLabel": "5 biji",
    "source": "TKPI"
@@ -3855,6 +4211,8 @@
    "carbs": 15.0,
    "fat": 0.1,
    "fiber": 3.1,
+   "sugar": 9.8,
+   "sodium": 1,
    "servingG": 150,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -3869,6 +4227,8 @@
    "carbs": 15.0,
    "fat": 0.5,
    "fiber": 3.0,
+   "sugar": 9.0,
+   "sodium": 3,
    "servingG": 75,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -3887,6 +4247,8 @@
    "carbs": 12.5,
    "fat": 0.2,
    "fiber": 1.6,
+   "sugar": 9.0,
+   "sodium": 3,
    "servingG": 150,
    "servingLabel": "1 piring kecil",
    "source": "POPULER"
@@ -3905,6 +4267,8 @@
    "carbs": 0.0,
    "fat": 0.0,
    "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 0,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -3926,6 +4290,8 @@
    "carbs": 8.0,
    "fat": 0.0,
    "fiber": 0.0,
+   "sugar": 8.0,
+   "sodium": 3,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -3944,6 +4310,8 @@
    "carbs": 0.2,
    "fat": 0.0,
    "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 3,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -3963,6 +4331,8 @@
    "carbs": 0.3,
    "fat": 0.0,
    "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 2,
    "servingG": 200,
    "servingLabel": "1 cangkir",
    "source": "POPULER"
@@ -3982,6 +4352,8 @@
    "carbs": 13.0,
    "fat": 2.5,
    "fiber": 0.0,
+   "sugar": 11.0,
+   "sodium": 40,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4001,6 +4373,8 @@
    "carbs": 10.0,
    "fat": 2.0,
    "fiber": 0.0,
+   "sugar": 9.0,
+   "sodium": 30,
    "servingG": 150,
    "servingLabel": "1 cangkir",
    "source": "POPULER"
@@ -4018,6 +4392,8 @@
    "carbs": 4.5,
    "fat": 2.8,
    "fiber": 0.0,
+   "sugar": 4.5,
+   "sodium": 45,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4035,6 +4411,8 @@
    "carbs": 16.0,
    "fat": 7.0,
    "fiber": 1.5,
+   "sugar": 13.0,
+   "sodium": 15,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4053,6 +4431,8 @@
    "carbs": 12.0,
    "fat": 0.1,
    "fiber": 0.2,
+   "sugar": 11.0,
+   "sodium": 2,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4070,6 +4450,8 @@
    "carbs": 17.0,
    "fat": 0.2,
    "fiber": 0.6,
+   "sugar": 15.0,
+   "sodium": 2,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4088,6 +4470,8 @@
    "carbs": 9.5,
    "fat": 0.1,
    "fiber": 0.5,
+   "sugar": 8.0,
+   "sodium": 5,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4108,6 +4492,8 @@
    "carbs": 4.8,
    "fat": 3.3,
    "fiber": 0.0,
+   "sugar": 4.8,
+   "sodium": 43,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "TKPI"
@@ -4125,6 +4511,8 @@
    "carbs": 5.0,
    "fat": 1.0,
    "fiber": 0.0,
+   "sugar": 5.0,
+   "sodium": 44,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4144,6 +4532,8 @@
    "carbs": 11.0,
    "fat": 3.0,
    "fiber": 0.5,
+   "sugar": 10.0,
+   "sodium": 60,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4162,6 +4552,8 @@
    "carbs": 55.0,
    "fat": 10.0,
    "fiber": 0.0,
+   "sugar": 54.0,
+   "sodium": 120,
    "servingG": 20,
    "servingLabel": "1 sdm",
    "source": "TKPI"
@@ -4179,6 +4571,8 @@
    "carbs": 6.5,
    "fat": 1.9,
    "fiber": 0.4,
+   "sugar": 5.0,
+   "sodium": 50,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4196,6 +4590,8 @@
    "carbs": 4.7,
    "fat": 3.3,
    "fiber": 0.0,
+   "sugar": 4.7,
+   "sodium": 46,
    "servingG": 150,
    "servingLabel": "1 cup",
    "source": "POPULER"
@@ -4216,6 +4612,8 @@
    "carbs": 10.6,
    "fat": 0.0,
    "fiber": 0.0,
+   "sugar": 10.6,
+   "sodium": 10,
    "servingG": 330,
    "servingLabel": "1 kaleng",
    "source": "POPULER"
@@ -4234,6 +4632,8 @@
    "carbs": 18.0,
    "fat": 2.0,
    "fiber": 0.8,
+   "sugar": 16.0,
+   "sodium": 15,
    "servingG": 300,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -4252,6 +4652,8 @@
    "carbs": 18.0,
    "fat": 4.0,
    "fiber": 0.3,
+   "sugar": 15.0,
+   "sodium": 20,
    "servingG": 300,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4271,6 +4673,8 @@
    "carbs": 16.0,
    "fat": 2.5,
    "fiber": 0.2,
+   "sugar": 14.0,
+   "sodium": 30,
    "servingG": 400,
    "servingLabel": "1 cup",
    "source": "POPULER"
@@ -4290,6 +4694,8 @@
    "carbs": 8.0,
    "fat": 0.3,
    "fiber": 0.0,
+   "sugar": 8.0,
+   "sodium": 3,
    "servingG": 200,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4307,6 +4713,8 @@
    "carbs": 10.0,
    "fat": 1.8,
    "fiber": 0.0,
+   "sugar": 9.0,
+   "sodium": 25,
    "servingG": 250,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4324,6 +4732,8 @@
    "carbs": 5.5,
    "fat": 0.2,
    "fiber": 0.4,
+   "sugar": 2.6,
+   "sodium": 105,
    "servingG": 300,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4342,6 +4752,8 @@
    "carbs": 6.5,
    "fat": 0.0,
    "fiber": 0.0,
+   "sugar": 6.0,
+   "sodium": 50,
    "servingG": 350,
    "servingLabel": "1 botol",
    "source": "POPULER"
@@ -4360,6 +4772,8 @@
    "carbs": 11.0,
    "fat": 0.1,
    "fiber": 0.2,
+   "sugar": 10.0,
+   "sodium": 5,
    "servingG": 200,
    "servingLabel": "1 gelas",
    "source": "POPULER"
@@ -4391,6 +4805,8 @@
    "carbs": 46.0,
    "fat": 3.0,
    "fiber": 1.0,
+   "sugar": 15.0,
+   "sodium": 40,
    "servingG": 40,
    "servingLabel": "4 buah",
    "source": "POPULER"
@@ -4407,6 +4823,8 @@
    "carbs": 42.0,
    "fat": 12.0,
    "fiber": 1.5,
+   "sugar": 12.0,
+   "sodium": 100,
    "servingG": 50,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -4423,6 +4841,8 @@
    "carbs": 30.0,
    "fat": 7.0,
    "fiber": 0.5,
+   "sugar": 1.5,
+   "sodium": 300,
    "servingG": 60,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -4475,6 +4895,8 @@
    "carbs": 50.0,
    "fat": 13.0,
    "fiber": 0.8,
+   "sugar": 30.0,
+   "sodium": 250,
    "servingG": 50,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -4491,6 +4913,8 @@
    "carbs": 55.0,
    "fat": 20.0,
    "fiber": 2.0,
+   "sugar": 35.0,
+   "sodium": 200,
    "servingG": 50,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -4509,6 +4933,8 @@
    "carbs": 45.0,
    "fat": 22.0,
    "fiber": 1.5,
+   "sugar": 15.0,
+   "sodium": 350,
    "servingG": 50,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -4528,6 +4954,8 @@
    "carbs": 62.0,
    "fat": 24.0,
    "fiber": 1.5,
+   "sugar": 30.0,
+   "sodium": 250,
    "servingG": 30,
    "servingLabel": "5 buah",
    "source": "POPULER"
@@ -4548,6 +4976,8 @@
    "carbs": 70.0,
    "fat": 18.0,
    "fiber": 2.0,
+   "sugar": 20.0,
+   "sodium": 400,
    "servingG": 30,
    "servingLabel": "4 keping",
    "source": "POPULER"
@@ -4567,6 +4997,8 @@
    "carbs": 58.0,
    "fat": 30.0,
    "fiber": 3.0,
+   "sugar": 50.0,
+   "sodium": 60,
    "servingG": 30,
    "servingLabel": "1/2 batang kecil",
    "source": "POPULER"
@@ -4585,6 +5017,8 @@
    "carbs": 24.0,
    "fat": 11.0,
    "fiber": 0.7,
+   "sugar": 21.0,
+   "sodium": 80,
    "servingG": 80,
    "servingLabel": "1 cup",
    "source": "POPULER"
@@ -4604,6 +5038,8 @@
    "carbs": 18.0,
    "fat": 48.0,
    "fiber": 8.0,
+   "sugar": 4.0,
+   "sodium": 300,
    "servingG": 30,
    "servingLabel": "1 genggam",
    "source": "POPULER"
@@ -4638,6 +5074,8 @@
    "carbs": 64.0,
    "fat": 28.0,
    "fiber": 3.0,
+   "sugar": 1.5,
+   "sodium": 500,
    "servingG": 30,
    "servingLabel": "1 genggam",
    "source": "POPULER"
@@ -4656,6 +5094,8 @@
    "carbs": 53.0,
    "fat": 35.0,
    "fiber": 4.5,
+   "sugar": 0.5,
+   "sodium": 550,
    "servingG": 30,
    "servingLabel": "1 bungkus kecil",
    "source": "POPULER"
@@ -4691,6 +5131,8 @@
    "carbs": 30.0,
    "fat": 9.0,
    "fiber": 1.0,
+   "sugar": 8.0,
+   "sodium": 400,
    "servingG": 80,
    "servingLabel": "2 buah kecil",
    "source": "POPULER"
@@ -4726,6 +5168,8 @@
    "carbs": 19.0,
    "fat": 3.0,
    "fiber": 2.5,
+   "sugar": 12.0,
+   "sodium": 30,
    "servingG": 250,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -4744,6 +5188,8 @@
    "carbs": 24.0,
    "fat": 4.5,
    "fiber": 1.5,
+   "sugar": 15.0,
+   "sodium": 30,
    "servingG": 200,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -4761,6 +5207,8 @@
    "carbs": 20.0,
    "fat": 5.0,
    "fiber": 0.5,
+   "sugar": 14.0,
+   "sodium": 60,
    "servingG": 200,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -4828,6 +5276,8 @@
    "carbs": 20.0,
    "fat": 2.5,
    "fiber": 0.3,
+   "sugar": 15.0,
+   "sodium": 60,
    "servingG": 100,
    "servingLabel": "1 cup",
    "source": "POPULER"
@@ -4846,6 +5296,8 @@
    "carbs": 25.0,
    "fat": 11.0,
    "fiber": 1.5,
+   "sugar": 5.0,
+   "sodium": 500,
    "servingG": 200,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -4863,6 +5315,8 @@
    "carbs": 33.0,
    "fat": 10.0,
    "fiber": 2.3,
+   "sugar": 3.6,
+   "sodium": 600,
    "servingG": 110,
    "servingLabel": "1 potong",
    "source": "POPULER"
@@ -4880,6 +5334,8 @@
    "carbs": 22.0,
    "fat": 10.0,
    "fiber": 1.5,
+   "sugar": 3.0,
+   "sodium": 500,
    "servingG": 200,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -4897,6 +5353,8 @@
    "carbs": 28.0,
    "fat": 10.0,
    "fiber": 2.0,
+   "sugar": 4.0,
+   "sodium": 500,
    "servingG": 150,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -4913,6 +5371,8 @@
    "carbs": 24.0,
    "fat": 15.0,
    "fiber": 1.0,
+   "sugar": 4.0,
+   "sodium": 700,
    "servingG": 120,
    "servingLabel": "1 buah",
    "source": "POPULER"
@@ -4933,6 +5393,8 @@
    "carbs": 23.0,
    "fat": 8.0,
    "fiber": 1.0,
+   "sugar": 3.0,
+   "sodium": 500,
    "servingG": 100,
    "servingLabel": "4 buah",
    "source": "POPULER"
@@ -4949,6 +5411,8 @@
    "carbs": 11.0,
    "fat": 3.5,
    "fiber": 0.6,
+   "sugar": 1.0,
+   "sodium": 450,
    "servingG": 450,
    "servingLabel": "1 mangkuk",
    "source": "POPULER"
@@ -4966,6 +5430,8 @@
    "carbs": 26.0,
    "fat": 2.5,
    "fiber": 0.8,
+   "sugar": 6.0,
+   "sodium": 400,
    "servingG": 150,
    "servingLabel": "6 potong",
    "source": "POPULER"
@@ -4980,6 +5446,8 @@
    "carbs": 23.0,
    "fat": 9.0,
    "fiber": 0.8,
+   "sugar": 3.0,
+   "sodium": 450,
    "servingG": 100,
    "servingLabel": "6 buah",
    "source": "POPULER"

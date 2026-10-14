@@ -36,13 +36,14 @@ fun MealWithElements.toDomain(): Meal = Meal(
     aiNotes = meal.aiNotes,
     suggestions = meal.suggestions.split("\n").filter { it.isNotBlank() },
     userNote = meal.userNote,
+    favorite = meal.favorite,
 )
 
 fun FoodElementEntity.toDomain(): FoodItem = FoodItem(
     id = id,
     name = name,
     grams = grams,
-    nutrients = Nutrients(calories, protein, carbs, fat, fiber),
+    nutrients = Nutrients(calories, protein, carbs, fat, fiber, sugar, sodium),
     cookingMethod = cookingMethod,
     source = NutritionSource.parse(nutritionSource),
     foodRefId = foodRefId,
@@ -64,6 +65,9 @@ fun Meal.toEntity(now: Long, createdAt: Long = now): MealEntryEntity {
         totalCarbs = t.carbs,
         totalFat = t.fat,
         totalFiber = t.fiber,
+        totalSugar = t.sugar,
+        totalSodium = t.sodium,
+        favorite = favorite,
         grade = grade?.name,
         assessments = assessments.joinToString(SEP),
         aiNotes = aiNotes,
@@ -85,6 +89,8 @@ fun FoodItem.toEntity(mealId: Long, position: Int): FoodElementEntity = FoodElem
     carbs = nutrients.carbs,
     fat = nutrients.fat,
     fiber = nutrients.fiber,
+    sugar = nutrients.sugar,
+    sodium = nutrients.sodium,
     cookingMethod = cookingMethod,
     nutritionSource = source.name,
     foodRefId = foodRefId,
@@ -97,10 +103,11 @@ fun FoodReferenceEntity.toDomain(): FoodReference = FoodReference(
     name = name,
     aliases = aliases.split(SEP).filter { it.isNotBlank() },
     category = category,
-    per100g = Nutrients(calories, protein, carbs, fat, fiber),
+    per100g = Nutrients(calories, protein, carbs, fat, fiber, sugar ?: 0.0, sodium ?: 0.0),
     defaultServingG = defaultServingG,
     servingLabel = servingLabel,
     source = source,
+    hasSugarSodium = sugar != null && sodium != null,
 )
 
 fun FoodReference.toEntity(dataVersion: Int): FoodReferenceEntity = FoodReferenceEntity(
@@ -114,6 +121,8 @@ fun FoodReference.toEntity(dataVersion: Int): FoodReferenceEntity = FoodReferenc
     carbs = per100g.carbs,
     fat = per100g.fat,
     fiber = per100g.fiber,
+    sugar = if (hasSugarSodium) per100g.sugar else null,
+    sodium = if (hasSugarSodium) per100g.sodium else null,
     defaultServingG = defaultServingG,
     servingLabel = servingLabel,
     source = source,
@@ -125,10 +134,11 @@ fun FoodDbItem.toReference(): FoodReference = FoodReference(
     name = name,
     aliases = aliases,
     category = category,
-    per100g = Nutrients(kcal, protein, carbs, fat, fiber),
+    per100g = Nutrients(kcal, protein, carbs, fat, fiber, sugar ?: 0.0, sodium ?: 0.0),
     defaultServingG = servingG,
     servingLabel = servingLabel,
     source = source,
+    hasSugarSodium = sugar != null && sodium != null,
 )
 
 fun UserProfileEntity.toDomain(): UserProfile = UserProfile(

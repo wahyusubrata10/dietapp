@@ -44,6 +44,21 @@ abstract class MealDao {
     @Query("DELETE FROM meal_entry WHERE id = :id")
     abstract suspend fun deleteMeal(id: Long)
 
+    @Query("UPDATE meal_entry SET favorite = :favorite WHERE id = :id")
+    abstract suspend fun setFavorite(id: Long, favorite: Boolean)
+
+    @Transaction
+    @Query("SELECT * FROM meal_entry WHERE favorite = 1 ORDER BY eaten_at DESC")
+    abstract fun observeFavorites(): Flow<List<MealWithElements>>
+
+    @Transaction
+    @Query("SELECT * FROM meal_entry ORDER BY eaten_at DESC LIMIT :limit")
+    abstract fun observeRecent(limit: Int): Flow<List<MealWithElements>>
+
+    @Transaction
+    @Query("SELECT * FROM meal_entry ORDER BY eaten_at ASC")
+    abstract fun observeAllMeals(): Flow<List<MealWithElements>>
+
     @Transaction
     @Query("SELECT * FROM meal_entry WHERE id = :id")
     abstract fun observeMeal(id: Long): Flow<MealWithElements?>

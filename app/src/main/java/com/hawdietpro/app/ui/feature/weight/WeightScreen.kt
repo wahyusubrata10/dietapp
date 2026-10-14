@@ -1,5 +1,6 @@
 package com.hawdietpro.app.ui.feature.weight
 
+import com.hawdietpro.app.ui.components.StatRow
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -98,7 +99,7 @@ fun WeightScreen(onBack: () -> Unit, viewModel: WeightViewModel = hiltViewModel(
             val latest = state.entries.lastOrNull()
             val first = state.entries.firstOrNull()
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                StatRow {
                     StatTile("Terakhir", latest?.let { Format.kg(it.weightKg) } ?: "-", Modifier.weight(1f), color = MaterialTheme.colorScheme.primaryContainer)
                     StatTile(
                         "Perubahan",

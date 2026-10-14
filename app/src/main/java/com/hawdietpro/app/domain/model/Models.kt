@@ -28,6 +28,7 @@ data class Meal(
     val aiNotes: String? = null,
     val suggestions: List<String> = emptyList(),
     val userNote: String? = null,
+    val favorite: Boolean = false,
 ) {
     val total: Nutrients get() = items.map { it.nutrients }.sum()
 }
@@ -41,6 +42,8 @@ data class FoodReference(
     val defaultServingG: Double,
     val servingLabel: String?,
     val source: String,
+    /** false = DB belum punya data gula/natrium untuk makanan ini (pakai estimasi AI). */
+    val hasSugarSodium: Boolean = false,
 )
 
 data class UserProfile(

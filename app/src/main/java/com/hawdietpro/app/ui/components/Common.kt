@@ -229,7 +229,7 @@ fun StatTile(
 ) {
     val bg = color ?: HawTheme.colors.card
     Surface(
-        modifier,
+        modifier.fillMaxHeight(),
         shape = MaterialTheme.shapes.medium,
         color = bg,
         border = if (color == null) BorderStroke(1.dp, HawTheme.colors.cardBorder) else null,

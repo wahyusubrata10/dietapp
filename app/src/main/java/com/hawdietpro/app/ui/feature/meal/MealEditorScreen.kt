@@ -14,6 +14,8 @@ import com.hawdietpro.app.domain.model.NutritionSource
 import com.hawdietpro.app.ui.components.Pill
 import com.hawdietpro.app.ui.components.SectionHeader
 import com.hawdietpro.app.ui.components.SegmentedMacroBar
+import com.hawdietpro.app.ui.components.SoftProgress
+import com.hawdietpro.app.domain.nutrition.NutritionLimits
 import com.hawdietpro.app.ui.theme.HawTheme
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -558,7 +560,34 @@ private fun NutritionCard(meal: Meal) {
                 MacroValue("Lemak", t.fat, split.fatPct, MacroColors.Fat)
                 MacroValue("Serat", t.fiber, null, MacroColors.Fiber)
             }
+            HorizontalDivider(color = HawTheme.colors.cardBorder)
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                LimitValue("🍬 Gula", "${Format.oneDecimal(t.sugar)} g", t.sugar / NutritionLimits.SUGAR_G, Modifier.weight(1f))
+                LimitValue("🧂 Natrium", "${Format.grouped(t.sodium.roundToInt())} mg", t.sodium / NutritionLimits.SODIUM_MG, Modifier.weight(1f))
+            }
         }
+    }
+}
+
+@Composable
+private fun LimitValue(label: String, value: String, fractionOfDaily: Double, modifier: Modifier = Modifier) {
+    val color = when {
+        fractionOfDaily >= 0.5 -> MaterialTheme.colorScheme.error
+        fractionOfDaily >= 0.3 -> HawTheme.colors.warning
+        else -> HawTheme.colors.success
+    }
+    Column(modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+            Text(value, style = MaterialTheme.typography.labelLarge)
+        }
+        Spacer(Modifier.height(6.dp))
+        SoftProgress(fractionOfDaily.toFloat(), color, height = 6.dp)
+        Text(
+            "${(fractionOfDaily * 100).roundToInt()}% batas harian",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

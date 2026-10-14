@@ -1,5 +1,6 @@
 package com.hawdietpro.app.ui.feature.profile
 
+import com.hawdietpro.app.ui.components.StatRow
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -112,7 +113,7 @@ fun ProfileScreen(
             if (p != null && t != null) {
                 item { ProfileHero(p, t, onEditProfile) }
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    StatRow {
                         StatTile("Target", Format.grouped(t.calories), Modifier.weight(1f), sub = "kkal/hari", accent = MaterialTheme.colorScheme.primary)
                         StatTile("BMI", Format.oneDecimal(t.bmi), Modifier.weight(1f), sub = t.bmiCategory, accent = MaterialTheme.colorScheme.tertiary)
                         StatTile("TDEE", Format.grouped(t.tdee), Modifier.weight(1f), sub = "kkal", accent = MaterialTheme.colorScheme.secondary)

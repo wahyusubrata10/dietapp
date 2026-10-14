@@ -40,6 +40,7 @@ data class BackupMeal(
     val aiNotes: String? = null,
     val suggestions: List<String> = emptyList(),
     val userNote: String? = null,
+    val favorite: Boolean = false,
     val items: List<BackupItem> = emptyList(),
 )
 
@@ -52,6 +53,8 @@ data class BackupItem(
     val carbs: Double,
     val fat: Double,
     val fiber: Double,
+    val sugar: Double = 0.0,
+    val sodium: Double = 0.0,
     val cookingMethod: String? = null,
     val source: String = "AI",
     val foodRefId: String? = null,

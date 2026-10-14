@@ -36,10 +36,11 @@ object TestFixtures {
                 name = it.name,
                 aliases = it.aliases,
                 category = it.category,
-                per100g = Nutrients(it.kcal, it.protein, it.carbs, it.fat, it.fiber),
+                per100g = Nutrients(it.kcal, it.protein, it.carbs, it.fat, it.fiber, it.sugar ?: 0.0, it.sodium ?: 0.0),
                 defaultServingG = it.servingG,
                 servingLabel = it.servingLabel,
                 source = it.source,
+                hasSugarSodium = it.sugar != null && it.sodium != null,
             )
         }
     }

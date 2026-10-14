@@ -1,5 +1,7 @@
 package com.hawdietpro.app.ui.feature.profile
 
+import com.hawdietpro.app.ui.components.StatRow
+import com.hawdietpro.app.ui.components.hawSegmentedColors
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -72,6 +74,7 @@ fun PersonalFields(form: ProfileForm, onChange: ((ProfileForm) -> ProfileForm) -
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
             Sex.entries.forEachIndexed { i, sex ->
                 SegmentedButton(
+                    colors = hawSegmentedColors(),
                     selected = form.sex == sex,
                     onClick = { onChange { it.copy(sex = sex) } },
                     shape = SegmentedButtonDefaults.itemShape(i, Sex.entries.size),
@@ -162,12 +165,12 @@ fun TargetSummary(target: DailyTarget, form: ProfileForm, onChange: ((ProfileFor
                 }
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        StatRow {
             StatTile("BMR", "${Format.grouped(target.bmr)}", Modifier.weight(1f), sub = "kkal istirahat")
             StatTile("TDEE", "${Format.grouped(target.tdee)}", Modifier.weight(1f), sub = "kkal/hari")
             StatTile("BMI", Format.oneDecimal(target.bmi), Modifier.weight(1f), sub = target.bmiCategory)
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        StatRow {
             StatTile("Protein", "${target.proteinG} g", Modifier.weight(1f), color = MacroColors.Protein.copy(alpha = 0.15f))
             StatTile("Karbo", "${target.carbsG} g", Modifier.weight(1f), color = MacroColors.Carbs.copy(alpha = 0.15f))
             StatTile("Lemak", "${target.fatG} g", Modifier.weight(1f), color = MacroColors.Fat.copy(alpha = 0.15f))

@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "minAppVersionCode": 1,
   "model": "gemini-flash-latest",
   "fallbackModels": [
@@ -13,7 +13,7 @@
   "fastThinkingBudget": 0,
   "maxImageSize": 1024,
   "jpegQuality": 80,
-  "systemPrompt": "Kamu adalah ahli gizi Indonesia yang menganalisis foto makanan untuk aplikasi diet. Kamu sangat paham makanan Indonesia (nasi padang, warteg, soto, pecel, gado-gado, nasi uduk, nasi kuning, ayam geprek, gorengan, jajanan pasar, dll) maupun makanan internasional.\n\nTugas:\n1. Kenali nama menu secara keseluruhan dengan nama yang lazim di Indonesia (contoh: \"Nasi Padang Rendang\", \"Nasi Uduk Komplit\", \"Pecel Lele\").\n2. Pecah SETIAP elemen yang terlihat di piring/mangkuk sebagai item terpisah: makanan pokok (nasi, lontong, mie), lauk hewani, lauk nabati, sayur, sambal, kuah/santan, kerupuk/peyek, gorengan, buah, dan minuman jika terlihat.\n3. Perkirakan berat tiap elemen dalam gram berdasarkan ukuran wadah dan alat makan sebagai pembanding (piring makan ±24 cm, mangkuk ±15 cm, sendok makan ±15 g nasi). Satu centong nasi ±100–150 g.\n4. Hitung kalori, protein, karbohidrat, lemak, dan serat untuk porsi tersebut (BUKAN per 100 g). Perhitungkan minyak goreng yang terserap, santan, gula, dan kecap.\n5. Isi metode_masak dengan salah satu: goreng, bakar, rebus, kukus, tumis, santan, panggang, mentah, berkuah, lainnya.\n6. Jumlahkan total dari semua elemen.\n7. catatan: 1–2 kalimat penting tentang komposisi gizi (contoh: \"Kuah santan dan rendang menambah lemak cukup tinggi\").\n\nAturan:\n- Gunakan nama elemen dalam Bahasa Indonesia yang umum dan singkat. Bila cocok, pakai nama dari daftar referensi yang diberikan.\n- Jangan menggabungkan elemen berbeda (nasi dan lauk harus terpisah). Bumbu/sambal yang terlihat jelas dijadikan elemen sendiri.\n- Jika ragu antara dua tebakan, pilih yang paling umum di Indonesia dan turunkan nilai confidence.\n- Jika foto bukan makanan/minuman, set adalah_makanan = false, elemen kosong, dan total 0.\n- Angka harus realistis. Jangan mengarang elemen yang tidak terlihat.",
+  "systemPrompt": "Kamu adalah ahli gizi Indonesia yang menganalisis foto makanan untuk aplikasi diet. Kamu sangat paham makanan Indonesia (nasi padang, warteg, soto, pecel, gado-gado, nasi uduk, nasi kuning, ayam geprek, gorengan, jajanan pasar, dll) maupun makanan internasional.\n\nTugas:\n1. Kenali nama menu secara keseluruhan dengan nama yang lazim di Indonesia (contoh: \"Nasi Padang Rendang\", \"Nasi Uduk Komplit\", \"Pecel Lele\").\n2. Pecah SETIAP elemen yang terlihat di piring/mangkuk sebagai item terpisah: makanan pokok (nasi, lontong, mie), lauk hewani, lauk nabati, sayur, sambal, kuah/santan, kerupuk/peyek, gorengan, buah, dan minuman jika terlihat.\n3. Perkirakan berat tiap elemen dalam gram berdasarkan ukuran wadah dan alat makan sebagai pembanding (piring makan ±24 cm, mangkuk ±15 cm, sendok makan ±15 g nasi). Satu centong nasi ±100–150 g.\n4. Hitung kalori, protein, karbohidrat, lemak, serat, gula (g), dan natrium (mg) untuk porsi tersebut (BUKAN per 100 g). Perhitungkan minyak goreng yang terserap, santan, gula, kecap manis/asin, garam, penyedap (MSG), sambal, dan kuah. Makanan Indonesia umumnya tinggi natrium, jangan diremehkan.\n5. Isi metode_masak dengan salah satu: goreng, bakar, rebus, kukus, tumis, santan, panggang, mentah, berkuah, lainnya.\n6. Jumlahkan total dari semua elemen.\n7. catatan: 1–2 kalimat penting tentang komposisi gizi (contoh: \"Kuah santan dan rendang menambah lemak cukup tinggi\").\n\nAturan:\n- Gunakan nama elemen dalam Bahasa Indonesia yang umum dan singkat. Bila cocok, pakai nama dari daftar referensi yang diberikan.\n- Jangan menggabungkan elemen berbeda (nasi dan lauk harus terpisah). Bumbu/sambal yang terlihat jelas dijadikan elemen sendiri.\n- Jika ragu antara dua tebakan, pilih yang paling umum di Indonesia dan turunkan nilai confidence.\n- Jika foto bukan makanan/minuman, set adalah_makanan = false, elemen kosong, dan total 0.\n- Angka harus realistis. Jangan mengarang elemen yang tidak terlihat.",
   "userPrompt": "Analisa foto makanan ini.\nWaktu makan: {meal_type} (pukul {time}).\n{user_hint}\nDaftar nama referensi makanan (pakai bila cocok): {reference_names}",
   "responseSchema": {
     "type": "OBJECT",
@@ -64,6 +64,14 @@
             },
             "metode_masak": {
               "type": "STRING"
+            },
+            "gula_g": {
+              "type": "NUMBER",
+              "description": "gram gula (termasuk gula tambahan, kecap manis, sirup)"
+            },
+            "natrium_mg": {
+              "type": "NUMBER",
+              "description": "miligram natrium (garam, kecap asin, penyedap, sambal, kuah)"
             }
           },
           "required": [
@@ -74,7 +82,9 @@
             "karbo_g",
             "lemak_g",
             "serat_g",
-            "metode_masak"
+            "metode_masak",
+            "gula_g",
+            "natrium_mg"
           ],
           "propertyOrdering": [
             "nama",
@@ -84,6 +94,8 @@
             "karbo_g",
             "lemak_g",
             "serat_g",
+            "gula_g",
+            "natrium_mg",
             "metode_masak"
           ]
         }
@@ -110,6 +122,14 @@
       },
       "catatan": {
         "type": "STRING"
+      },
+      "total_gula_g": {
+        "type": "NUMBER",
+        "description": "gram"
+      },
+      "total_natrium_mg": {
+        "type": "NUMBER",
+        "description": "miligram"
       }
     },
     "required": [
@@ -122,7 +142,9 @@
       "total_karbo_g",
       "total_lemak_g",
       "total_serat_g",
-      "catatan"
+      "catatan",
+      "total_gula_g",
+      "total_natrium_mg"
     ],
     "propertyOrdering": [
       "adalah_makanan",
@@ -134,6 +156,8 @@
       "total_karbo_g",
       "total_lemak_g",
       "total_serat_g",
+      "total_gula_g",
+      "total_natrium_mg",
       "catatan"
     ]
   },
@@ -212,6 +236,70 @@
       "rekomendasi",
       "contoh_menu",
       "fokus_berikutnya"
+    ]
+  },
+  "suggestSystemPrompt": "Kamu adalah ahli gizi Indonesia yang praktis. Pengguna aplikasi diet meminta saran menu untuk waktu makan berikutnya berdasarkan sisa kalori dan gizi hari ini (data JSON).\n\nAturan:\n- Beri 3–4 pilihan menu yang realistis dan mudah didapat di Indonesia sesuai preferensi tempat (warteg, nasi padang, kantin, masak sendiri, minimarket, ojek online, dll).\n- Setiap pilihan harus muat dalam sisa kalori (boleh sedikit di bawah), dan bantu memenuhi kekurangan protein/serat hari ini.\n- Perhatikan gula & natrium yang sudah dikonsumsi; bila sudah tinggi, pilih menu rendah gula/garam.\n- Sebutkan perkiraan kkal dan protein per pilihan, alasan singkat, dan cara memesan/memasak agar lebih sehat (mis. \"minta nasi setengah\", \"pilih lauk bakar\", \"kuah dipisah\").\n- Bila sisa kalori sangat sedikit (< 150 kkal) atau sudah lewat target, sarankan opsi ringan (buah, sayur, teh tawar) dengan nada suportif, tanpa menghakimi.\n- Jangan pernah menyarankan melewatkan makan atau diet ekstrem.\n- Bahasa Indonesia santai, singkat, dan bersahabat.",
+  "suggestPrompt": "Data hari ini (JSON):\n{context}\n\nBeri saran menu untuk {meal_type}.",
+  "suggestSchema": {
+    "type": "OBJECT",
+    "properties": {
+      "pembuka": {
+        "type": "STRING",
+        "description": "1–2 kalimat ringkas kondisi hari ini"
+      },
+      "opsi": {
+        "type": "ARRAY",
+        "items": {
+          "type": "OBJECT",
+          "properties": {
+            "nama": {
+              "type": "STRING"
+            },
+            "perkiraan_kkal": {
+              "type": "NUMBER"
+            },
+            "protein_g": {
+              "type": "NUMBER"
+            },
+            "alasan": {
+              "type": "STRING"
+            },
+            "tips": {
+              "type": "STRING"
+            }
+          },
+          "required": [
+            "nama",
+            "perkiraan_kkal",
+            "protein_g",
+            "alasan",
+            "tips"
+          ],
+          "propertyOrdering": [
+            "nama",
+            "perkiraan_kkal",
+            "protein_g",
+            "alasan",
+            "tips"
+          ]
+        }
+      },
+      "hindari": {
+        "type": "ARRAY",
+        "items": {
+          "type": "STRING"
+        }
+      }
+    },
+    "required": [
+      "pembuka",
+      "opsi",
+      "hindari"
+    ],
+    "propertyOrdering": [
+      "pembuka",
+      "opsi",
+      "hindari"
     ]
   }
 }

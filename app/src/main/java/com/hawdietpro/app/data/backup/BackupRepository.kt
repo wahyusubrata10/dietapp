@@ -77,10 +77,23 @@ class BackupRepository @Inject constructor(
                     aiNotes = m.aiNotes,
                     suggestions = m.suggestions,
                     userNote = m.userNote,
+                    favorite = m.favorite,
                     items = m.items.map { i ->
                         BackupItem(
-                            i.name, i.grams, i.nutrients.calories, i.nutrients.protein, i.nutrients.carbs, i.nutrients.fat, i.nutrients.fiber,
-                            i.cookingMethod, i.source.name, i.foodRefId, i.category, i.aiNutrients?.calories,
+                            name = i.name,
+                            grams = i.grams,
+                            calories = i.nutrients.calories,
+                            protein = i.nutrients.protein,
+                            carbs = i.nutrients.carbs,
+                            fat = i.nutrients.fat,
+                            fiber = i.nutrients.fiber,
+                            sugar = i.nutrients.sugar,
+                            sodium = i.nutrients.sodium,
+                            cookingMethod = i.cookingMethod,
+                            source = i.source.name,
+                            foodRefId = i.foodRefId,
+                            category = i.category,
+                            aiCalories = i.aiNutrients?.calories,
                         )
                     },
                 )
@@ -147,7 +160,7 @@ class BackupRepository @Inject constructor(
                         FoodItem(
                             name = i.name,
                             grams = i.grams,
-                            nutrients = Nutrients(i.calories, i.protein, i.carbs, i.fat, i.fiber),
+                            nutrients = Nutrients(i.calories, i.protein, i.carbs, i.fat, i.fiber, i.sugar, i.sodium),
                             cookingMethod = i.cookingMethod,
                             source = NutritionSource.parse(i.source),
                             foodRefId = i.foodRefId,
@@ -160,6 +173,7 @@ class BackupRepository @Inject constructor(
                     aiNotes = bm.aiNotes,
                     suggestions = bm.suggestions,
                     userNote = bm.userNote,
+                    favorite = bm.favorite,
                 )
                 val now = System.currentTimeMillis()
                 meals.saveMeal(meal.toEntity(now), meal.items.mapIndexed { idx, it -> it.toEntity(0, idx) })
@@ -198,7 +212,7 @@ class BackupRepository @Inject constructor(
         val out = context.contentResolver.openOutputStream(target) ?: error("Tidak bisa menulis file")
         OutputStreamWriter(out, Charsets.UTF_8).use { w ->
             w.write("﻿")
-            w.write("Tanggal;Jam;Waktu makan;Menu;Elemen;Gram;Kalori (kkal);Protein (g);Karbo (g);Lemak (g);Serat (g);Metode masak;Sumber angka;Skor gizi;Penilaian;Catatan\n")
+            w.write("Tanggal;Jam;Waktu makan;Menu;Elemen;Gram;Kalori (kkal);Protein (g);Karbo (g);Lemak (g);Serat (g);Gula (g);Natrium (mg);Metode masak;Sumber angka;Skor gizi;Penilaian;Catatan\n")
             all.forEach { m ->
                 val dt = Instant.ofEpochMilli(m.eatenAt).atZone(zone)
                 m.items.forEach { i ->
@@ -215,6 +229,8 @@ class BackupRepository @Inject constructor(
                             dec(i.nutrients.carbs),
                             dec(i.nutrients.fat),
                             dec(i.nutrients.fiber),
+                            dec(i.nutrients.sugar),
+                            dec(i.nutrients.sodium),
                             i.cookingMethod.orEmpty(),
                             i.source.label,
                             m.grade?.name.orEmpty(),

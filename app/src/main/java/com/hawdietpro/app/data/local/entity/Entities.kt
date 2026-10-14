@@ -39,6 +39,9 @@ data class MealEntryEntity(
     @ColumnInfo(name = "total_carbs") val totalCarbs: Double,
     @ColumnInfo(name = "total_fat") val totalFat: Double,
     @ColumnInfo(name = "total_fiber") val totalFiber: Double,
+    @ColumnInfo(name = "total_sugar", defaultValue = "0") val totalSugar: Double = 0.0,
+    @ColumnInfo(name = "total_sodium", defaultValue = "0") val totalSodium: Double = 0.0,
+    @ColumnInfo(defaultValue = "0") val favorite: Boolean = false,
     val grade: String?,
     /** Label penilaian, dipisah "|" (contoh: "Tinggi karbo|Kurang sayur"). */
     val assessments: String,
@@ -73,6 +76,8 @@ data class FoodElementEntity(
     val carbs: Double,
     val fat: Double,
     val fiber: Double,
+    @ColumnInfo(defaultValue = "0") val sugar: Double = 0.0,
+    @ColumnInfo(defaultValue = "0") val sodium: Double = 0.0,
     @ColumnInfo(name = "cooking_method") val cookingMethod: String?,
     @ColumnInfo(name = "nutrition_source") val nutritionSource: String,
     @ColumnInfo(name = "food_ref_id") val foodRefId: String?,
@@ -102,6 +107,10 @@ data class FoodReferenceEntity(
     val carbs: Double,
     val fat: Double,
     val fiber: Double,
+    /** Gula g/100 g; null = belum ada data. */
+    val sugar: Double? = null,
+    /** Natrium mg/100 g; null = belum ada data. */
+    val sodium: Double? = null,
     @ColumnInfo(name = "default_serving_g") val defaultServingG: Double,
     @ColumnInfo(name = "serving_label") val servingLabel: String?,
     /** TKPI, POPULER, atau USER (ditambah pengguna). */

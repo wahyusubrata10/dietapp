@@ -79,6 +79,8 @@ import com.hawdietpro.app.ui.components.HeroMacro
 import com.hawdietpro.app.ui.components.LoadingBox
 import com.hawdietpro.app.ui.components.MealRow
 import com.hawdietpro.app.ui.components.SectionHeader
+import com.hawdietpro.app.ui.components.SoftProgress
+import com.hawdietpro.app.domain.nutrition.NutritionLimits
 import com.hawdietpro.app.ui.components.mealTypeColor
 import com.hawdietpro.app.ui.feature.weight.WeightEstimateCompact
 import com.hawdietpro.app.ui.theme.HawTheme
@@ -203,6 +205,8 @@ fun HomeScreen(
         }
 
         item { HeroCard(state) }
+
+        if (state.meals.isNotEmpty()) item { LimitsCard(state.total.sugar, state.total.sodium) }
 
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -393,6 +397,35 @@ private fun HeroCard(state: HomeState) {
                 }
             }
         }
+    }
+}
+
+/** Batas harian gula & garam (Kemenkes): ringkas, satu kartu. */
+@Composable
+private fun LimitsCard(sugar: Double, sodium: Double) {
+    HawCard(contentPadding = 14.dp) {
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            LimitBar("🍬 Gula", sugar, NutritionLimits.SUGAR_G, "g", Modifier.weight(1f))
+            LimitBar("🧂 Natrium", sodium, NutritionLimits.SODIUM_MG, "mg", Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+private fun LimitBar(label: String, value: Double, limit: Double, unit: String, modifier: Modifier) {
+    val ratio = (value / limit).toFloat()
+    val color = when {
+        ratio > 1f -> MaterialTheme.colorScheme.error
+        ratio > 0.75f -> HawTheme.colors.warning
+        else -> HawTheme.colors.success
+    }
+    Column(modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+            Text("${Format.grouped(value.roundToInt())}/${Format.grouped(limit.roundToInt())} $unit", style = MaterialTheme.typography.labelMedium)
+        }
+        Spacer(Modifier.height(6.dp))
+        SoftProgress(ratio, color, height = 7.dp)
     }
 }
 

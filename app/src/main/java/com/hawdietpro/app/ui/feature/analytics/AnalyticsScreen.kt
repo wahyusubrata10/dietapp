@@ -1,5 +1,7 @@
 package com.hawdietpro.app.ui.feature.analytics
 
+import com.hawdietpro.app.ui.components.StatRow
+import com.hawdietpro.app.ui.components.hawSegmentedColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -54,6 +57,7 @@ import com.hawdietpro.app.domain.insight.RankedItem
 import com.hawdietpro.app.domain.model.Grade
 import com.hawdietpro.app.domain.model.MealType
 import com.hawdietpro.app.domain.nutrition.DailyTarget
+import com.hawdietpro.app.domain.nutrition.NutritionLimits
 import com.hawdietpro.app.ui.components.BarChart
 import com.hawdietpro.app.ui.components.Banner
 import com.hawdietpro.app.ui.components.ChartLegend
@@ -94,7 +98,13 @@ fun AnalyticsScreen(onOpenWeight: () -> Unit, viewModel: AnalyticsViewModel = hi
         Column(Modifier.padding(padding).fillMaxSize()) {
             PrimaryTabRow(selectedTabIndex = tab, containerColor = MaterialTheme.colorScheme.background) {
                 TABS.forEachIndexed { i, title ->
-                    Tab(selected = tab == i, onClick = { viewModel.setTab(i) }, text = { Text(title) })
+                    Tab(
+                        selected = tab == i,
+                        onClick = { viewModel.setTab(i) },
+                        text = { Text(title, fontWeight = if (tab == i) FontWeight.Bold else FontWeight.Medium) },
+                        selectedContentColor = MaterialTheme.colorScheme.primary,
+                        unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
             LazyColumn(
@@ -121,6 +131,7 @@ private fun LazyListScope.periodHeader(state: AnalyticsUi, viewModel: AnalyticsV
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
             listOf(Period.WEEK to "Mingguan", Period.MONTH to "Bulanan").forEachIndexed { i, (p, label) ->
                 SegmentedButton(
+                    colors = hawSegmentedColors(),
                     selected = state.period == p,
                     onClick = { viewModel.setPeriod(p) },
                     shape = SegmentedButtonDefaults.itemShape(i, 2),
@@ -145,8 +156,11 @@ private fun LazyListScope.periodHeader(state: AnalyticsUi, viewModel: AnalyticsV
 }
 
 private fun rangeLabel(period: Period, start: LocalDate, end: LocalDate, offset: Int): String = when (period) {
-    Period.MONTH -> Format.monthYear(start) + if (offset == 0) " (bulan ini)" else ""
-    else -> "${Format.dayMonth(start)} – ${Format.shortDate(end)}" + if (offset == 0) "\n(minggu ini)" else ""
+    Period.MONTH -> Format.monthYear(start) + if (offset == 0) " · bulan ini" else ""
+    else -> {
+        val range = if (start.month == end.month) "${start.dayOfMonth}–${Format.shortDate(end)}" else "${Format.dayMonth(start)} – ${Format.shortDate(end)}"
+        range + if (offset == 0) " · minggu ini" else ""
+    }
 }
 
 private fun dayLabels(stats: PeriodStats, period: Period) =
@@ -221,7 +235,7 @@ private fun SummaryTiles(stats: PeriodStats, prev: PeriodStats?, target: Int?) {
     val avg = stats.averagePerDay.calories
     val prevAvg = prev?.takeIf { it.daysLogged > 0 }?.averagePerDay?.calories
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        StatRow {
             StatTile(
                 "Rata-rata/hari",
                 Format.grouped(avg.roundToInt()),
@@ -242,7 +256,7 @@ private fun SummaryTiles(stats: PeriodStats, prev: PeriodStats?, target: Int?) {
                 sub = prevAvg?.let { "lalu ${Format.grouped(it.roundToInt())} kkal" } ?: "belum ada data",
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        StatRow {
             StatTile("Tercatat", "${stats.daysLogged}/${stats.days.size}", Modifier.weight(1f), sub = "hari")
             if (target != null) {
                 StatTile("Sesuai", "${stats.daysOnTarget}", Modifier.weight(1f), sub = "hari (±10%)")
@@ -411,8 +425,42 @@ private fun LazyListScope.nutritionTab(stats: PeriodStats, target: DailyTarget?)
             }
         }
     }
+    item { SugarSaltCard(stats) }
     item { GradeCard(stats) }
     if (stats.topSources.isNotEmpty()) item { RankCard("Sumber kalori terbesar", stats.topSources, showCount = false) }
+}
+
+@Composable
+private fun SugarSaltCard(stats: PeriodStats) {
+    val logged = stats.days.filter { it.mealCount > 0 }
+    val avg = stats.averagePerDay
+    val sugarOver = logged.count { it.nutrients.sugar > NutritionLimits.SUGAR_G }
+    val sodiumOver = logged.count { it.nutrients.sodium > NutritionLimits.SODIUM_MG }
+    HawCard {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Gula & garam", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Batas harian Kemenkes: gula 50 g (±4 sdm) · natrium 2.000 mg (±5 g garam / 1 sdt).",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            StatRow {
+                StatTile("Gula rata-rata", "${avg.sugar.roundToInt()} g", Modifier.weight(1f), sub = "$sugarOver hari lewat batas", accent = MacroColors.Carbs)
+                StatTile("Natrium rata-rata", "${Format.grouped(avg.sodium.roundToInt())} mg", Modifier.weight(1f), sub = "$sodiumOver hari lewat batas", accent = MacroColors.Fat)
+            }
+            BarChart(
+                values = stats.days.map { it.nutrients.sodium },
+                labels = stats.days.map { it.date.dayOfMonth.toString() },
+                tooltipLabels = dayTooltips(stats),
+                target = NutritionLimits.SODIUM_MG,
+                targetLabel = "Batas natrium",
+                barColor = MacroColors.Fat,
+                valueFormat = { Format.grouped(it.roundToInt()) },
+                height = 170.dp,
+                emptyText = "Belum ada data natrium",
+            )
+        }
+    }
 }
 
 @Composable
@@ -449,8 +497,8 @@ private fun LazyListScope.patternTab(stats: PeriodStats, period: Period) {
         return
     }
     item {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            StatTile("Streak", "${stats.currentStreak}", Modifier.weight(1f), sub = "hari berturut-turut", color = MaterialTheme.colorScheme.primaryContainer)
+        StatRow {
+            StatTile("Streak", "${stats.currentStreak}", Modifier.weight(1f), sub = "hari beruntun", color = MaterialTheme.colorScheme.primaryContainer)
             StatTile("Konsistensi", "${(stats.daysLogged * 100 / stats.days.size.coerceAtLeast(1))}%", Modifier.weight(1f), sub = "hari tercatat")
             StatTile("Larut malam", "${(stats.metrics["lateNightShare"] ?: 0.0).roundToInt()}%", Modifier.weight(1f), sub = "kalori ≥ 21.00")
         }

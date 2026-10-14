@@ -80,7 +80,7 @@ class MealAnalyzer @Inject constructor(
         result.elements
             .filter { it.name.isNotBlank() && it.grams > 0 }
             .map { e ->
-                val ai = Nutrients(e.calories, e.protein, e.carbs, e.fat, e.fiber)
+                val ai = Nutrients(e.calories, e.protein, e.carbs, e.fat, e.fiber, e.sugar.coerceAtLeast(0.0), e.sodium.coerceAtLeast(0.0))
                 val item = FoodItem(
                     name = e.name.trim().replaceFirstChar { it.uppercase() },
                     grams = e.grams,

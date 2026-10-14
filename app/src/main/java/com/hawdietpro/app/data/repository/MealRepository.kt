@@ -4,6 +4,7 @@ import com.hawdietpro.app.data.local.dao.MealDao
 import com.hawdietpro.app.data.local.toDomain
 import com.hawdietpro.app.data.local.toEntity
 import com.hawdietpro.app.domain.model.Meal
+import com.hawdietpro.app.domain.model.MealType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -58,6 +59,45 @@ class MealRepository @Inject constructor(
     }
 
     suspend fun getAll(): List<Meal> = dao.getAllMeals().map { it.toDomain() }
+
+    fun observeAll(): Flow<List<Meal>> = dao.observeAllMeals().map { list -> list.map { it.toDomain() } }
+
+    suspend fun setFavorite(id: Long, favorite: Boolean) = dao.setFavorite(id, favorite)
+
+    fun observeFavorites(): Flow<List<Meal>> = dao.observeFavorites().map { list ->
+        list.map { it.toDomain() }.distinctBy { it.menuName.trim().lowercase() }
+    }
+
+    /** Menu terakhir (unik per nama) untuk "makan lagi". */
+    fun observeRecentDistinct(limit: Int = 20): Flow<List<Meal>> = dao.observeRecent(200).map { list ->
+        list.map { it.toDomain() }.distinctBy { it.menuName.trim().lowercase() }.take(limit)
+    }
+
+    /**
+     * Mencatat ulang makan yang sama pada waktu [eatenAt] (foto disalin agar tetap aman
+     * walau catatan aslinya dihapus). Mengembalikan id catatan baru.
+     */
+    suspend fun duplicate(meal: Meal, eatenAt: Long, mealType: MealType = meal.mealType): Long {
+        val photo = meal.photoPath?.let { path ->
+            withContext(Dispatchers.IO) {
+                val src = File(path)
+                if (!src.exists()) null else {
+                    val dest = File(src.parentFile, "copy_${System.currentTimeMillis()}_${src.name}")
+                    runCatching { src.copyTo(dest, overwrite = true).path }.getOrNull()
+                }
+            }
+        }
+        return save(
+            meal.copy(
+                id = 0,
+                eatenAt = eatenAt,
+                mealType = mealType,
+                photoPath = photo,
+                favorite = false,
+                items = meal.items.map { it.copy(id = 0) },
+            ),
+        )
+    }
 
     suspend fun firstMealDate(): LocalDate? =
         dao.firstMealTime()?.let { Instant.ofEpochMilli(it).atZone(zone).toLocalDate() }

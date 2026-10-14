@@ -1,5 +1,6 @@
 package com.hawdietpro.app.ui.feature.history
 
+import com.hawdietpro.app.ui.components.hawSegmentedColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -88,12 +89,14 @@ fun HistoryScreen(
             item {
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                     SegmentedButton(
+                        colors = hawSegmentedColors(),
                         selected = state.mode == HistoryMode.TIMELINE,
                         onClick = { viewModel.setMode(HistoryMode.TIMELINE) },
                         shape = SegmentedButtonDefaults.itemShape(0, 2),
                         icon = { Icon(Icons.AutoMirrored.Filled.ViewList, null, Modifier.size(18.dp)) },
                     ) { Text("Timeline") }
                     SegmentedButton(
+                        colors = hawSegmentedColors(),
                         selected = state.mode == HistoryMode.CALENDAR,
                         onClick = { viewModel.setMode(HistoryMode.CALENDAR) },
                         shape = SegmentedButtonDefaults.itemShape(1, 2),

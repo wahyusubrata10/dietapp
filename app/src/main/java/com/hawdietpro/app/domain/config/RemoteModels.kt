@@ -78,6 +78,10 @@ data class FoodDbItem(
     val carbs: Double,
     val fat: Double,
     val fiber: Double = 0.0,
+    /** Gula g/100 g (null = belum ada data). */
+    val sugar: Double? = null,
+    /** Natrium mg/100 g (null = belum ada data). */
+    val sodium: Double? = null,
     val servingG: Double = 100.0,
     val servingLabel: String? = null,
     val source: String = "POPULER",
