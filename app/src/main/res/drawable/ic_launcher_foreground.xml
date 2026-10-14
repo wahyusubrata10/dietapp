@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Piring + daun: logo Haw Diet Pro -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- piring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:pathData="M54,30a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
+    <!-- daun -->
+    <path
+        android:fillColor="#B9F6CA"
+        android:pathData="M42,66C42,50 52,40 68,40C68,56 58,66 42,66Z" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#2E7D5B"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M45,63L62,46" />
+</vector>

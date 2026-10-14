@@ -1,0 +1,17 @@
+# Gradle / build
+.gradle/
+build/
+/local.properties
+/captures
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+# IDE
+.idea/
+*.iml
+.DS_Store
+# Signing — JANGAN pernah commit keystore
+*.jks
+*.keystore
+keystore.properties

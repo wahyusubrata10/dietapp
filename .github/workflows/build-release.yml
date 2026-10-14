@@ -1,0 +1,117 @@
+name: Build & Release APK
+
+on:
+  push:
+    branches: [main]
+    # Perubahan yang hanya menyentuh remote config / dokumentasi tidak perlu APK baru.
+    paths-ignore:
+      - 'remote/**'
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # butuh riwayat + tag untuk changelog
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Tentukan versi
+        id: ver
+        run: |
+          CODE=${{ github.run_number }}
+          NAME="$(TZ=Asia/Jakarta date +%Y.%m.%d).${CODE}"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "Versi: $NAME (versionCode $CODE)"
+
+      - name: Siapkan keystore
+        id: ks
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "path=$RUNNER_TEMP/release.jks" >> "$GITHUB_OUTPUT"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Secret KEYSTORE_BASE64 belum diisi. APK tidak ditandatangani dan GitHub Release tidak dibuat. Lihat README bagian 'Setup keystore'."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Unit test
+        run: ./gradlew --stacktrace testReleaseUnitTest
+
+      - name: Build release APK
+        env:
+          VERSION_CODE: ${{ steps.ver.outputs.code }}
+          VERSION_NAME: ${{ steps.ver.outputs.name }}
+          KEYSTORE_PATH: ${{ steps.ks.outputs.path }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew --stacktrace assembleRelease
+
+      - name: Rapikan nama APK
+        id: apk
+        run: |
+          SRC=$(ls app/build/outputs/apk/release/*.apk | head -n1)
+          DEST="HawDietPro-${{ steps.ver.outputs.name }}.apk"
+          cp "$SRC" "$DEST"
+          echo "file=$DEST" >> "$GITHUB_OUTPUT"
+          ls -la "$DEST"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HawDietPro-${{ steps.ver.outputs.name }}
+          path: ${{ steps.apk.outputs.file }}
+          retention-days: 14
+
+      - name: Susun changelog
+        if: steps.ks.outputs.signed == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          PREV=$(git describe --tags --abbrev=0 --match 'build-*' 2>/dev/null || true)
+          {
+            echo "## Perubahan"
+            if [ -n "$PREV" ]; then
+              git log "$PREV..HEAD" --no-merges --pretty=format:'- %s'
+            else
+              git log -n 30 --no-merges --pretty=format:'- %s'
+            fi
+            echo
+          } > changelog.md
+          cat changelog.md
+
+      - name: Buat GitHub Release
+        if: steps.ks.outputs.signed == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "build-${{ steps.ver.outputs.code }}" \
+            "${{ steps.apk.outputs.file }}" \
+            --title "Haw Diet Pro ${{ steps.ver.outputs.name }}" \
+            --notes-file changelog.md \
+            --target "$GITHUB_SHA" \
+            --latest
