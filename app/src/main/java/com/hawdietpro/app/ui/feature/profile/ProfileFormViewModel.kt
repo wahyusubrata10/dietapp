@@ -35,16 +35,24 @@ data class ProfileForm(
 ) {
     private fun num(s: String) = s.replace(',', '.').trim().toDoubleOrNull()
 
+    /** Null = valid (atau kosong). Kosong ditangani oleh pengecekan wajib isi. */
+    private fun rangeError(raw: String, value: Double?, range: ClosedFloatingPointRange<Double>, message: String): String? = when {
+        raw.isBlank() -> null
+        value == null -> "Angka tidak valid"
+        value !in range -> message
+        else -> null
+    }
+
     val ageValue get() = age.trim().toIntOrNull()
     val heightValue get() = num(height)
     val weightValue get() = num(weight)
     val targetWeightValue get() = num(targetWeight)
     val customValue get() = customCalories.trim().toIntOrNull()
 
-    val ageError get() = ageValue?.let { if (it !in 13..100) "Umur 13–100 tahun" else null } ?: if (age.isNotBlank()) "Angka tidak valid" else null
-    val heightError get() = heightValue?.let { if (it !in 100.0..250.0) "Tinggi 100–250 cm" else null } ?: if (height.isNotBlank()) "Angka tidak valid" else null
-    val weightError get() = weightValue?.let { if (it !in 25.0..300.0) "Berat 25–300 kg" else null } ?: if (weight.isNotBlank()) "Angka tidak valid" else null
-    val targetWeightError get() = if (targetWeight.isBlank()) null else targetWeightValue?.let { if (it !in 25.0..300.0) "Berat 25–300 kg" else null } ?: "Angka tidak valid"
+    val ageError get() = rangeError(age, ageValue?.toDouble(), 13.0..100.0, "Umur 13–100 tahun")
+    val heightError get() = rangeError(height, heightValue, 100.0..250.0, "Tinggi 100–250 cm")
+    val weightError get() = rangeError(weight, weightValue, 25.0..300.0, "Berat 25–300 kg")
+    val targetWeightError get() = rangeError(targetWeight, targetWeightValue, 25.0..300.0, "Berat 25–300 kg")
 
     val personalValid get() = name.isNotBlank() && ageValue != null && ageError == null
     val bodyValid get() = heightValue != null && heightError == null && weightValue != null && weightError == null && targetWeightError == null
