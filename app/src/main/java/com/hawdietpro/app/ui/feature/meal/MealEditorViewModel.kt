@@ -51,6 +51,8 @@ data class EditorState(
     /** Pesan selesai (lalu layar ditutup). */
     val finishedMessage: String? = null,
     val dirty: Boolean = false,
+    /** Pengali porsi seluruh piring (1 = sesuai foto/catatan). */
+    val portion: Double = 1.0,
 )
 
 @HiltViewModel
@@ -139,7 +141,7 @@ class MealEditorViewModel @Inject constructor(
         analysisJob = viewModelScope.launch {
             try {
                 val result = analyzer.analyze(photo, s.meal.mealType, s.meal.eatenAt, s.hint)
-                _state.update { it.copy(meal = result.copy(id = it.meal.id, userNote = it.meal.userNote), phase = EditorPhase.Ready, dirty = true) }
+                _state.update { it.copy(meal = result.copy(id = it.meal.id, userNote = it.meal.userNote), phase = EditorPhase.Ready, dirty = true, portion = 1.0) }
             } catch (e: GeminiError) {
                 _state.update { it.copy(phase = EditorPhase.Error(e.message ?: "Analisa gagal", e.retryable, e.queueable && pendingId == null)) }
             } catch (e: kotlinx.coroutines.CancellationException) {
@@ -235,6 +237,24 @@ class MealEditorViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Mengalikan seluruh elemen piring, mis. "hanya makan setengah". Relatif terhadap porsi
+     * sebelumnya, sehingga bisa dipilih bolak-balik tanpa kehilangan angka asli.
+     */
+    fun setPortion(factor: Double) {
+        val current = _state.value.portion
+        if (factor <= 0 || factor == current) return
+        val ratio = factor / current
+        viewModelScope.launch {
+            val items = _state.value.meal.items.map { item ->
+                val ref = if (item.source == NutritionSource.DB) item.foodRefId?.let { foods.getById(it) } else null
+                NutritionCalculator.rescale(item, item.grams * ratio, ref)
+            }
+            mutateMeal { it.copy(items = items) }
+            _state.update { it.copy(portion = factor) }
+        }
+    }
+
     /** Simpan perubahan dari lembar edit elemen: nama & gram sekaligus (berurutan, tanpa race). */
     fun updateItem(index: Int, name: String, grams: Double) {
         viewModelScope.launch {
@@ -306,6 +326,26 @@ class MealEditorViewModel @Inject constructor(
             committed = true
             pendingId?.let { pending.remove(it, deletePhoto = false) }
             _state.update { it.copy(finishedMessage = if (s.mode == EditorMode.EDIT) "Perubahan disimpan" else "Tersimpan: ${meal.menuName}") }
+        }
+    }
+
+    /** Tandai/lepas favorit. Untuk catatan tersimpan langsung diperbarui di database. */
+    fun toggleFavorite() {
+        val newValue = !_state.value.meal.favorite
+        _state.update { it.copy(meal = it.meal.copy(favorite = newValue)) }
+        val id = _state.value.meal.id
+        if (id != 0L) viewModelScope.launch { meals.setFavorite(id, newValue) }
+    }
+
+    /** Catat ulang makan ini sekarang (mis. menu yang sama untuk makan siang hari ini). */
+    fun eatAgainNow() {
+        val meal = _state.value.meal
+        if (meal.id == 0L || meal.items.isEmpty()) return
+        viewModelScope.launch {
+            val now = System.currentTimeMillis()
+            val type = MealType.fromHour(hourOf(now))
+            meals.duplicate(meal, now, type)
+            _state.update { it.copy(finishedMessage = "Dicatat lagi: ${meal.menuName} (${type.label})") }
         }
     }
 

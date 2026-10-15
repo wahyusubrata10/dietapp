@@ -53,6 +53,9 @@ import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -138,7 +141,17 @@ fun MealEditorScreen(
         title = title,
         onBack = { onClose(null) },
         actions = {
+            if (state.phase == EditorPhase.Ready) {
+                IconButton(onClick = viewModel::toggleFavorite) {
+                    Icon(
+                        if (state.meal.favorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                        contentDescription = if (state.meal.favorite) "Hapus dari favorit" else "Jadikan favorit",
+                        tint = if (state.meal.favorite) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
             if (state.mode == EditorMode.EDIT) {
+                IconButton(onClick = viewModel::eatAgainNow) { Icon(Icons.Filled.Replay, contentDescription = "Makan lagi sekarang") }
                 IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Filled.Delete, contentDescription = "Hapus") }
             }
         },
@@ -451,6 +464,10 @@ private fun EditorContent(
 
         item { NutritionCard(meal) }
 
+        if (meal.items.isNotEmpty()) {
+            item { PortionSelector(state.portion, viewModel::setPortion) }
+        }
+
         if (meal.grade != null) item { AssessmentCard(meal) }
 
         item {
@@ -588,6 +605,46 @@ private fun LimitValue(label: String, value: String, fractionOfDaily: Double, mo
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+private val PORTIONS = listOf(0.5 to "½", 0.75 to "¾", 1.0 to "1", 1.5 to "1½", 2.0 to "2")
+
+/** Porsi cepat untuk seluruh piring. */
+@Composable
+private fun PortionSelector(current: Double, onSelect: (Double) -> Unit) {
+    HawCard(contentPadding = 14.dp) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Porsi yang dimakan", style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                Text(
+                    if (current == 1.0) "sesuai foto" else "× ${Format.oneDecimal(current)}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                PORTIONS.forEach { (value, label) ->
+                    val selected = current == value
+                    Surface(
+                        onClick = { onSelect(value) },
+                        shape = MaterialTheme.shapes.medium,
+                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer,
+                        contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f).height(44.dp),
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(label, style = MaterialTheme.typography.titleMedium)
+                        }
+                    }
+                }
+            }
+            Text(
+                "Mis. hanya habis setengah piring → pilih ½. Semua elemen ikut disesuaikan.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 

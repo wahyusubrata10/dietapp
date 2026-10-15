@@ -27,11 +27,15 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.CloudQueue
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.MonitorWeight
@@ -82,6 +86,7 @@ import com.hawdietpro.app.ui.components.SectionHeader
 import com.hawdietpro.app.ui.components.SoftProgress
 import com.hawdietpro.app.domain.nutrition.NutritionLimits
 import com.hawdietpro.app.ui.components.mealTypeColor
+import com.hawdietpro.app.ui.feature.suggest.MenuSuggestionSheet
 import com.hawdietpro.app.ui.feature.weight.WeightEstimateCompact
 import com.hawdietpro.app.ui.theme.HawTheme
 import com.hawdietpro.app.ui.theme.MacroColors
@@ -116,6 +121,7 @@ fun HomeScreen(
     onOpenSettings: () -> Unit,
     onOpenWeight: () -> Unit,
     onOpenProfile: () -> Unit,
+    onOpenAchievements: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -127,6 +133,9 @@ fun HomeScreen(
         onPauseOrDispose { }
     }
     RequestNotificationPermissionOnce()
+
+    var showSuggest by rememberSaveable { mutableStateOf(false) }
+    if (showSuggest) MenuSuggestionSheet(onDismiss = { showSuggest = false })
 
     if (state.loading) {
         LoadingBox()
@@ -204,7 +213,21 @@ fun HomeScreen(
             }
         }
 
-        item { HeroCard(state) }
+        if (state.newAchievements.isNotEmpty()) {
+            item {
+                val fresh = state.newAchievements
+                Banner(
+                    title = if (fresh.size == 1) "Badge baru: ${fresh.first().emoji} ${fresh.first().title}" else "${fresh.size} badge baru terbuka!",
+                    text = if (fresh.size == 1) fresh.first().description + ". Ketuk untuk melihat koleksi." else fresh.joinToString("  ") { it.emoji } + "  · Ketuk untuk melihat.",
+                    icon = Icons.Filled.EmojiEvents,
+                    container = MaterialTheme.colorScheme.tertiaryContainer,
+                    content = MaterialTheme.colorScheme.onTertiaryContainer,
+                    onClick = onOpenAchievements,
+                )
+            }
+        }
+
+        item { HeroCard(state, onSuggest = { showSuggest = true }) }
 
         if (state.meals.isNotEmpty()) item { LimitsCard(state.total.sugar, state.total.sodium) }
 
@@ -254,6 +277,8 @@ fun HomeScreen(
                     suggested = state.target?.let { (it.calories * (MEAL_SHARE[type] ?: 0.25)).roundToInt() },
                     onAdd = { addFor(type) },
                     onOpenMeal = onOpenMeal,
+                    previous = state.previousDayByType[type].orEmpty(),
+                    onCopyPrevious = { viewModel.copyFromPreviousDay(type) },
                 )
             }
         }
@@ -357,7 +382,7 @@ private fun DayItem(day: DayChip, selected: Boolean, target: Int?, onClick: () -
 }
 
 @Composable
-private fun HeroCard(state: HomeState) {
+private fun HeroCard(state: HomeState, onSuggest: () -> Unit) {
     val hc = HawTheme.colors
     val target = state.target
     Box(
@@ -394,6 +419,34 @@ private fun HeroCard(state: HomeState) {
                     HeroMacro("Karbo", state.total.carbs, target.carbsG, MacroColors.Carbs, hc.heroContent, hc.heroContentSub, hc.heroTrack, Modifier.weight(1f))
                     HeroMacro("Lemak", state.total.fat, target.fatG, Color(0xFF9FC1FF), hc.heroContent, hc.heroContentSub, hc.heroTrack, Modifier.weight(1f))
                     HeroMacro("Serat", state.total.fiber, target.fiberG, Color(0xFFB9F6CA), hc.heroContent, hc.heroContentSub, hc.heroTrack, Modifier.weight(1f))
+                }
+            }
+            if (state.isToday && state.hasApiKey) {
+                Spacer(Modifier.height(16.dp))
+                Surface(
+                    onClick = onSuggest,
+                    shape = RoundedCornerShape(16.dp),
+                    color = hc.heroTrack,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(Modifier.padding(horizontal = 14.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.AutoAwesome, null, tint = hc.heroContent, modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(10.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text("Bingung mau makan apa?", style = MaterialTheme.typography.labelLarge, color = hc.heroContent, fontWeight = FontWeight.Bold)
+                            val remaining = target?.let { it.calories - state.total.calories.roundToInt() }
+                            Text(
+                                when {
+                                    remaining == null -> "Minta saran menu dari AI"
+                                    remaining > 0 -> "Saran menu AI untuk sisa ${Format.grouped(remaining)} kkal"
+                                    else -> "Saran menu ringan, target hari ini sudah terpenuhi"
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = hc.heroContentSub,
+                            )
+                        }
+                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = hc.heroContent)
+                    }
                 }
             }
         }
@@ -462,6 +515,8 @@ private fun MealTypeCard(
     suggested: Int?,
     onAdd: () -> Unit,
     onOpenMeal: (Long) -> Unit,
+    previous: List<com.hawdietpro.app.domain.model.Meal> = emptyList(),
+    onCopyPrevious: () -> Unit = {},
 ) {
     val color = mealTypeColor(type)
     val kcal = meals.sumOf { it.total.calories }
@@ -486,6 +541,31 @@ private fun MealTypeCard(
                     onClick = onAdd,
                     colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = color.copy(alpha = 0.14f), contentColor = color),
                 ) { Icon(Icons.Filled.Add, contentDescription = "Tambah ${type.label}") }
+            }
+            if (meals.isEmpty() && previous.isNotEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                Surface(
+                    onClick = onCopyPrevious,
+                    shape = MaterialTheme.shapes.medium,
+                    color = color.copy(alpha = 0.08f),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.ContentCopy, null, tint = color, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(10.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text("Sama seperti kemarin?", style = MaterialTheme.typography.labelLarge, color = color)
+                            Text(
+                                previous.joinToString(", ") { it.menuName } + " · " + Format.kcal(previous.sumOf { it.total.calories }),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                        Text("Salin", style = MaterialTheme.typography.labelLarge, color = color)
+                    }
+                }
             }
             if (meals.isNotEmpty()) {
                 Spacer(Modifier.height(6.dp))

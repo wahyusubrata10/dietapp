@@ -75,6 +75,24 @@ class GeminiClient @Inject constructor(
             .getOrElse { throw GeminiError.BadResponse("JSON analisa") }
     }
 
+    fun suggestionAvailable(): Boolean = store.geminiPrompt.value.let {
+        it.suggestSystemPrompt != null && it.suggestPrompt != null && it.suggestSchema != null
+    }
+
+    /** Saran menu untuk waktu makan berikutnya dari konteks hari ini (JSON). */
+    suspend fun generateSuggestion(contextJson: String, mealTypeLabel: String): GeminiSuggestion {
+        val config = store.geminiPrompt.value
+        val system = config.suggestSystemPrompt ?: throw GeminiError.Other("fitur belum tersedia")
+        val schema = config.suggestSchema ?: throw GeminiError.Other("fitur belum tersedia")
+        val prompt = (config.suggestPrompt ?: "{context}")
+            .replace("{context}", contextJson)
+            .replace("{meal_type}", mealTypeLabel)
+        val text = generate(system, listOf(Part(text = prompt)), schema, temperature = 0.6)
+        val cleaned = text.trim().removePrefix("```json").removePrefix("```").removeSuffix("```").trim()
+        return runCatching { json.decodeFromString(GeminiSuggestion.serializer(), cleaned) }
+            .getOrElse { throw GeminiError.BadResponse("JSON saran") }
+    }
+
     /**
      * Memanggil generateContent dengan rantai model (override → utama → cadangan).
      * Model sibuk (503), kuota per-model habis (429), atau tidak tersedia (404) → coba model berikutnya.

@@ -168,6 +168,11 @@ Contoh:
   - batas bawah 1200 kkal (wanita) / 1500 kkal (pria),
   - tidak ada defisit bila BMI < 18,5.
 - **Log berat badan** dengan grafik tren dan BMI.
+- **Makan lagi & favorit.** Tandai ★ menu favorit, catat ulang menu lama dengan 1 ketukan, atau "Sama seperti kemarin?" untuk menyalin satu waktu makan dari hari sebelumnya.
+- **Porsi cepat.** Tombol ½ · ¾ · 1 · 1½ · 2 porsi untuk menskalakan semua elemen sekaligus.
+- **Gula & natrium.** Dihitung per elemen (DB lokal, atau estimasi AI bila DB belum punya data), dibandingkan batas harian Kemenkes (gula 50 g, natrium 2.000 mg).
+- **Saran menu AI.** Dari Beranda: saran 3–4 menu realistis sesuai sisa kalori, kekurangan protein/serat, tempat makan, dan catatan Anda.
+- **Pencapaian.** Badge kebiasaan (streak, sarapan, sayur, protein, tepat target, gula & garam terkendali, rajin menimbang, progres berat) dihitung dari data, jadi tetap ada setelah restore backup.
 - **Riwayat.** Timeline dan kalender (warna sesuai/lebih/kurang target), pencarian menu/elemen, filter waktu makan dan skor.
 - **Backup.** ZIP (data + foto) untuk ekspor dan impor (gabung atau ganti), plus **CSV** untuk Excel (pemisah `;`, desimal koma).
 - **Tema.** Dark mode (ikuti sistem, terang, atau gelap) dan seluruh UI berbahasa Indonesia.

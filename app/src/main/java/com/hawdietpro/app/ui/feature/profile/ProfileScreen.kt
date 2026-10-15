@@ -29,6 +29,8 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.CloudQueue
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SystemUpdate
@@ -99,6 +101,8 @@ fun ProfileScreen(
     onQueue: () -> Unit,
     onUpdate: () -> Unit,
     onBackup: () -> Unit,
+    onAchievements: () -> Unit,
+    onRelog: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -124,6 +128,8 @@ fun ProfileScreen(
                 MenuGroup("Data & kebiasaan") {
                     MenuItem(Icons.Filled.Edit, "Data diri & target", "Umur, tinggi, berat, aktivitas, tujuan", onEditProfile)
                     MenuItem(Icons.Filled.MonitorWeight, "Log berat badan", "Catat & lihat tren berat", onWeight)
+                    MenuItem(Icons.Filled.EmojiEvents, "Pencapaian", "Badge kebiasaan & rekor streak", onAchievements)
+                    MenuItem(Icons.Filled.Replay, "Makan lagi & favorit", "Catat ulang menu yang sering dimakan", onRelog)
                     MenuItem(
                         Icons.Filled.CloudQueue,
                         "Antrian analisa",

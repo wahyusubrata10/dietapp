@@ -121,3 +121,21 @@ data class GeminiRecommendation(
     @SerialName("judul") val title: String = "",
     @SerialName("detail") val detail: String = "",
 )
+
+// ---------- Saran menu dari sisa kalori (sesuai suggestSchema) ----------
+
+@Serializable
+data class GeminiSuggestion(
+    @SerialName("pembuka") val intro: String = "",
+    @SerialName("opsi") val options: List<GeminiMenuOption> = emptyList(),
+    @SerialName("hindari") val avoid: List<String> = emptyList(),
+)
+
+@Serializable
+data class GeminiMenuOption(
+    @SerialName("nama") val name: String = "",
+    @SerialName("perkiraan_kkal") val calories: Double = 0.0,
+    @SerialName("protein_g") val protein: Double = 0.0,
+    @SerialName("alasan") val reason: String = "",
+    @SerialName("tips") val tips: String = "",
+)

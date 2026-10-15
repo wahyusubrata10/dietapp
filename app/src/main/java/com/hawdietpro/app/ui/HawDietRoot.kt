@@ -46,6 +46,8 @@ import com.hawdietpro.app.ui.feature.onboarding.OnboardingScreen
 import com.hawdietpro.app.ui.feature.profile.ProfileEditScreen
 import com.hawdietpro.app.ui.feature.profile.ProfileScreen
 import com.hawdietpro.app.ui.feature.queue.QueueScreen
+import com.hawdietpro.app.ui.feature.relog.RelogScreen
+import com.hawdietpro.app.ui.feature.achievements.AchievementsScreen
 import com.hawdietpro.app.ui.feature.settings.SettingsScreen
 import com.hawdietpro.app.ui.feature.update.UpdateScreen
 import com.hawdietpro.app.ui.feature.weight.WeightScreen
@@ -121,6 +123,7 @@ private fun MainScaffold(
                 when (action) {
                     QuickAction.CAMERA -> navController.navigate(Routes.camera())
                     QuickAction.GALLERY -> navController.navigate(Routes.camera(openGallery = true))
+                    QuickAction.RELOG -> navController.navigate(Routes.RELOG)
                     QuickAction.MANUAL -> navController.navigate(Routes.manualMeal())
                     QuickAction.WEIGHT -> navController.navigate(Routes.WEIGHT)
                 }
@@ -171,6 +174,7 @@ private fun MainScaffold(
                         onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                         onOpenWeight = { navController.navigate(Routes.WEIGHT) },
                         onOpenProfile = { navController.navigateTopLevel(Routes.PROFILE) },
+                        onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
                     )
                 }
                 composable(Routes.HISTORY) {
@@ -190,6 +194,8 @@ private fun MainScaffold(
                         onQueue = { navController.navigate(Routes.QUEUE) },
                         onUpdate = { navController.navigate(Routes.UPDATE) },
                         onBackup = { navController.navigate(Routes.BACKUP) },
+                        onAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
+                        onRelog = { navController.navigate(Routes.RELOG) },
                     )
                 }
                 composable(
@@ -247,6 +253,8 @@ private fun MainScaffold(
                     )
                 }
                 composable(Routes.UPDATE) { UpdateScreen(onBack = { navController.popBackStack() }) }
+                composable(Routes.RELOG) { RelogScreen(onBack = { navController.popBackStack() }) }
+                composable(Routes.ACHIEVEMENTS) { AchievementsScreen(onBack = { navController.popBackStack() }) }
                 composable(Routes.BACKUP) { BackupScreen(onBack = { navController.popBackStack() }, showMessage = showMessage) }
             }
         }

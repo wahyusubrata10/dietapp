@@ -28,6 +28,8 @@ object Routes {
     const val QUEUE = "antrian"
     const val UPDATE = "update"
     const val BACKUP = "backup"
+    const val RELOG = "makan-lagi"
+    const val ACHIEVEMENTS = "pencapaian"
 
     fun camera(type: MealType? = null, openGallery: Boolean = false) =
         "kamera?type=${type?.name.orEmpty()}&gallery=${if (openGallery) "1" else ""}"

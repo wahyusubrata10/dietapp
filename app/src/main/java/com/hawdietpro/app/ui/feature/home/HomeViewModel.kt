@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.data.prefs.SecureStorage
 import com.hawdietpro.app.data.remote.RemoteConfigStore
+import com.hawdietpro.app.data.repository.AchievementRepository
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.PendingRepository
 import com.hawdietpro.app.data.repository.ProfileRepository
 import com.hawdietpro.app.data.repository.WeightProjectionRepository
+import com.hawdietpro.app.domain.achievement.Achievement
 import com.hawdietpro.app.domain.insight.Insight
 import com.hawdietpro.app.domain.insight.InsightEngine
 import com.hawdietpro.app.domain.insight.Period
@@ -28,6 +30,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -51,17 +54,22 @@ data class HomeState(
     val hasApiKey: Boolean = true,
     val projection: WeightProjection? = null,
     val days: List<DayChip> = emptyList(),
+    /** Catatan sehari sebelumnya, per waktu makan (untuk "Salin dari kemarin"). */
+    val previousDayByType: Map<MealType, List<Meal>> = emptyMap(),
+    /** Badge yang baru terbuka dan belum dilihat. */
+    val newAchievements: List<Achievement> = emptyList(),
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    meals: MealRepository,
+    private val meals: MealRepository,
     profiles: ProfileRepository,
     pending: PendingRepository,
     secure: SecureStorage,
     private val store: RemoteConfigStore,
     projections: WeightProjectionRepository,
+    achievements: AchievementRepository,
 ) : ViewModel() {
 
     private val today = MutableStateFlow(LocalDate.now())
@@ -105,9 +113,26 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    val state: StateFlow<HomeState> = combine(base, projections.observe(), strip) { home, proj, days ->
-        home.copy(projection = proj, days = days)
+    private val previousDay = selected.flatMapLatest { d -> meals.observeDay(d.minusDays(1)) }
+        .map { list -> list.sortedBy { it.eatenAt }.groupBy { it.mealType } }
+
+    val state: StateFlow<HomeState> = combine(base, projections.observe(), strip, previousDay, achievements.observeNew()) { home, proj, days, prev, fresh ->
+        home.copy(projection = proj, days = days, previousDayByType = prev, newAchievements = fresh)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState())
+
+    /** Salin semua makan [type] dari hari sebelumnya ke hari yang sedang dilihat (jam sama). */
+    fun copyFromPreviousDay(type: MealType) {
+        val date = state.value.date
+        val source = state.value.previousDayByType[type].orEmpty()
+        if (source.isEmpty()) return
+        viewModelScope.launch {
+            val zone = ZoneId.systemDefault()
+            source.forEach { meal ->
+                val time = Instant.ofEpochMilli(meal.eatenAt).atZone(zone).toLocalTime()
+                meals.duplicate(meal, date.atTime(time).atZone(zone).toInstant().toEpochMilli(), type)
+            }
+        }
+    }
 
     fun select(date: LocalDate) {
         selected.value = date

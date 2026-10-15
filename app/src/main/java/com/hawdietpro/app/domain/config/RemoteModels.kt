@@ -56,6 +56,10 @@ data class GeminiPromptConfig(
     val reviewSystemPrompt: String? = null,
     val reviewPrompt: String? = null,
     val reviewSchema: JsonObject? = null,
+    /** Saran menu dari sisa kalori (opsional). */
+    val suggestSystemPrompt: String? = null,
+    val suggestPrompt: String? = null,
+    val suggestSchema: JsonObject? = null,
 ) : VersionedConfig
 
 @Serializable

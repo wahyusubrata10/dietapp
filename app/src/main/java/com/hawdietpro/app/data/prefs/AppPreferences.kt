@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -64,6 +65,7 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
         val LAST_REMOTE_SYNC = longPreferencesKey("last_remote_sync")
         val FOOD_DB_VERSION = intPreferencesKey("food_db_version")
         val SKIPPED_UPDATE = intPreferencesKey("skipped_update_version")
+        val SEEN_ACHIEVEMENTS = stringSetPreferencesKey("seen_achievements")
     }
 
     val settings: Flow<Settings> = context.dataStore.data.map { p ->
@@ -82,6 +84,13 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
     }
 
     suspend fun current(): Settings = settings.first()
+
+    /** Id badge yang sudah pernah dilihat pengguna (untuk penanda "badge baru"). */
+    val seenAchievements: Flow<Set<String>> = context.dataStore.data.map { it[Keys.SEEN_ACHIEVEMENTS].orEmpty() }
+
+    suspend fun markAchievementsSeen(ids: Set<String>) = context.dataStore.edit {
+        it[Keys.SEEN_ACHIEVEMENTS] = it[Keys.SEEN_ACHIEVEMENTS].orEmpty() + ids
+    }
 
     suspend fun setThemeMode(mode: ThemeMode) = context.dataStore.edit { it[Keys.THEME] = mode.name }
     suspend fun setAnalysisMode(mode: AnalysisMode) = context.dataStore.edit { it[Keys.ANALYSIS_MODE] = mode.name }
