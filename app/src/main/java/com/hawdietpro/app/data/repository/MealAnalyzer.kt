@@ -55,7 +55,8 @@ class MealAnalyzer @Inject constructor(
                 mealType = mealType.label,
                 time = time,
                 userHint = userHint,
-                referenceNames = foods.all().filter { it.source != "USER" }.map { it.name },
+                // Kombinasi otomatis (PERKIRAAN) tidak dikirim agar prompt tetap ringkas; matcher tetap mengenalinya.
+                referenceNames = foods.all().filter { it.source != "USER" && it.source != "PERKIRAAN" }.map { it.name },
             ),
         )
         val meal = Meal(

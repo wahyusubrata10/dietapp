@@ -26,7 +26,7 @@ class RemoteFilesTest {
     @Test
     fun `food db valid dan id unik`() {
         val db = TestFixtures.foodDb
-        assertTrue(db.foods.size >= 250)
+        assertTrue(db.foods.size >= 1000)
         assertEquals(db.foods.size, db.foods.map { it.id }.toSet().size)
         db.foods.forEach { f ->
             assertTrue("${f.id} kategori tak dikenal", f.category in db.categories.keys)

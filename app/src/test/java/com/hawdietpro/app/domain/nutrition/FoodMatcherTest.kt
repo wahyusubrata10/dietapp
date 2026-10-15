@@ -37,6 +37,33 @@ class FoodMatcherTest {
     }
 
     @Test
+    fun `ejaan lain diseragamkan`() {
+        assertEquals("ayam_suwir_bumbu_bali", idOf("Ayam suir bumbu Bali"))
+        assertEquals("ayam_suwir_bumbu_kuning", idOf("ayam suir bumbu kuning"))
+        assertEquals("telur_balado", idOf("Telor balado"))
+        assertEquals("sambal_ijo", idOf("Sambel ijo"))
+    }
+
+    @Test
+    fun `makanan lokal yang dulu tidak ada kini dikenali`() {
+        assertEquals("jengkol_rebus", idOf("Jengkol"))
+        assertEquals("semur_jengkol", idOf("Semur jengkol"))
+        assertEquals("jengkol_balado", idOf("jengkol balado"))
+        assertEquals("petai", idOf("pete"))
+        assertEquals("ikan_tongkol_bumbu_bali", idOf("Tongkol bumbu bali"))
+        assertEquals("tahu_bumbu_bali", idOf("Tahu bumbu Bali"))
+        assertEquals("tempe_bacem", idOf("Bacem tempe"))
+        assertEquals("kremesan", idOf("Kremes"))
+    }
+
+    @Test
+    fun `lauk berbeda tidak tertukar`() {
+        assertTrue(idOf("Udang balado") != idOf("Cumi balado"))
+        assertTrue(idOf("Tahu bumbu bali") != idOf("Telur bumbu bali"))
+        assertEquals("cumi_balado", idOf("Cumi balado"))
+    }
+
+    @Test
     fun `toleransi salah ketik`() {
         assertEquals("tempe_goreng", idOf("tempe gorng"))
     }

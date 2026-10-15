@@ -22,7 +22,7 @@ class FoodMatcher(references: List<FoodReference>) {
         val list = ArrayList<Key>()
         val map = HashMap<String, FoodReference>()
         for (ref in references) {
-            val names = (listOf(ref.name) + ref.aliases).map(TextNormalizer::normalize).filter { it.isNotBlank() }.distinct()
+            val names = (listOf(ref.name) + ref.aliases).map(::canonical).filter { it.isNotBlank() }.distinct()
             for (n in names) {
                 list += Key(n, meaningfulTokens(n), ref)
                 map.putIfAbsent(n, ref)
@@ -33,12 +33,12 @@ class FoodMatcher(references: List<FoodReference>) {
     }
 
     fun match(name: String, cookingMethod: String? = null, minScore: Double = DEFAULT_MIN_SCORE): Match? {
-        val normalized = TextNormalizer.normalize(name)
+        val normalized = canonical(name)
         if (normalized.isBlank()) return null
 
         exact[normalized]?.let { return Match(it, 1.0) }
 
-        val method = cookingMethod?.let(TextNormalizer::normalize)?.takeIf { it.isNotBlank() }
+        val method = cookingMethod?.let(::canonical)?.takeIf { it.isNotBlank() }
         if (method != null && !normalized.contains(method)) {
             exact["$normalized $method"]?.let { return Match(it, 0.95) }
         }
@@ -60,7 +60,7 @@ class FoodMatcher(references: List<FoodReference>) {
 
     /** Pencarian untuk input manual: hasil diurutkan dari paling relevan. */
     fun search(query: String, limit: Int = 30): List<FoodReference> {
-        val q = TextNormalizer.normalize(query)
+        val q = canonical(query)
         if (q.isBlank()) return emptyList()
         val qTokens = meaningfulTokens(q)
         val scored = HashMap<String, Pair<FoodReference, Double>>()
@@ -97,8 +97,32 @@ class FoodMatcher(references: List<FoodReference>) {
 
         private val STOPWORDS = setOf(
             "dan", "dengan", "pakai", "porsi", "potong", "sepotong", "buah", "biji", "irisan",
-            "sedikit", "setengah", "satu", "dua", "isi", "ala", "khas", "yang", "berisi",
+            "sedikit", "setengah", "satu", "dua", "isi", "ala", "khas", "yang", "berisi", "bumbu", "masak",
         )
+
+        /** Ejaan lain yang umum dipakai → satu bentuk baku, agar "ayam suir" = "ayam suwir". */
+        private val SYNONYMS = mapOf(
+            "suir" to "suwir", "sisit" to "suwir",
+            "cabe" to "cabai", "lombok" to "cabai", "ijo" to "hijau",
+            "sambel" to "sambal", "telor" to "telur", "tempeh" to "tempe",
+            "toge" to "tauge", "taoge" to "tauge", "pete" to "petai", "jering" to "jengkol",
+            "mi" to "mie", "mee" to "mie", "baso" to "bakso", "sop" to "sup", "soup" to "sup",
+            "krupuk" to "kerupuk", "kripik" to "keripik", "coklat" to "cokelat",
+            "kwetiaw" to "kwetiau", "kwetiauw" to "kwetiau", "somay" to "siomay", "gurami" to "gurame",
+            "rica2" to "rica", "kare" to "kari", "gule" to "gulai", "terung" to "terong", "tumis" to "oseng",
+            "ketela" to "singkong",
+        )
+        private val PHRASES = listOf(
+            "nasgor" to "nasi goreng", "mie goreng instan" to "mie instan goreng", "empek empek" to "pempek",
+            "rica rica" to "rica", "cap cay" to "capcay", "oseng oseng" to "oseng", "ubi kayu" to "singkong",
+        )
+
+        /** Normalisasi + penyeragaman ejaan, dipakai untuk nama di DB maupun nama dari AI. */
+        fun canonical(text: String): String {
+            var t = " " + TextNormalizer.normalize(text) + " "
+            for ((from, to) in PHRASES) t = t.replace(" $from ", " $to ")
+            return t.trim().split(' ').filter { it.isNotBlank() }.joinToString(" ") { SYNONYMS[it] ?: it }
+        }
 
         fun meaningfulTokens(text: String): Set<String> =
             TextNormalizer.tokens(text).filter { it !in STOPWORDS && it.length > 1 }.toSet()
