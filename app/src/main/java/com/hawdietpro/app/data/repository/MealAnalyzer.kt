@@ -90,8 +90,19 @@ class MealAnalyzer @Inject constructor(
                     source = NutritionSource.AI,
                     aiNutrients = ai,
                 )
-                reconcile(item, matcher)
+                val match = matcher.match(item.name, item.cookingMethod)
+                when {
+                    match == null -> item
+                    // Produk kemasan: angka AI bisa berasal dari label gizi di foto, jadi tidak ditimpa
+                    // perkiraan DB; cukup ditautkan agar nama & kategori konsisten.
+                    match.reference.source == KEMASAN -> item.copy(foodRefId = match.reference.id, category = match.reference.category)
+                    else -> NutritionCalculator.applyReference(item, match.reference)
+                }
             }
+
+    private companion object {
+        const val KEMASAN = "KEMASAN"
+    }
 
     fun maxImageSize(): Int = store.geminiPrompt.value.maxImageSize
     fun jpegQuality(): Int = store.geminiPrompt.value.jpegQuality

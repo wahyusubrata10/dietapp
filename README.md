@@ -157,7 +157,7 @@ Contoh:
 
 - **Foto → hasil.** Kamera (CameraX) atau galeri. Waktu makan ditebak otomatis dari jam. Ada catatan opsional untuk AI. Foto dikecilkan (maks ±1024 px) sebelum dikirim, lalu disimpan terkompresi di penyimpanan internal.
 - **Kartu hasil yang bisa diedit.** Ubah nama elemen (otomatis dicocokkan ke DB lokal), atur gram dengan slider, hapus, atau tambah elemen yang terlewat. Kalori dan skor dihitung ulang otomatis. Setiap angka diberi badge sumber **AI / DB lokal / Manual**.
-- **Input manual cepat.** Cari di DB lokal (±1.500 makanan Indonesia: bahan dasar, masakan daerah, jajanan, minuman, plus kombinasi lauk × bumbu seperti "ayam suwir bumbu bali" atau "semur jengkol") atau isi kalori sendiri, lalu simpan ke DB untuk dipakai lagi. Ejaan lain dikenali otomatis (suir/suwir, cabe/cabai, telor/telur, sambel/sambal, dll).
+- **Input manual cepat.** Cari di DB lokal (±1.750 makanan: bahan dasar, masakan daerah, jajanan, minuman, produk minimarket & gerai populer seperti Chitato, Ultra Milk, Hotto Purto, Indomie, KFC, Kopi Kenangan, plus kombinasi lauk × bumbu seperti "ayam suwir bumbu bali" atau "semur jengkol") atau isi kalori sendiri, lalu simpan ke DB untuk dipakai lagi. Ejaan lain dikenali otomatis (suir/suwir, cabe/cabai, telor/telur, sambel/sambal, dll).
 - **Antrian offline.** Tanpa internet atau saat kuota habis, foto masuk antrian dan dianalisa otomatis saat online (WorkManager). Hasilnya langsung tercatat dan muncul notifikasi.
 - **Analisa per foto.** Skor A–E, label penilaian, saran realistis, dan catatan AI.
 - **Harian.** Ring kalori masuk vs target, sisa kalori, progress protein/karbo/lemak/serat, ringkasan per waktu makan, insight hari ini, dan tips.

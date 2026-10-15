@@ -1,7 +1,7 @@
 {
- "version": 3,
+ "version": 4,
  "minAppVersionCode": 1,
- "note": "Nilai per 100 g bagian dapat dimakan. Sumber: TKPI (Tabel Komposisi Pangan Indonesia); REFERENSI = bahan dasar mengacu TKPI/USDA; POPULER = perkiraan makanan olahan populer; PERKIRAAN = dihitung dari bahan dasar + bumbu/cara masak. sugar = gula (g), sodium = natrium (mg).",
+ "note": "Nilai per 100 g bagian dapat dimakan. Sumber: TKPI (Tabel Komposisi Pangan Indonesia); REFERENSI = bahan dasar mengacu TKPI/USDA; POPULER = perkiraan makanan olahan populer; PERKIRAAN = dihitung dari bahan dasar + bumbu/cara masak. sugar = gula (g), sodium = natrium (mg). KEMASAN = dari informasi nilai gizi produk kemasan/gerai (perkiraan, resep bisa berubah; cek label).",
  "categories": {
   "karbo": "Makanan pokok",
   "lauk_hewani": "Lauk hewani",
@@ -4281,8 +4281,7 @@
     "teh",
     "es teh",
     "teh hangat manis",
-    "teh botol",
-    "teh kotak"
+    "teh botol"
    ],
    "category": "minuman",
    "kcal": 32,
@@ -4601,9 +4600,6 @@
    "name": "Minuman bersoda",
    "aliases": [
     "soda",
-    "coca cola",
-    "sprite",
-    "fanta",
     "minuman soda"
    ],
    "category": "minuman",
@@ -4966,9 +4962,7 @@
    "aliases": [
     "biscuit",
     "crackers",
-    "roma kelapa",
-    "regal",
-    "biskuat"
+    "regal"
    ],
    "category": "camilan",
    "kcal": 470,
@@ -4988,7 +4982,6 @@
    "aliases": [
     "cokelat",
     "chocolate",
-    "silverqueen",
     "coklat"
    ],
    "category": "camilan",
@@ -5065,8 +5058,7 @@
    "name": "Keripik singkong",
    "aliases": [
     "kripik singkong",
-    "keripik balado",
-    "maicih"
+    "keripik balado"
    ],
    "category": "camilan",
    "kcal": 520,
@@ -5084,7 +5076,6 @@
    "id": "keripik_kentang",
    "name": "Keripik kentang",
    "aliases": [
-    "chitato",
     "potato chips",
     "kripik kentang"
    ],
@@ -10304,7 +10295,6 @@
    "id": "biskuit_cokelat_sandwich",
    "name": "Biskuit cokelat sandwich",
    "aliases": [
-    "oreo",
     "biskuit krim"
    ],
    "category": "camilan",
@@ -19268,8 +19258,7 @@
    "id": "minuman_energi",
    "name": "Minuman energi",
    "aliases": [
-    "energy drink",
-    "kratingdaeng"
+    "energy drink"
    ],
    "category": "minuman",
    "kcal": 44,
@@ -29215,6 +29204,4486 @@
    "servingG": 100,
    "servingLabel": "1 porsi",
    "source": "PERKIRAAN"
+  },
+  {
+   "id": "hotto_purto",
+   "name": "Hotto Purto",
+   "aliases": [
+    "hotto purto ubi ungu",
+    "hotto ubi ungu",
+    "hotto multigrain"
+   ],
+   "category": "minuman",
+   "kcal": 410,
+   "protein": 8.0,
+   "carbs": 72.0,
+   "fat": 10.0,
+   "fiber": 6.0,
+   "sugar": 36.0,
+   "sodium": 140,
+   "servingG": 25.0,
+   "servingLabel": "1 sachet (25 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "hotto_mix",
+   "name": "Hotto Mix",
+   "aliases": [
+    "hotto mix multigrain"
+   ],
+   "category": "minuman",
+   "kcal": 410,
+   "protein": 8.0,
+   "carbs": 72.0,
+   "fat": 10.0,
+   "fiber": 6.0,
+   "sugar": 36.0,
+   "sodium": 140,
+   "servingG": 25.0,
+   "servingLabel": "1 sachet (25 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "energen_cokelat",
+   "name": "Energen cokelat",
+   "aliases": [
+    "energen coklat"
+   ],
+   "category": "minuman",
+   "kcal": 410,
+   "protein": 8.0,
+   "carbs": 72.0,
+   "fat": 10.0,
+   "fiber": 3.0,
+   "sugar": 40.0,
+   "sodium": 300,
+   "servingG": 30.0,
+   "servingLabel": "1 sachet (30 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "energen_vanila",
+   "name": "Energen vanila",
+   "aliases": [
+    "energen vanilla"
+   ],
+   "category": "minuman",
+   "kcal": 410,
+   "protein": 8.0,
+   "carbs": 72.0,
+   "fat": 10.0,
+   "fiber": 3.0,
+   "sugar": 40.0,
+   "sodium": 300,
+   "servingG": 30.0,
+   "servingLabel": "1 sachet (30 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "milo_sachet",
+   "name": "Milo sachet",
+   "aliases": [
+    "milo bubuk",
+    "milo activ go sachet"
+   ],
+   "category": "minuman",
+   "kcal": 401,
+   "protein": 9.0,
+   "carbs": 71.0,
+   "fat": 9.0,
+   "fiber": 5.0,
+   "sugar": 45.0,
+   "sodium": 150,
+   "servingG": 22.0,
+   "servingLabel": "1 sachet (22 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "milo_kotak",
+   "name": "Milo kotak",
+   "aliases": [
+    "milo uht",
+    "milo kotak 180 ml",
+    "milo activ go kotak"
+   ],
+   "category": "minuman",
+   "kcal": 75,
+   "protein": 2.8,
+   "carbs": 11.0,
+   "fat": 2.2,
+   "fiber": 0.5,
+   "sugar": 8.0,
+   "sodium": 60,
+   "servingG": 180.0,
+   "servingLabel": "1 kotak (180 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "ovaltine_sachet",
+   "name": "Ovaltine sachet",
+   "aliases": [
+    "ovaltine",
+    "ovomaltine"
+   ],
+   "category": "minuman",
+   "kcal": 400,
+   "protein": 9.0,
+   "carbs": 73.0,
+   "fat": 8.0,
+   "fiber": 3.0,
+   "sugar": 50.0,
+   "sodium": 250,
+   "servingG": 25.0,
+   "servingLabel": "1 sachet (25 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "chocolatos_drink",
+   "name": "Chocolatos drink",
+   "aliases": [
+    "chocolatos minuman"
+   ],
+   "category": "minuman",
+   "kcal": 404,
+   "protein": 5.0,
+   "carbs": 78.0,
+   "fat": 8.0,
+   "fiber": 3.0,
+   "sugar": 60.0,
+   "sodium": 150,
+   "servingG": 28.0,
+   "servingLabel": "1 sachet (28 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "good_day_cappuccino",
+   "name": "Good Day cappuccino",
+   "aliases": [
+    "goodday cappuccino",
+    "good day"
+   ],
+   "category": "minuman",
+   "kcal": 442,
+   "protein": 4.0,
+   "carbs": 75.0,
+   "fat": 14.0,
+   "fiber": 1.0,
+   "sugar": 55.0,
+   "sodium": 150,
+   "servingG": 25.0,
+   "servingLabel": "1 sachet (25 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "good_day_freeze",
+   "name": "Good Day freeze",
+   "aliases": [
+    "goodday freeze",
+    "good day mocafrio"
+   ],
+   "category": "minuman",
+   "kcal": 427,
+   "protein": 4.0,
+   "carbs": 78.0,
+   "fat": 11.0,
+   "fiber": 1.0,
+   "sugar": 60.0,
+   "sodium": 150,
+   "servingG": 30.0,
+   "servingLabel": "1 sachet (30 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kopi_kapal_api_mix",
+   "name": "Kopi Kapal Api mix",
+   "aliases": [
+    "kapal api special mix",
+    "kopi kapal api"
+   ],
+   "category": "minuman",
+   "kcal": 420,
+   "protein": 3.0,
+   "carbs": 75.0,
+   "fat": 12.0,
+   "fiber": 1.0,
+   "sugar": 60.0,
+   "sodium": 60,
+   "servingG": 25.0,
+   "servingLabel": "1 sachet (25 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "torabika_cappuccino",
+   "name": "Torabika cappuccino",
+   "aliases": [
+    "torabika capucino",
+    "cappuccino sachet"
+   ],
+   "category": "minuman",
+   "kcal": 443,
+   "protein": 4.0,
+   "carbs": 73.0,
+   "fat": 15.0,
+   "fiber": 1.0,
+   "sugar": 55.0,
+   "sodium": 200,
+   "servingG": 25.0,
+   "servingLabel": "1 sachet (25 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "torabika_susu",
+   "name": "Torabika susu",
+   "aliases": [
+    "torabika 3in1",
+    "torabika duo susu"
+   ],
+   "category": "minuman",
+   "kcal": 432,
+   "protein": 3.5,
+   "carbs": 73.0,
+   "fat": 14.0,
+   "fiber": 1.0,
+   "sugar": 58.0,
+   "sodium": 150,
+   "servingG": 30.0,
+   "servingLabel": "1 sachet (30 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "luwak_white_koffie",
+   "name": "Luwak white koffie",
+   "aliases": [
+    "white koffie",
+    "kopi luwak white coffee"
+   ],
+   "category": "minuman",
+   "kcal": 446,
+   "protein": 3.5,
+   "carbs": 72.0,
+   "fat": 16.0,
+   "fiber": 1.0,
+   "sugar": 55.0,
+   "sodium": 150,
+   "servingG": 20.0,
+   "servingLabel": "1 sachet (20 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "abc_kopi_susu",
+   "name": "ABC kopi susu",
+   "aliases": [
+    "abc susu",
+    "kopi abc"
+   ],
+   "category": "minuman",
+   "kcal": 430,
+   "protein": 3.0,
+   "carbs": 73.0,
+   "fat": 14.0,
+   "fiber": 1.0,
+   "sugar": 60.0,
+   "sodium": 150,
+   "servingG": 31.0,
+   "servingLabel": "1 sachet (31 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "nescafe_classic",
+   "name": "Nescafe classic",
+   "aliases": [
+    "nescafe",
+    "kopi instan murni"
+   ],
+   "category": "minuman",
+   "kcal": 220,
+   "protein": 12.0,
+   "carbs": 42.0,
+   "fat": 0.5,
+   "fiber": 30.0,
+   "sugar": 0.0,
+   "sodium": 50,
+   "servingG": 2.0,
+   "servingLabel": "1 sdt (2 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "nescafe_3in1",
+   "name": "Nescafe 3in1",
+   "aliases": [
+    "nescafe original 3in1"
+   ],
+   "category": "minuman",
+   "kcal": 431,
+   "protein": 3.5,
+   "carbs": 75.0,
+   "fat": 13.0,
+   "fiber": 1.0,
+   "sugar": 58.0,
+   "sodium": 120,
+   "servingG": 17.0,
+   "servingLabel": "1 sachet (17 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kopi_kenangan_mantan_sachet",
+   "name": "Kopi Kenangan Mantan sachet",
+   "aliases": [
+    "kopi kenangan sachet"
+   ],
+   "category": "minuman",
+   "kcal": 430,
+   "protein": 3.0,
+   "carbs": 73.0,
+   "fat": 14.0,
+   "fiber": 1.0,
+   "sugar": 60.0,
+   "sodium": 150,
+   "servingG": 25.0,
+   "servingLabel": "1 sachet (25 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "nutrisari_jeruk",
+   "name": "Nutrisari jeruk",
+   "aliases": [
+    "nutrisari",
+    "nutri sari"
+   ],
+   "category": "minuman",
+   "kcal": 360,
+   "protein": 0.0,
+   "carbs": 90.0,
+   "fat": 0.0,
+   "fiber": 0.5,
+   "sugar": 85.0,
+   "sodium": 300,
+   "servingG": 11.0,
+   "servingLabel": "1 sachet (11 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "pop_ice",
+   "name": "Pop Ice",
+   "aliases": [
+    "pop ice cokelat",
+    "pop ice rasa"
+   ],
+   "category": "minuman",
+   "kcal": 400,
+   "protein": 1.5,
+   "carbs": 85.0,
+   "fat": 6.0,
+   "fiber": 0.5,
+   "sugar": 70.0,
+   "sodium": 150,
+   "servingG": 25.0,
+   "servingLabel": "1 sachet (25 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "marimas",
+   "name": "Marimas",
+   "aliases": [
+    "marimas jeruk"
+   ],
+   "category": "minuman",
+   "kcal": 380,
+   "protein": 0.0,
+   "carbs": 95.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 90.0,
+   "sodium": 100,
+   "servingG": 8.0,
+   "servingLabel": "1 sachet (8 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "teh_tarik_sachet",
+   "name": "Teh tarik sachet",
+   "aliases": [
+    "max tea teh tarik",
+    "teh tarik instan"
+   ],
+   "category": "minuman",
+   "kcal": 438,
+   "protein": 3.0,
+   "carbs": 75.0,
+   "fat": 14.0,
+   "fiber": 0.5,
+   "sugar": 60.0,
+   "sodium": 150,
+   "servingG": 25.0,
+   "servingLabel": "1 sachet (25 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "jahe_wangi_sachet",
+   "name": "Jahe wangi sachet",
+   "aliases": [
+    "jahe merah sachet",
+    "intra jahe"
+   ],
+   "category": "minuman",
+   "kcal": 380,
+   "protein": 0.0,
+   "carbs": 95.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 92.0,
+   "sodium": 10,
+   "servingG": 20.0,
+   "servingLabel": "1 sachet (20 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "susu_dancow_fortigro",
+   "name": "Susu Dancow fortigro",
+   "aliases": [
+    "dancow",
+    "dancow sachet",
+    "susu bubuk dancow"
+   ],
+   "category": "susu_olahan",
+   "kcal": 450,
+   "protein": 20.0,
+   "carbs": 52.0,
+   "fat": 18.0,
+   "fiber": 0.0,
+   "sugar": 40.0,
+   "sodium": 300,
+   "servingG": 27.0,
+   "servingLabel": "1 sachet (27 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "susu_bubuk_full_cream",
+   "name": "Susu bubuk full cream",
+   "aliases": [
+    "susu bubuk",
+    "dancow full cream"
+   ],
+   "category": "susu_olahan",
+   "kcal": 495,
+   "protein": 25.0,
+   "carbs": 38.0,
+   "fat": 27.0,
+   "fiber": 0.0,
+   "sugar": 38.0,
+   "sodium": 370,
+   "servingG": 27.0,
+   "servingLabel": "4 sdm (27 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "frisian_flag_bubuk",
+   "name": "Frisian Flag bubuk",
+   "aliases": [
+    "susu bendera bubuk",
+    "frisian flag instant"
+   ],
+   "category": "susu_olahan",
+   "kcal": 444,
+   "protein": 20.0,
+   "carbs": 55.0,
+   "fat": 16.0,
+   "fiber": 0.0,
+   "sugar": 40.0,
+   "sodium": 300,
+   "servingG": 27.0,
+   "servingLabel": "1 sachet (27 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "susu_bear_brand",
+   "name": "Susu Bear Brand",
+   "aliases": [
+    "bear brand",
+    "susu beruang"
+   ],
+   "category": "susu_olahan",
+   "kcal": 63,
+   "protein": 3.2,
+   "carbs": 4.7,
+   "fat": 3.5,
+   "fiber": 0.0,
+   "sugar": 4.7,
+   "sodium": 50,
+   "servingG": 189.0,
+   "servingLabel": "1 kaleng (189 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "anlene",
+   "name": "Anlene",
+   "aliases": [
+    "susu anlene"
+   ],
+   "category": "susu_olahan",
+   "kcal": 365,
+   "protein": 30.0,
+   "carbs": 50.0,
+   "fat": 5.0,
+   "fiber": 2.0,
+   "sugar": 30.0,
+   "sodium": 400,
+   "servingG": 30.0,
+   "servingLabel": "1 sachet (30 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "boneeto",
+   "name": "Boneeto",
+   "aliases": [
+    "susu boneeto"
+   ],
+   "category": "susu_olahan",
+   "kcal": 420,
+   "protein": 18.0,
+   "carbs": 60.0,
+   "fat": 12.0,
+   "fiber": 1.0,
+   "sugar": 45.0,
+   "sodium": 300,
+   "servingG": 30.0,
+   "servingLabel": "1 sachet",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "susu_kental_manis_frisian_flag",
+   "name": "Susu kental manis Frisian Flag",
+   "aliases": [
+    "skm bendera",
+    "kental manis frisian flag"
+   ],
+   "category": "susu_olahan",
+   "kcal": 328,
+   "protein": 8.0,
+   "carbs": 56.0,
+   "fat": 8.0,
+   "fiber": 0.0,
+   "sugar": 56.0,
+   "sodium": 120,
+   "servingG": 20.0,
+   "servingLabel": "1 sdm (20 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "indomilk_kental_manis",
+   "name": "Indomilk kental manis",
+   "aliases": [
+    "skm indomilk"
+   ],
+   "category": "susu_olahan",
+   "kcal": 328,
+   "protein": 7.0,
+   "carbs": 57.0,
+   "fat": 8.0,
+   "fiber": 0.0,
+   "sugar": 57.0,
+   "sodium": 120,
+   "servingG": 20.0,
+   "servingLabel": "1 sdm (20 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "whey_protein_bubuk",
+   "name": "Whey protein bubuk",
+   "aliases": [
+    "whey",
+    "whey protein",
+    "protein powder"
+   ],
+   "category": "susu_olahan",
+   "kcal": 385,
+   "protein": 75.0,
+   "carbs": 10.0,
+   "fat": 5.0,
+   "fiber": 1.0,
+   "sugar": 5.0,
+   "sodium": 200,
+   "servingG": 30.0,
+   "servingLabel": "1 scoop (30 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "ultra_milk_full_cream",
+   "name": "Ultra Milk full cream",
+   "aliases": [
+    "ultra milk",
+    "ultramilk plain",
+    "ultra milk putih"
+   ],
+   "category": "susu_olahan",
+   "kcal": 60,
+   "protein": 3.2,
+   "carbs": 4.5,
+   "fat": 3.2,
+   "fiber": 0.0,
+   "sugar": 4.5,
+   "sodium": 50,
+   "servingG": 250.0,
+   "servingLabel": "1 kotak (250 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "ultra_milk_cokelat",
+   "name": "Ultra Milk cokelat",
+   "aliases": [
+    "ultramilk coklat",
+    "ultra milk coklat"
+   ],
+   "category": "minuman",
+   "kcal": 76,
+   "protein": 2.6,
+   "carbs": 11.0,
+   "fat": 2.4,
+   "fiber": 0.5,
+   "sugar": 9.0,
+   "sodium": 60,
+   "servingG": 250.0,
+   "servingLabel": "1 kotak (250 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "ultra_milk_stroberi",
+   "name": "Ultra Milk stroberi",
+   "aliases": [
+    "ultramilk strawberry",
+    "ultra milk strawberry"
+   ],
+   "category": "minuman",
+   "kcal": 76,
+   "protein": 2.6,
+   "carbs": 11.0,
+   "fat": 2.4,
+   "fiber": 0.0,
+   "sugar": 9.5,
+   "sodium": 60,
+   "servingG": 250.0,
+   "servingLabel": "1 kotak (250 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "ultra_milk_low_fat",
+   "name": "Ultra Milk low fat",
+   "aliases": [
+    "ultramilk lowfat",
+    "ultra milk rendah lemak"
+   ],
+   "category": "susu_olahan",
+   "kcal": 45,
+   "protein": 3.6,
+   "carbs": 5.0,
+   "fat": 1.2,
+   "fiber": 0.0,
+   "sugar": 5.0,
+   "sodium": 55,
+   "servingG": 250.0,
+   "servingLabel": "1 kotak (250 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "ultra_milk_mimi",
+   "name": "Ultra Milk mimi",
+   "aliases": [
+    "ultra mimi",
+    "susu mimi"
+   ],
+   "category": "minuman",
+   "kcal": 72,
+   "protein": 2.4,
+   "carbs": 10.0,
+   "fat": 2.5,
+   "fiber": 0.0,
+   "sugar": 8.0,
+   "sodium": 50,
+   "servingG": 125.0,
+   "servingLabel": "1 kotak (125 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "frisian_flag_kotak_cokelat",
+   "name": "Frisian Flag kotak cokelat",
+   "aliases": [
+    "susu bendera kotak",
+    "frisian flag uht coklat"
+   ],
+   "category": "minuman",
+   "kcal": 79,
+   "protein": 2.6,
+   "carbs": 11.5,
+   "fat": 2.5,
+   "fiber": 0.5,
+   "sugar": 9.0,
+   "sodium": 60,
+   "servingG": 225.0,
+   "servingLabel": "1 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "frisian_flag_kotak_putih",
+   "name": "Frisian Flag kotak putih",
+   "aliases": [
+    "frisian flag uht plain",
+    "susu bendera putih"
+   ],
+   "category": "susu_olahan",
+   "kcal": 61,
+   "protein": 3.0,
+   "carbs": 5.0,
+   "fat": 3.2,
+   "fiber": 0.0,
+   "sugar": 5.0,
+   "sodium": 50,
+   "servingG": 225.0,
+   "servingLabel": "1 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "indomilk_kotak_cokelat",
+   "name": "Indomilk kotak cokelat",
+   "aliases": [
+    "indomilk uht coklat",
+    "indomilk kids"
+   ],
+   "category": "minuman",
+   "kcal": 75,
+   "protein": 2.4,
+   "carbs": 11.0,
+   "fat": 2.4,
+   "fiber": 0.3,
+   "sugar": 9.0,
+   "sodium": 55,
+   "servingG": 190.0,
+   "servingLabel": "1 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "greenfields_full_cream",
+   "name": "Greenfields full cream",
+   "aliases": [
+    "greenfields",
+    "susu greenfields"
+   ],
+   "category": "susu_olahan",
+   "kcal": 65,
+   "protein": 3.3,
+   "carbs": 4.8,
+   "fat": 3.6,
+   "fiber": 0.0,
+   "sugar": 4.8,
+   "sodium": 45,
+   "servingG": 250.0,
+   "servingLabel": "1 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "greenfields_cokelat",
+   "name": "Greenfields cokelat",
+   "aliases": [
+    "greenfields coklat"
+   ],
+   "category": "minuman",
+   "kcal": 81,
+   "protein": 3.0,
+   "carbs": 10.5,
+   "fat": 3.0,
+   "fiber": 0.5,
+   "sugar": 9.0,
+   "sodium": 55,
+   "servingG": 250.0,
+   "servingLabel": "1 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "diamond_milk",
+   "name": "Diamond milk",
+   "aliases": [
+    "susu diamond"
+   ],
+   "category": "susu_olahan",
+   "kcal": 62,
+   "protein": 3.2,
+   "carbs": 4.8,
+   "fat": 3.3,
+   "fiber": 0.0,
+   "sugar": 4.8,
+   "sodium": 45,
+   "servingG": 250.0,
+   "servingLabel": "1 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "cimory_yogurt_drink",
+   "name": "Cimory yogurt drink",
+   "aliases": [
+    "cimory",
+    "yogurt cimory"
+   ],
+   "category": "minuman",
+   "kcal": 72,
+   "protein": 2.4,
+   "carbs": 13.0,
+   "fat": 1.2,
+   "fiber": 0.0,
+   "sugar": 12.0,
+   "sodium": 40,
+   "servingG": 250.0,
+   "servingLabel": "1 botol (250 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "cimory_susu_cokelat",
+   "name": "Cimory susu cokelat",
+   "aliases": [
+    "cimory coklat",
+    "cimory uht"
+   ],
+   "category": "minuman",
+   "kcal": 83,
+   "protein": 3.0,
+   "carbs": 11.0,
+   "fat": 3.0,
+   "fiber": 0.5,
+   "sugar": 9.5,
+   "sodium": 55,
+   "servingG": 250.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "cimory_squeeze",
+   "name": "Cimory squeeze",
+   "aliases": [
+    "cimory yogurt squeeze",
+    "yogurt squeeze"
+   ],
+   "category": "susu_olahan",
+   "kcal": 94,
+   "protein": 3.0,
+   "carbs": 15.0,
+   "fat": 2.5,
+   "fiber": 0.0,
+   "sugar": 13.0,
+   "sodium": 40,
+   "servingG": 120.0,
+   "servingLabel": "1 pouch (120 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "heavenly_blush_yogurt",
+   "name": "Heavenly Blush yogurt",
+   "aliases": [
+    "heavenly blush",
+    "yogurt heavenly blush"
+   ],
+   "category": "susu_olahan",
+   "kcal": 78,
+   "protein": 3.0,
+   "carbs": 13.0,
+   "fat": 1.5,
+   "fiber": 0.0,
+   "sugar": 12.0,
+   "sodium": 40,
+   "servingG": 200.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "yakult_light",
+   "name": "Yakult Light",
+   "aliases": [],
+   "category": "minuman",
+   "kcal": 42,
+   "protein": 1.2,
+   "carbs": 9.0,
+   "fat": 0.1,
+   "fiber": 2.0,
+   "sugar": 5.0,
+   "sodium": 20,
+   "servingG": 65.0,
+   "servingLabel": "1 botol (65 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "bear_brand_gold",
+   "name": "Bear Brand gold",
+   "aliases": [],
+   "category": "minuman",
+   "kcal": 62,
+   "protein": 3.0,
+   "carbs": 7.0,
+   "fat": 2.5,
+   "fiber": 0.0,
+   "sugar": 6.5,
+   "sodium": 50,
+   "servingG": 140.0,
+   "servingLabel": "1 kaleng",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "susu_kedelai_kemasan",
+   "name": "Susu kedelai kemasan",
+   "aliases": [
+    "soya",
+    "susu soya kotak",
+    "vsoy"
+   ],
+   "category": "minuman",
+   "kcal": 48,
+   "protein": 2.5,
+   "carbs": 6.0,
+   "fat": 1.5,
+   "fiber": 0.5,
+   "sugar": 5.0,
+   "sodium": 40,
+   "servingG": 250.0,
+   "servingLabel": "1 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "teh_pucuk_harum",
+   "name": "Teh Pucuk Harum",
+   "aliases": [
+    "teh pucuk",
+    "pucuk harum"
+   ],
+   "category": "minuman",
+   "kcal": 24,
+   "protein": 0.0,
+   "carbs": 6.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 6.0,
+   "sodium": 10,
+   "servingG": 350.0,
+   "servingLabel": "1 botol (350 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "teh_kotak",
+   "name": "Teh Kotak",
+   "aliases": [
+    "teh kotak sosro"
+   ],
+   "category": "minuman",
+   "kcal": 28,
+   "protein": 0.0,
+   "carbs": 7.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 7.0,
+   "sodium": 10,
+   "servingG": 300.0,
+   "servingLabel": "1 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "teh_botol_sosro",
+   "name": "Teh Botol Sosro",
+   "aliases": [
+    "teh botol sosro kotak"
+   ],
+   "category": "minuman",
+   "kcal": 28,
+   "protein": 0.0,
+   "carbs": 7.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 7.0,
+   "sodium": 10,
+   "servingG": 250.0,
+   "servingLabel": "1 kotak (250 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "frestea",
+   "name": "Frestea",
+   "aliases": [
+    "frestea jasmine"
+   ],
+   "category": "minuman",
+   "kcal": 30,
+   "protein": 0.0,
+   "carbs": 7.5,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 7.5,
+   "sodium": 10,
+   "servingG": 350.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "fruit_tea",
+   "name": "Fruit Tea",
+   "aliases": [
+    "fruit tea sosro",
+    "fruittea"
+   ],
+   "category": "minuman",
+   "kcal": 36,
+   "protein": 0.0,
+   "carbs": 9.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 9.0,
+   "sodium": 15,
+   "servingG": 350.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "teh_gelas",
+   "name": "Teh Gelas",
+   "aliases": [
+    "tehgelas"
+   ],
+   "category": "minuman",
+   "kcal": 30,
+   "protein": 0.0,
+   "carbs": 7.5,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 7.5,
+   "sodium": 10,
+   "servingG": 180.0,
+   "servingLabel": "1 cup",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "ichitan_thai_tea",
+   "name": "Ichitan thai tea",
+   "aliases": [
+    "ichitan",
+    "thai tea botol"
+   ],
+   "category": "minuman",
+   "kcal": 57,
+   "protein": 1.0,
+   "carbs": 11.0,
+   "fat": 1.0,
+   "fiber": 0.0,
+   "sugar": 10.0,
+   "sodium": 40,
+   "servingG": 310.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "nu_green_tea",
+   "name": "Nu Green Tea",
+   "aliases": [
+    "nu milk tea"
+   ],
+   "category": "minuman",
+   "kcal": 26,
+   "protein": 0.0,
+   "carbs": 6.5,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 6.5,
+   "sodium": 20,
+   "servingG": 330.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "teh_javana",
+   "name": "Teh Javana",
+   "aliases": [
+    "javana"
+   ],
+   "category": "minuman",
+   "kcal": 28,
+   "protein": 0.0,
+   "carbs": 7.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 7.0,
+   "sodium": 10,
+   "servingG": 350.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "teh_botol_less_sugar",
+   "name": "Teh Botol Less Sugar",
+   "aliases": [],
+   "category": "minuman",
+   "kcal": 14,
+   "protein": 0.0,
+   "carbs": 3.5,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 3.5,
+   "sodium": 10,
+   "servingG": 350.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "coca_cola",
+   "name": "Coca-Cola",
+   "aliases": [
+    "coke",
+    "cola"
+   ],
+   "category": "minuman",
+   "kcal": 42,
+   "protein": 0.0,
+   "carbs": 10.6,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 10.6,
+   "sodium": 10,
+   "servingG": 390.0,
+   "servingLabel": "1 botol (390 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "coca_cola_zero",
+   "name": "Coca-Cola Zero",
+   "aliases": [
+    "coke zero",
+    "cola zero"
+   ],
+   "category": "minuman",
+   "kcal": 0,
+   "protein": 0.0,
+   "carbs": 0.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 15,
+   "servingG": 390.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "sprite",
+   "name": "Sprite",
+   "aliases": [
+    "sprite botol"
+   ],
+   "category": "minuman",
+   "kcal": 36,
+   "protein": 0.0,
+   "carbs": 9.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 9.0,
+   "sodium": 10,
+   "servingG": 390.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "fanta",
+   "name": "Fanta",
+   "aliases": [
+    "fanta stroberi",
+    "fanta merah"
+   ],
+   "category": "minuman",
+   "kcal": 44,
+   "protein": 0.0,
+   "carbs": 11.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 11.0,
+   "sodium": 10,
+   "servingG": 390.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "big_cola",
+   "name": "Big Cola",
+   "aliases": [
+    "bigcola"
+   ],
+   "category": "minuman",
+   "kcal": 38,
+   "protein": 0.0,
+   "carbs": 9.5,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 9.5,
+   "sodium": 10,
+   "servingG": 535.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "pocari_sweat",
+   "name": "Pocari Sweat",
+   "aliases": [
+    "ion water"
+   ],
+   "category": "minuman",
+   "kcal": 25,
+   "protein": 0.0,
+   "carbs": 6.2,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 6.0,
+   "sodium": 49,
+   "servingG": 350.0,
+   "servingLabel": "1 botol (350 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mizone",
+   "name": "Mizone",
+   "aliases": [
+    "mizone botol"
+   ],
+   "category": "minuman",
+   "kcal": 12,
+   "protein": 0.0,
+   "carbs": 3.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 3.0,
+   "sodium": 40,
+   "servingG": 500.0,
+   "servingLabel": "1 botol (500 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "hydro_coco",
+   "name": "Hydro Coco",
+   "aliases": [
+    "hydrococo",
+    "air kelapa kemasan"
+   ],
+   "category": "minuman",
+   "kcal": 18,
+   "protein": 0.0,
+   "carbs": 4.5,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 4.5,
+   "sodium": 30,
+   "servingG": 250.0,
+   "servingLabel": "1 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "isoplus",
+   "name": "Isoplus",
+   "aliases": [
+    "isoplus botol"
+   ],
+   "category": "minuman",
+   "kcal": 24,
+   "protein": 0.0,
+   "carbs": 6.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 6.0,
+   "sodium": 45,
+   "servingG": 350.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "larutan_penyegar",
+   "name": "Larutan Penyegar",
+   "aliases": [
+    "cap kaki tiga",
+    "larutan penyegar kaleng"
+   ],
+   "category": "minuman",
+   "kcal": 20,
+   "protein": 0.0,
+   "carbs": 5.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 5.0,
+   "sodium": 20,
+   "servingG": 320.0,
+   "servingLabel": "1 kaleng",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kratingdaeng",
+   "name": "Kratingdaeng",
+   "aliases": [
+    "kratingdaeng botol"
+   ],
+   "category": "minuman",
+   "kcal": 56,
+   "protein": 0.0,
+   "carbs": 14.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 14.0,
+   "sodium": 50,
+   "servingG": 150.0,
+   "servingLabel": "1 botol (150 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "extra_joss",
+   "name": "Extra Joss",
+   "aliases": [
+    "extrajoss",
+    "extra joss susu"
+   ],
+   "category": "minuman",
+   "kcal": 322,
+   "protein": 0.5,
+   "carbs": 80.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 75.0,
+   "sodium": 100,
+   "servingG": 4.0,
+   "servingLabel": "1 sachet (4 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "floridina",
+   "name": "Floridina",
+   "aliases": [
+    "floridina jeruk"
+   ],
+   "category": "minuman",
+   "kcal": 44,
+   "protein": 0.0,
+   "carbs": 11.0,
+   "fat": 0.0,
+   "fiber": 0.2,
+   "sugar": 10.5,
+   "sodium": 15,
+   "servingG": 350.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "buavita",
+   "name": "Buavita",
+   "aliases": [
+    "buavita jambu",
+    "buavita jeruk"
+   ],
+   "category": "minuman",
+   "kcal": 49,
+   "protein": 0.3,
+   "carbs": 12.0,
+   "fat": 0.0,
+   "fiber": 0.5,
+   "sugar": 11.0,
+   "sodium": 10,
+   "servingG": 250.0,
+   "servingLabel": "1 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "minute_maid_pulpy",
+   "name": "Minute Maid Pulpy",
+   "aliases": [
+    "pulpy orange",
+    "minute maid"
+   ],
+   "category": "minuman",
+   "kcal": 44,
+   "protein": 0.1,
+   "carbs": 11.0,
+   "fat": 0.0,
+   "fiber": 0.3,
+   "sugar": 10.5,
+   "sodium": 10,
+   "servingG": 300.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "okky_jelly_drink",
+   "name": "Okky Jelly Drink",
+   "aliases": [
+    "okky jelly",
+    "jelly drink okky"
+   ],
+   "category": "minuman",
+   "kcal": 52,
+   "protein": 0.0,
+   "carbs": 13.0,
+   "fat": 0.0,
+   "fiber": 0.5,
+   "sugar": 12.0,
+   "sodium": 30,
+   "servingG": 150.0,
+   "servingLabel": "1 pouch",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "inaco_jelly",
+   "name": "Inaco jelly",
+   "aliases": [
+    "nata de coco cup",
+    "inaco"
+   ],
+   "category": "camilan",
+   "kcal": 56,
+   "protein": 0.0,
+   "carbs": 14.0,
+   "fat": 0.0,
+   "fiber": 1.0,
+   "sugar": 13.0,
+   "sodium": 20,
+   "servingG": 120.0,
+   "servingLabel": "1 cup",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "le_minerale",
+   "name": "Le Minerale",
+   "aliases": [
+    "le mineral",
+    "air mineral botol"
+   ],
+   "category": "minuman",
+   "kcal": 0,
+   "protein": 0.0,
+   "carbs": 0.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 0.0,
+   "sodium": 1,
+   "servingG": 600.0,
+   "servingLabel": "1 botol (600 ml)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kopi_good_day_botol",
+   "name": "Kopi Good Day botol",
+   "aliases": [
+    "good day botol",
+    "good day coffee drink"
+   ],
+   "category": "minuman",
+   "kcal": 62,
+   "protein": 1.0,
+   "carbs": 11.0,
+   "fat": 1.5,
+   "fiber": 0.0,
+   "sugar": 10.5,
+   "sodium": 40,
+   "servingG": 250.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kopiko_78",
+   "name": "Kopiko 78",
+   "aliases": [
+    "kopiko 78 c",
+    "kopiko botol"
+   ],
+   "category": "minuman",
+   "kcal": 59,
+   "protein": 1.3,
+   "carbs": 10.0,
+   "fat": 1.5,
+   "fiber": 0.0,
+   "sugar": 9.5,
+   "sodium": 40,
+   "servingG": 240.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "nescafe_kaleng",
+   "name": "Nescafe kaleng",
+   "aliases": [
+    "nescafe original kaleng",
+    "nescafe can"
+   ],
+   "category": "minuman",
+   "kcal": 48,
+   "protein": 1.2,
+   "carbs": 8.0,
+   "fat": 1.2,
+   "fiber": 0.0,
+   "sugar": 7.5,
+   "sodium": 40,
+   "servingG": 240.0,
+   "servingLabel": "1 kaleng",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kopi_janji_jiwa_botol",
+   "name": "Kopi Janji Jiwa botol",
+   "aliases": [
+    "janji jiwa botol",
+    "kopi susu botol"
+   ],
+   "category": "minuman",
+   "kcal": 61,
+   "protein": 1.8,
+   "carbs": 9.0,
+   "fat": 2.0,
+   "fiber": 0.0,
+   "sugar": 8.5,
+   "sodium": 40,
+   "servingG": 200.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kopi_kenangan_mantan_botol",
+   "name": "Kopi Kenangan Mantan botol",
+   "aliases": [
+    "kopi kenangan botol"
+   ],
+   "category": "minuman",
+   "kcal": 65,
+   "protein": 1.8,
+   "carbs": 9.5,
+   "fat": 2.2,
+   "fiber": 0.0,
+   "sugar": 9.0,
+   "sodium": 40,
+   "servingG": 200.0,
+   "servingLabel": "1 botol",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "chatime_milk_tea",
+   "name": "Chatime milk tea",
+   "aliases": [
+    "chatime",
+    "chatime pearl milk tea"
+   ],
+   "category": "minuman",
+   "kcal": 89,
+   "protein": 0.8,
+   "carbs": 17.0,
+   "fat": 2.0,
+   "fiber": 0.0,
+   "sugar": 13.0,
+   "sodium": 25,
+   "servingG": 500.0,
+   "servingLabel": "1 cup (regular)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mixue_ice_cream_cone",
+   "name": "Mixue ice cream cone",
+   "aliases": [
+    "mixue cone",
+    "es krim mixue"
+   ],
+   "category": "camilan",
+   "kcal": 187,
+   "protein": 3.0,
+   "carbs": 28.0,
+   "fat": 7.0,
+   "fiber": 0.0,
+   "sugar": 22.0,
+   "sodium": 60,
+   "servingG": 90.0,
+   "servingLabel": "1 cone",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mixue_boba_milk_tea",
+   "name": "Mixue boba milk tea",
+   "aliases": [
+    "mixue milk tea",
+    "mixue"
+   ],
+   "category": "minuman",
+   "kcal": 89,
+   "protein": 0.8,
+   "carbs": 18.0,
+   "fat": 1.5,
+   "fiber": 0.0,
+   "sugar": 14.0,
+   "sodium": 25,
+   "servingG": 500.0,
+   "servingLabel": "1 cup",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "es_teh_indonesia",
+   "name": "Es teh Indonesia",
+   "aliases": [
+    "esteh indonesia",
+    "es teh jumbo"
+   ],
+   "category": "minuman",
+   "kcal": 36,
+   "protein": 0.0,
+   "carbs": 9.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 9.0,
+   "sodium": 5,
+   "servingG": 700.0,
+   "servingLabel": "1 cup jumbo",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "indomie_goreng_kering",
+   "name": "Indomie goreng (kering)",
+   "aliases": [
+    "indomie goreng mentah",
+    "indomie goreng 1 bungkus"
+   ],
+   "category": "hidangan",
+   "kcal": 446,
+   "protein": 8.5,
+   "carbs": 58.0,
+   "fat": 20.0,
+   "fiber": 2.0,
+   "sugar": 6.0,
+   "sodium": 1150,
+   "servingG": 85.0,
+   "servingLabel": "1 bungkus (85 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "indomie_kuah_soto_kering",
+   "name": "Indomie kuah soto (kering)",
+   "aliases": [
+    "indomie soto",
+    "indomie ayam bawang"
+   ],
+   "category": "hidangan",
+   "kcal": 425,
+   "protein": 8.0,
+   "carbs": 60.0,
+   "fat": 17.0,
+   "fiber": 2.0,
+   "sugar": 3.0,
+   "sodium": 1650,
+   "servingG": 75.0,
+   "servingLabel": "1 bungkus (75 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "indomie_rendang",
+   "name": "Indomie rendang",
+   "aliases": [
+    "indomie goreng rendang"
+   ],
+   "category": "hidangan",
+   "kcal": 451,
+   "protein": 8.5,
+   "carbs": 57.0,
+   "fat": 21.0,
+   "fiber": 2.0,
+   "sugar": 7.0,
+   "sodium": 1200,
+   "servingG": 91.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "indomie_hype_abis",
+   "name": "Indomie Hype Abis",
+   "aliases": [
+    "indomie hype abis ayam geprek"
+   ],
+   "category": "hidangan",
+   "kcal": 451,
+   "protein": 8.5,
+   "carbs": 57.0,
+   "fat": 21.0,
+   "fiber": 2.0,
+   "sugar": 6.0,
+   "sodium": 1200,
+   "servingG": 90.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mie_sedaap_goreng",
+   "name": "Mie Sedaap goreng",
+   "aliases": [
+    "mie sedap goreng",
+    "sedaap goreng"
+   ],
+   "category": "hidangan",
+   "kcal": 447,
+   "protein": 8.5,
+   "carbs": 56.0,
+   "fat": 21.0,
+   "fiber": 2.0,
+   "sugar": 5.0,
+   "sodium": 1150,
+   "servingG": 90.0,
+   "servingLabel": "1 bungkus (90 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mie_sedaap_kuah_soto",
+   "name": "Mie Sedaap kuah soto",
+   "aliases": [
+    "mie sedap soto",
+    "sedaap kuah"
+   ],
+   "category": "hidangan",
+   "kcal": 425,
+   "protein": 8.0,
+   "carbs": 60.0,
+   "fat": 17.0,
+   "fiber": 2.0,
+   "sugar": 3.0,
+   "sodium": 1650,
+   "servingG": 75.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mie_sedaap_korean_spicy",
+   "name": "Mie Sedaap Korean spicy",
+   "aliases": [
+    "sedaap korean",
+    "mie sedaap korea"
+   ],
+   "category": "hidangan",
+   "kcal": 440,
+   "protein": 8.0,
+   "carbs": 57.0,
+   "fat": 20.0,
+   "fiber": 2.0,
+   "sugar": 6.0,
+   "sodium": 1300,
+   "servingG": 87.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "sarimi_isi_2",
+   "name": "Sarimi isi 2",
+   "aliases": [
+    "sarimi",
+    "sarimi goreng"
+   ],
+   "category": "hidangan",
+   "kcal": 437,
+   "protein": 8.5,
+   "carbs": 58.0,
+   "fat": 19.0,
+   "fiber": 2.0,
+   "sugar": 5.0,
+   "sodium": 1100,
+   "servingG": 115.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "supermi",
+   "name": "Supermi",
+   "aliases": [
+    "supermi ayam bawang"
+   ],
+   "category": "hidangan",
+   "kcal": 425,
+   "protein": 8.0,
+   "carbs": 60.0,
+   "fat": 17.0,
+   "fiber": 2.0,
+   "sugar": 3.0,
+   "sodium": 1600,
+   "servingG": 70.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "pop_mie",
+   "name": "Pop Mie",
+   "aliases": [
+    "popmie",
+    "pop mie ayam"
+   ],
+   "category": "hidangan",
+   "kcal": 427,
+   "protein": 8.5,
+   "carbs": 60.0,
+   "fat": 17.0,
+   "fiber": 2.0,
+   "sugar": 4.0,
+   "sodium": 1600,
+   "servingG": 75.0,
+   "servingLabel": "1 cup (75 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "samyang_buldak",
+   "name": "Samyang buldak",
+   "aliases": [
+    "samyang",
+    "buldak",
+    "mie samyang"
+   ],
+   "category": "hidangan",
+   "kcal": 407,
+   "protein": 8.0,
+   "carbs": 60.0,
+   "fat": 15.0,
+   "fiber": 2.0,
+   "sugar": 5.0,
+   "sodium": 1050,
+   "servingG": 140.0,
+   "servingLabel": "1 bungkus (140 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "lemonilo_mie_goreng",
+   "name": "Lemonilo mie goreng",
+   "aliases": [
+    "lemonilo"
+   ],
+   "category": "hidangan",
+   "kcal": 396,
+   "protein": 10.0,
+   "carbs": 62.0,
+   "fat": 12.0,
+   "fiber": 5.0,
+   "sugar": 4.0,
+   "sodium": 900,
+   "servingG": 70.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mie_gelas",
+   "name": "Mie gelas",
+   "aliases": [
+    "miegelas"
+   ],
+   "category": "hidangan",
+   "kcal": 424,
+   "protein": 8.0,
+   "carbs": 62.0,
+   "fat": 16.0,
+   "fiber": 2.0,
+   "sugar": 4.0,
+   "sodium": 1500,
+   "servingG": 28.0,
+   "servingLabel": "1 cup kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "bihun_instan",
+   "name": "Bihun instan",
+   "aliases": [
+    "bihun jagung instan",
+    "bihun kuah instan"
+   ],
+   "category": "hidangan",
+   "kcal": 380,
+   "protein": 5.0,
+   "carbs": 72.0,
+   "fat": 8.0,
+   "fiber": 1.0,
+   "sugar": 3.0,
+   "sodium": 1500,
+   "servingG": 55.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "bubur_instan",
+   "name": "Bubur instan",
+   "aliases": [
+    "bubur ayam instan",
+    "sun bubur"
+   ],
+   "category": "karbo",
+   "kcal": 392,
+   "protein": 8.0,
+   "carbs": 72.0,
+   "fat": 8.0,
+   "fiber": 2.0,
+   "sugar": 8.0,
+   "sodium": 700,
+   "servingG": 40.0,
+   "servingLabel": "1 sachet",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "quaker_oat_instan",
+   "name": "Quaker oat instan",
+   "aliases": [
+    "quaker oats",
+    "quaker"
+   ],
+   "category": "karbo",
+   "kcal": 375,
+   "protein": 11.0,
+   "carbs": 67.0,
+   "fat": 7.0,
+   "fiber": 10.0,
+   "sugar": 1.0,
+   "sodium": 10,
+   "servingG": 30.0,
+   "servingLabel": "3 sdm (30 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "nugget_fiesta",
+   "name": "Nugget Fiesta",
+   "aliases": [
+    "fiesta nugget",
+    "nugget so good",
+    "so good nugget"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 255,
+   "protein": 12.0,
+   "carbs": 18.0,
+   "fat": 15.0,
+   "fiber": 1.0,
+   "sugar": 1.5,
+   "sodium": 600,
+   "servingG": 60.0,
+   "servingLabel": "3 potong",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "sosis_kanzler",
+   "name": "Sosis Kanzler",
+   "aliases": [
+    "kanzler",
+    "sosis kanzler singles"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 256,
+   "protein": 12.0,
+   "carbs": 7.0,
+   "fat": 20.0,
+   "fiber": 0.0,
+   "sugar": 2.0,
+   "sodium": 900,
+   "servingG": 65.0,
+   "servingLabel": "1 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "sosis_so_nice",
+   "name": "Sosis So Nice",
+   "aliases": [
+    "so nice"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 148,
+   "protein": 9.0,
+   "carbs": 10.0,
+   "fat": 8.0,
+   "fiber": 0.0,
+   "sugar": 3.0,
+   "sodium": 700,
+   "servingG": 20.0,
+   "servingLabel": "1 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "champ_sosis",
+   "name": "Champ sosis",
+   "aliases": [
+    "sosis champ"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 170,
+   "protein": 8.0,
+   "carbs": 12.0,
+   "fat": 10.0,
+   "fiber": 0.0,
+   "sugar": 3.0,
+   "sodium": 750,
+   "servingG": 30.0,
+   "servingLabel": "1 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "bakso_sapi_beku",
+   "name": "Bakso sapi beku",
+   "aliases": [
+    "bakso bernardi",
+    "bakso frozen"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 151,
+   "protein": 10.0,
+   "carbs": 12.0,
+   "fat": 7.0,
+   "fiber": 0.3,
+   "sugar": 0.5,
+   "sodium": 600,
+   "servingG": 60.0,
+   "servingLabel": "5 butir",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "chicken_karaage_beku",
+   "name": "Chicken karaage beku",
+   "aliases": [
+    "karaage so good",
+    "ayam karage frozen"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 246,
+   "protein": 15.0,
+   "carbs": 15.0,
+   "fat": 14.0,
+   "fiber": 0.5,
+   "sugar": 1.0,
+   "sodium": 600,
+   "servingG": 80.0,
+   "servingLabel": "4 potong",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "spicy_wing_beku",
+   "name": "Spicy wing beku",
+   "aliases": [
+    "spicy wing so good",
+    "spicy wings fiesta"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 256,
+   "protein": 16.0,
+   "carbs": 12.0,
+   "fat": 16.0,
+   "fiber": 0.5,
+   "sugar": 2.0,
+   "sodium": 700,
+   "servingG": 80.0,
+   "servingLabel": "3 potong",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "dimsum_beku",
+   "name": "Dimsum beku",
+   "aliases": [
+    "dimsum frozen",
+    "siomay frozen"
+   ],
+   "category": "camilan",
+   "kcal": 184,
+   "protein": 10.0,
+   "carbs": 18.0,
+   "fat": 8.0,
+   "fiber": 0.8,
+   "sugar": 2.0,
+   "sodium": 600,
+   "servingG": 75.0,
+   "servingLabel": "5 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kornet_pronas",
+   "name": "Kornet Pronas",
+   "aliases": [
+    "kornet kaleng"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 215,
+   "protein": 15.0,
+   "carbs": 5.0,
+   "fat": 15.0,
+   "fiber": 0.0,
+   "sugar": 1.0,
+   "sodium": 900,
+   "servingG": 50.0,
+   "servingLabel": "2 sdm",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "sarden_abc",
+   "name": "Sarden ABC",
+   "aliases": [
+    "abc sardines"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 157,
+   "protein": 15.0,
+   "carbs": 4.0,
+   "fat": 9.0,
+   "fiber": 0.5,
+   "sugar": 3.0,
+   "sodium": 500,
+   "servingG": 80.0,
+   "servingLabel": "1/2 kaleng",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kecap_bango",
+   "name": "Kecap Bango",
+   "aliases": [
+    "bango",
+    "kecap manis bango"
+   ],
+   "category": "sambal_saus",
+   "kcal": 252,
+   "protein": 3.0,
+   "carbs": 60.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 55.0,
+   "sodium": 3000,
+   "servingG": 15.0,
+   "servingLabel": "1 sdm",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "saus_sambal_abc",
+   "name": "Saus sambal ABC",
+   "aliases": [
+    "sambal abc",
+    "saus abc"
+   ],
+   "category": "sambal_saus",
+   "kcal": 108,
+   "protein": 1.0,
+   "carbs": 25.0,
+   "fat": 0.5,
+   "fiber": 1.0,
+   "sugar": 20.0,
+   "sodium": 1300,
+   "servingG": 15.0,
+   "servingLabel": "1 sdm",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "saus_sambal_indofood",
+   "name": "Saus sambal Indofood",
+   "aliases": [
+    "sambal indofood",
+    "saus sambal botol indofood"
+   ],
+   "category": "sambal_saus",
+   "kcal": 108,
+   "protein": 1.0,
+   "carbs": 25.0,
+   "fat": 0.5,
+   "fiber": 1.0,
+   "sugar": 20.0,
+   "sodium": 1300,
+   "servingG": 15.0,
+   "servingLabel": "1 sdm",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mayones_maestro",
+   "name": "Mayones Maestro",
+   "aliases": [
+    "maestro mayonnaise"
+   ],
+   "category": "sambal_saus",
+   "kcal": 494,
+   "protein": 1.0,
+   "carbs": 10.0,
+   "fat": 50.0,
+   "fiber": 0.0,
+   "sugar": 6.0,
+   "sodium": 600,
+   "servingG": 15.0,
+   "servingLabel": "1 sdm",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "selai_morin",
+   "name": "Selai Morin",
+   "aliases": [
+    "selai morin stroberi"
+   ],
+   "category": "sambal_saus",
+   "kcal": 261,
+   "protein": 0.2,
+   "carbs": 65.0,
+   "fat": 0.0,
+   "fiber": 1.0,
+   "sugar": 50.0,
+   "sodium": 20,
+   "servingG": 20.0,
+   "servingLabel": "1 sdm",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "skippy",
+   "name": "Skippy",
+   "aliases": [
+    "selai kacang skippy"
+   ],
+   "category": "sambal_saus",
+   "kcal": 626,
+   "protein": 25.0,
+   "carbs": 19.0,
+   "fat": 50.0,
+   "fiber": 6.0,
+   "sugar": 9.0,
+   "sodium": 430,
+   "servingG": 16.0,
+   "servingLabel": "1 sdm",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "sari_roti_tawar",
+   "name": "Sari Roti tawar",
+   "aliases": [
+    "sari roti",
+    "roti tawar sari roti"
+   ],
+   "category": "karbo",
+   "kcal": 272,
+   "protein": 9.0,
+   "carbs": 50.0,
+   "fat": 4.0,
+   "fiber": 2.5,
+   "sugar": 6.0,
+   "sodium": 480,
+   "servingG": 35.0,
+   "servingLabel": "1 lembar",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "sari_roti_sandwich_cokelat",
+   "name": "Sari Roti sandwich cokelat",
+   "aliases": [
+    "sari roti sandwich coklat",
+    "roti sandwich"
+   ],
+   "category": "camilan",
+   "kcal": 332,
+   "protein": 8.0,
+   "carbs": 48.0,
+   "fat": 12.0,
+   "fiber": 2.0,
+   "sugar": 18.0,
+   "sodium": 380,
+   "servingG": 55.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "sari_roti_sobek_cokelat",
+   "name": "Sari Roti sobek cokelat",
+   "aliases": [
+    "roti sobek sari roti"
+   ],
+   "category": "camilan",
+   "kcal": 321,
+   "protein": 8.0,
+   "carbs": 52.0,
+   "fat": 9.0,
+   "fiber": 2.0,
+   "sugar": 18.0,
+   "sodium": 380,
+   "servingG": 40.0,
+   "servingLabel": "1 sobek",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "sari_roti_roti_isi",
+   "name": "Sari Roti roti isi",
+   "aliases": [
+    "sari roti isi coklat",
+    "sari roti krim keju"
+   ],
+   "category": "camilan",
+   "kcal": 320,
+   "protein": 7.5,
+   "carbs": 50.0,
+   "fat": 10.0,
+   "fiber": 2.0,
+   "sugar": 18.0,
+   "sodium": 350,
+   "servingG": 55.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "roti_o",
+   "name": "Roti O",
+   "aliases": [
+    "rotio",
+    "roti boy"
+   ],
+   "category": "camilan",
+   "kcal": 361,
+   "protein": 7.0,
+   "carbs": 45.0,
+   "fat": 17.0,
+   "fiber": 1.5,
+   "sugar": 15.0,
+   "sodium": 300,
+   "servingG": 80.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "roti_aoka",
+   "name": "Roti Aoka",
+   "aliases": [
+    "aoka",
+    "roti aoka panggang"
+   ],
+   "category": "camilan",
+   "kcal": 363,
+   "protein": 7.0,
+   "carbs": 50.0,
+   "fat": 15.0,
+   "fiber": 2.0,
+   "sugar": 20.0,
+   "sodium": 300,
+   "servingG": 60.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "roti_kacang_garuda_bakar",
+   "name": "Roti Kacang Garuda bakar",
+   "aliases": [
+    "roti panggang kemasan"
+   ],
+   "category": "camilan",
+   "kcal": 356,
+   "protein": 7.0,
+   "carbs": 55.0,
+   "fat": 12.0,
+   "fiber": 2.0,
+   "sugar": 22.0,
+   "sodium": 300,
+   "servingG": 50.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "holland_bakery_donut",
+   "name": "Holland bakery donut",
+   "aliases": [
+    "donat jco",
+    "jco donut",
+    "donat dunkin"
+   ],
+   "category": "camilan",
+   "kcal": 410,
+   "protein": 5.0,
+   "carbs": 48.0,
+   "fat": 22.0,
+   "fiber": 1.5,
+   "sugar": 20.0,
+   "sodium": 300,
+   "servingG": 55.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "j_co_alcapone",
+   "name": "J.CO alcapone",
+   "aliases": [
+    "jco alcapone"
+   ],
+   "category": "camilan",
+   "kcal": 429,
+   "protein": 6.0,
+   "carbs": 45.0,
+   "fat": 25.0,
+   "fiber": 1.5,
+   "sugar": 22.0,
+   "sodium": 300,
+   "servingG": 60.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "tango_wafer",
+   "name": "Tango wafer",
+   "aliases": [
+    "tango",
+    "wafer tango"
+   ],
+   "category": "camilan",
+   "kcal": 510,
+   "protein": 5.0,
+   "carbs": 64.0,
+   "fat": 26.0,
+   "fiber": 1.5,
+   "sugar": 38.0,
+   "sodium": 100,
+   "servingG": 21.0,
+   "servingLabel": "1 bungkus kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "nabati_wafer",
+   "name": "Nabati wafer",
+   "aliases": [
+    "nabati",
+    "richeese nabati"
+   ],
+   "category": "camilan",
+   "kcal": 516,
+   "protein": 6.0,
+   "carbs": 60.0,
+   "fat": 28.0,
+   "fiber": 1.0,
+   "sugar": 30.0,
+   "sodium": 250,
+   "servingG": 22.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "richeese_ahh",
+   "name": "Richeese Ahh",
+   "aliases": [
+    "richeese ah",
+    "ahh"
+   ],
+   "category": "camilan",
+   "kcal": 547,
+   "protein": 8.0,
+   "carbs": 50.0,
+   "fat": 35.0,
+   "fiber": 1.0,
+   "sugar": 10.0,
+   "sodium": 700,
+   "servingG": 30.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "gery_saluut",
+   "name": "Gery saluut",
+   "aliases": [
+    "gery salut",
+    "gery malkist"
+   ],
+   "category": "camilan",
+   "kcal": 505,
+   "protein": 5.0,
+   "carbs": 65.0,
+   "fat": 25.0,
+   "fiber": 1.5,
+   "sugar": 35.0,
+   "sodium": 200,
+   "servingG": 25.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "beng_beng",
+   "name": "Beng-Beng",
+   "aliases": [],
+   "category": "camilan",
+   "kcal": 506,
+   "protein": 6.0,
+   "carbs": 62.0,
+   "fat": 26.0,
+   "fiber": 2.0,
+   "sugar": 42.0,
+   "sodium": 80,
+   "servingG": 20.0,
+   "servingLabel": "1 batang (20 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "choki_choki",
+   "name": "Choki-Choki",
+   "aliases": [],
+   "category": "camilan",
+   "kcal": 518,
+   "protein": 4.0,
+   "carbs": 58.0,
+   "fat": 30.0,
+   "fiber": 2.0,
+   "sugar": 50.0,
+   "sodium": 50,
+   "servingG": 10.0,
+   "servingLabel": "1 stik",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "silverqueen",
+   "name": "SilverQueen",
+   "aliases": [
+    "silver queen",
+    "silverqueen kacang mete"
+   ],
+   "category": "camilan",
+   "kcal": 555,
+   "protein": 8.0,
+   "carbs": 52.0,
+   "fat": 35.0,
+   "fiber": 3.0,
+   "sugar": 45.0,
+   "sodium": 60,
+   "servingG": 30.0,
+   "servingLabel": "1/2 batang kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "cadbury_dairy_milk",
+   "name": "Cadbury dairy milk",
+   "aliases": [
+    "cadbury"
+   ],
+   "category": "camilan",
+   "kcal": 527,
+   "protein": 7.3,
+   "carbs": 57.0,
+   "fat": 30.0,
+   "fiber": 2.0,
+   "sugar": 56.0,
+   "sodium": 80,
+   "servingG": 30.0,
+   "servingLabel": "5 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "delfi_top",
+   "name": "Delfi top",
+   "aliases": [
+    "top coklat"
+   ],
+   "category": "camilan",
+   "kcal": 512,
+   "protein": 5.0,
+   "carbs": 60.0,
+   "fat": 28.0,
+   "fiber": 2.0,
+   "sugar": 40.0,
+   "sodium": 100,
+   "servingG": 9.0,
+   "servingLabel": "1 batang kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kitkat",
+   "name": "KitKat",
+   "aliases": [
+    "kit kat",
+    "kitkat 2 finger"
+   ],
+   "category": "camilan",
+   "kcal": 500,
+   "protein": 6.5,
+   "carbs": 60.0,
+   "fat": 26.0,
+   "fiber": 2.0,
+   "sugar": 48.0,
+   "sodium": 60,
+   "servingG": 17.0,
+   "servingLabel": "1 bungkus (17 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "toblerone",
+   "name": "Toblerone",
+   "aliases": [
+    "toblerone susu"
+   ],
+   "category": "camilan",
+   "kcal": 523,
+   "protein": 5.4,
+   "carbs": 60.0,
+   "fat": 29.0,
+   "fiber": 2.0,
+   "sugar": 58.0,
+   "sodium": 60,
+   "servingG": 35.0,
+   "servingLabel": "1/3 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "oreo",
+   "name": "Oreo",
+   "aliases": [
+    "oreo original"
+   ],
+   "category": "camilan",
+   "kcal": 476,
+   "protein": 5.0,
+   "carbs": 69.0,
+   "fat": 20.0,
+   "fiber": 3.0,
+   "sugar": 38.0,
+   "sodium": 380,
+   "servingG": 29.0,
+   "servingLabel": "3 keping",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "roma_malkist",
+   "name": "Roma Malkist",
+   "aliases": [
+    "malkist",
+    "malkist abon",
+    "malkist crackers"
+   ],
+   "category": "camilan",
+   "kcal": 472,
+   "protein": 8.0,
+   "carbs": 65.0,
+   "fat": 20.0,
+   "fiber": 2.0,
+   "sugar": 15.0,
+   "sodium": 500,
+   "servingG": 20.0,
+   "servingLabel": "5 keping",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "roma_kelapa",
+   "name": "Roma Kelapa",
+   "aliases": [
+    "biskuit kelapa roma"
+   ],
+   "category": "camilan",
+   "kcal": 480,
+   "protein": 7.0,
+   "carbs": 68.0,
+   "fat": 20.0,
+   "fiber": 2.0,
+   "sugar": 22.0,
+   "sodium": 300,
+   "servingG": 25.0,
+   "servingLabel": "4 keping",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "khong_guan",
+   "name": "Khong Guan",
+   "aliases": [
+    "biskuit khong guan"
+   ],
+   "category": "camilan",
+   "kcal": 480,
+   "protein": 7.0,
+   "carbs": 68.0,
+   "fat": 20.0,
+   "fiber": 2.0,
+   "sugar": 25.0,
+   "sodium": 300,
+   "servingG": 30.0,
+   "servingLabel": "4 keping",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "monde_butter_cookies",
+   "name": "Monde butter cookies",
+   "aliases": [
+    "monde",
+    "butter cookies"
+   ],
+   "category": "camilan",
+   "kcal": 524,
+   "protein": 6.0,
+   "carbs": 62.0,
+   "fat": 28.0,
+   "fiber": 1.0,
+   "sugar": 25.0,
+   "sodium": 200,
+   "servingG": 25.0,
+   "servingLabel": "4 keping",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "good_time_cookies",
+   "name": "Good Time cookies",
+   "aliases": [
+    "good time",
+    "goodtime"
+   ],
+   "category": "camilan",
+   "kcal": 506,
+   "protein": 6.0,
+   "carbs": 62.0,
+   "fat": 26.0,
+   "fiber": 2.0,
+   "sugar": 35.0,
+   "sodium": 250,
+   "servingG": 18.0,
+   "servingLabel": "3 keping",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "biskuat",
+   "name": "Biskuat",
+   "aliases": [
+    "biskuat coklat"
+   ],
+   "category": "camilan",
+   "kcal": 470,
+   "protein": 7.0,
+   "carbs": 70.0,
+   "fat": 18.0,
+   "fiber": 2.0,
+   "sugar": 25.0,
+   "sodium": 350,
+   "servingG": 25.0,
+   "servingLabel": "2 keping",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "regal_marie",
+   "name": "Regal Marie",
+   "aliases": [
+    "marie regal"
+   ],
+   "category": "camilan",
+   "kcal": 424,
+   "protein": 7.5,
+   "carbs": 76.0,
+   "fat": 10.0,
+   "fiber": 2.0,
+   "sugar": 22.0,
+   "sodium": 330,
+   "servingG": 25.0,
+   "servingLabel": "5 keping",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "better_biskuit",
+   "name": "Better biskuit",
+   "aliases": [
+    "better"
+   ],
+   "category": "camilan",
+   "kcal": 509,
+   "protein": 6.0,
+   "carbs": 65.0,
+   "fat": 25.0,
+   "fiber": 1.5,
+   "sugar": 30.0,
+   "sodium": 250,
+   "servingG": 25.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "hello_panda",
+   "name": "Hello Panda",
+   "aliases": [
+    "hello panda coklat"
+   ],
+   "category": "camilan",
+   "kcal": 500,
+   "protein": 6.0,
+   "carbs": 65.0,
+   "fat": 24.0,
+   "fiber": 2.0,
+   "sugar": 30.0,
+   "sodium": 250,
+   "servingG": 25.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "pocky",
+   "name": "Pocky",
+   "aliases": [
+    "pocky coklat"
+   ],
+   "category": "camilan",
+   "kcal": 486,
+   "protein": 7.0,
+   "carbs": 65.0,
+   "fat": 22.0,
+   "fiber": 2.0,
+   "sugar": 35.0,
+   "sodium": 250,
+   "servingG": 25.0,
+   "servingLabel": "1/2 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "yupi",
+   "name": "Yupi",
+   "aliases": [
+    "permen yupi",
+    "yupi gummy"
+   ],
+   "category": "camilan",
+   "kcal": 336,
+   "protein": 6.0,
+   "carbs": 78.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 55.0,
+   "sodium": 30,
+   "servingG": 20.0,
+   "servingLabel": "1 bungkus kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kopiko_permen",
+   "name": "Kopiko permen",
+   "aliases": [
+    "permen kopiko"
+   ],
+   "category": "camilan",
+   "kcal": 407,
+   "protein": 0.5,
+   "carbs": 90.0,
+   "fat": 5.0,
+   "fiber": 0.0,
+   "sugar": 75.0,
+   "sodium": 40,
+   "servingG": 5.0,
+   "servingLabel": "1 butir",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "fox_s_permen",
+   "name": "Fox's permen",
+   "aliases": [
+    "fox crystal",
+    "permen fox"
+   ],
+   "category": "camilan",
+   "kcal": 392,
+   "protein": 0.0,
+   "carbs": 98.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 65.0,
+   "sodium": 10,
+   "servingG": 4.0,
+   "servingLabel": "1 butir",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "tolak_angin_permen",
+   "name": "Tolak Angin permen",
+   "aliases": [
+    "permen jahe"
+   ],
+   "category": "camilan",
+   "kcal": 388,
+   "protein": 0.0,
+   "carbs": 97.0,
+   "fat": 0.0,
+   "fiber": 0.0,
+   "sugar": 65.0,
+   "sodium": 10,
+   "servingG": 4.0,
+   "servingLabel": "1 butir",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "coklat_chunky_bar",
+   "name": "Coklat Chunky Bar",
+   "aliases": [
+    "chunky bar"
+   ],
+   "category": "camilan",
+   "kcal": 518,
+   "protein": 7.0,
+   "carbs": 55.0,
+   "fat": 30.0,
+   "fiber": 3.0,
+   "sugar": 45.0,
+   "sodium": 60,
+   "servingG": 30.0,
+   "servingLabel": "1 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "soyjoy",
+   "name": "Soyjoy",
+   "aliases": [
+    "soy joy"
+   ],
+   "category": "camilan",
+   "kcal": 436,
+   "protein": 14.0,
+   "carbs": 50.0,
+   "fat": 20.0,
+   "fiber": 7.0,
+   "sugar": 20.0,
+   "sodium": 150,
+   "servingG": 30.0,
+   "servingLabel": "1 batang (30 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "fitbar",
+   "name": "Fitbar",
+   "aliases": [
+    "fit bar"
+   ],
+   "category": "camilan",
+   "kcal": 430,
+   "protein": 6.0,
+   "carbs": 70.0,
+   "fat": 14.0,
+   "fiber": 5.0,
+   "sugar": 25.0,
+   "sodium": 80,
+   "servingG": 22.0,
+   "servingLabel": "1 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "chitato",
+   "name": "Chitato",
+   "aliases": [
+    "chitato original",
+    "chitato sapi panggang"
+   ],
+   "category": "camilan",
+   "kcal": 547,
+   "protein": 6.0,
+   "carbs": 52.0,
+   "fat": 35.0,
+   "fiber": 3.0,
+   "sugar": 2.0,
+   "sodium": 600,
+   "servingG": 35.0,
+   "servingLabel": "1 bungkus kecil (35 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "chitato_lite",
+   "name": "Chitato Lite",
+   "aliases": [],
+   "category": "camilan",
+   "kcal": 514,
+   "protein": 6.0,
+   "carbs": 55.0,
+   "fat": 30.0,
+   "fiber": 3.0,
+   "sugar": 2.0,
+   "sodium": 600,
+   "servingG": 35.0,
+   "servingLabel": "1 bungkus kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "citato",
+   "name": "Citato",
+   "aliases": [
+    "citato kentang"
+   ],
+   "category": "camilan",
+   "kcal": 547,
+   "protein": 6.0,
+   "carbs": 52.0,
+   "fat": 35.0,
+   "fiber": 3.0,
+   "sugar": 2.0,
+   "sodium": 600,
+   "servingG": 35.0,
+   "servingLabel": "1 bungkus kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "lays",
+   "name": "Lays",
+   "aliases": [
+    "lay's",
+    "lays rumput laut"
+   ],
+   "category": "camilan",
+   "kcal": 544,
+   "protein": 6.5,
+   "carbs": 53.0,
+   "fat": 34.0,
+   "fiber": 4.0,
+   "sugar": 1.0,
+   "sodium": 550,
+   "servingG": 35.0,
+   "servingLabel": "1 bungkus kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "pringles",
+   "name": "Pringles",
+   "aliases": [
+    "pringles original"
+   ],
+   "category": "camilan",
+   "kcal": 546,
+   "protein": 4.5,
+   "carbs": 51.0,
+   "fat": 36.0,
+   "fiber": 3.0,
+   "sugar": 1.5,
+   "sodium": 550,
+   "servingG": 40.0,
+   "servingLabel": "1/3 tabung",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "potabee",
+   "name": "Potabee",
+   "aliases": [
+    "potabee rumput laut"
+   ],
+   "category": "camilan",
+   "kcal": 547,
+   "protein": 6.0,
+   "carbs": 52.0,
+   "fat": 35.0,
+   "fiber": 3.0,
+   "sugar": 2.0,
+   "sodium": 600,
+   "servingG": 35.0,
+   "servingLabel": "1 bungkus kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "qtela_singkong",
+   "name": "Qtela singkong",
+   "aliases": [
+    "qtela",
+    "keripik qtela"
+   ],
+   "category": "camilan",
+   "kcal": 534,
+   "protein": 1.5,
+   "carbs": 60.0,
+   "fat": 32.0,
+   "fiber": 3.0,
+   "sugar": 2.0,
+   "sodium": 500,
+   "servingG": 55.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "qtela_tempe",
+   "name": "Qtela tempe",
+   "aliases": [],
+   "category": "camilan",
+   "kcal": 560,
+   "protein": 15.0,
+   "carbs": 35.0,
+   "fat": 40.0,
+   "fiber": 4.0,
+   "sugar": 2.0,
+   "sodium": 500,
+   "servingG": 55.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "taro",
+   "name": "Taro",
+   "aliases": [
+    "taro snack",
+    "taro net"
+   ],
+   "category": "camilan",
+   "kcal": 493,
+   "protein": 7.0,
+   "carbs": 60.0,
+   "fat": 25.0,
+   "fiber": 2.0,
+   "sugar": 3.0,
+   "sodium": 700,
+   "servingG": 36.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "chiki_balls",
+   "name": "Chiki balls",
+   "aliases": [
+    "chiki ball",
+    "chiki balls keju"
+   ],
+   "category": "camilan",
+   "kcal": 516,
+   "protein": 6.0,
+   "carbs": 60.0,
+   "fat": 28.0,
+   "fiber": 1.5,
+   "sugar": 5.0,
+   "sodium": 700,
+   "servingG": 20.0,
+   "servingLabel": "1 bungkus kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "cheetos",
+   "name": "Cheetos",
+   "aliases": [
+    "cheetos jagung"
+   ],
+   "category": "camilan",
+   "kcal": 526,
+   "protein": 6.0,
+   "carbs": 58.0,
+   "fat": 30.0,
+   "fiber": 1.5,
+   "sugar": 3.0,
+   "sodium": 800,
+   "servingG": 30.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "jetz",
+   "name": "Jetz",
+   "aliases": [
+    "jetz chocolate"
+   ],
+   "category": "camilan",
+   "kcal": 497,
+   "protein": 6.0,
+   "carbs": 62.0,
+   "fat": 25.0,
+   "fiber": 1.5,
+   "sugar": 20.0,
+   "sodium": 300,
+   "servingG": 25.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "twistko",
+   "name": "Twistko",
+   "aliases": [
+    "twistko jagung bakar"
+   ],
+   "category": "camilan",
+   "kcal": 506,
+   "protein": 6.0,
+   "carbs": 62.0,
+   "fat": 26.0,
+   "fiber": 2.0,
+   "sugar": 4.0,
+   "sodium": 700,
+   "servingG": 30.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kusuka",
+   "name": "Kusuka",
+   "aliases": [
+    "keripik kusuka",
+    "kusuka singkong"
+   ],
+   "category": "camilan",
+   "kcal": 524,
+   "protein": 1.5,
+   "carbs": 62.0,
+   "fat": 30.0,
+   "fiber": 3.0,
+   "sugar": 5.0,
+   "sodium": 550,
+   "servingG": 60.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "maicih",
+   "name": "Maicih",
+   "aliases": [
+    "keripik maicih"
+   ],
+   "category": "camilan",
+   "kcal": 528,
+   "protein": 2.0,
+   "carbs": 58.0,
+   "fat": 32.0,
+   "fiber": 3.0,
+   "sugar": 6.0,
+   "sodium": 900,
+   "servingG": 50.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "basreng_kemasan",
+   "name": "Basreng kemasan",
+   "aliases": [
+    "basreng pedas",
+    "baso goreng kemasan"
+   ],
+   "category": "camilan",
+   "kcal": 462,
+   "protein": 8.0,
+   "carbs": 40.0,
+   "fat": 30.0,
+   "fiber": 1.0,
+   "sugar": 2.0,
+   "sodium": 1200,
+   "servingG": 50.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "guribee",
+   "name": "Guribee",
+   "aliases": [
+    "guri bee",
+    "gurihbee"
+   ],
+   "category": "camilan",
+   "kcal": 516,
+   "protein": 6.0,
+   "carbs": 60.0,
+   "fat": 28.0,
+   "fiber": 2.0,
+   "sugar": 4.0,
+   "sodium": 700,
+   "servingG": 25.0,
+   "servingLabel": "1 bungkus kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kacang_garuda",
+   "name": "Kacang Garuda",
+   "aliases": [
+    "garuda kacang kulit",
+    "kacang kulit garuda"
+   ],
+   "category": "camilan",
+   "kcal": 603,
+   "protein": 25.0,
+   "carbs": 20.0,
+   "fat": 47.0,
+   "fiber": 8.0,
+   "sugar": 4.0,
+   "sodium": 300,
+   "servingG": 40.0,
+   "servingLabel": "1 genggam",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kacang_dua_kelinci",
+   "name": "Kacang Dua Kelinci",
+   "aliases": [
+    "dua kelinci",
+    "kacang sukro dua kelinci"
+   ],
+   "category": "camilan",
+   "kcal": 537,
+   "protein": 15.0,
+   "carbs": 45.0,
+   "fat": 33.0,
+   "fiber": 4.0,
+   "sugar": 5.0,
+   "sodium": 450,
+   "servingG": 30.0,
+   "servingLabel": "1 bungkus kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "pilus_garuda",
+   "name": "Pilus Garuda",
+   "aliases": [
+    "pilus"
+   ],
+   "category": "camilan",
+   "kcal": 534,
+   "protein": 6.0,
+   "carbs": 60.0,
+   "fat": 30.0,
+   "fiber": 2.0,
+   "sugar": 3.0,
+   "sodium": 600,
+   "servingG": 25.0,
+   "servingLabel": "1 bungkus kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kacang_atom_garuda",
+   "name": "Kacang Atom Garuda",
+   "aliases": [
+    "garuda atom"
+   ],
+   "category": "camilan",
+   "kcal": 537,
+   "protein": 14.0,
+   "carbs": 46.0,
+   "fat": 33.0,
+   "fiber": 4.0,
+   "sugar": 4.0,
+   "sodium": 450,
+   "servingG": 30.0,
+   "servingLabel": "1 bungkus kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "tic_tac_snack",
+   "name": "Tic Tac snack",
+   "aliases": [
+    "tic tac"
+   ],
+   "category": "camilan",
+   "kcal": 530,
+   "protein": 5.0,
+   "carbs": 60.0,
+   "fat": 30.0,
+   "fiber": 1.0,
+   "sugar": 3.0,
+   "sodium": 700,
+   "servingG": 25.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "krupuk_finna",
+   "name": "Krupuk Finna",
+   "aliases": [
+    "finna",
+    "kerupuk udang finna"
+   ],
+   "category": "camilan",
+   "kcal": 505,
+   "protein": 5.0,
+   "carbs": 65.0,
+   "fat": 25.0,
+   "fiber": 0.5,
+   "sugar": 3.0,
+   "sodium": 700,
+   "servingG": 20.0,
+   "servingLabel": "1 genggam",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "gery_chocolatos",
+   "name": "Gery Chocolatos",
+   "aliases": [
+    "chocolatos",
+    "chocolatos wafer roll"
+   ],
+   "category": "camilan",
+   "kcal": 520,
+   "protein": 5.0,
+   "carbs": 62.0,
+   "fat": 28.0,
+   "fiber": 2.0,
+   "sugar": 38.0,
+   "sodium": 120,
+   "servingG": 16.0,
+   "servingLabel": "1 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "momogi",
+   "name": "Momogi",
+   "aliases": [
+    "momogi jagung bakar"
+   ],
+   "category": "camilan",
+   "kcal": 520,
+   "protein": 5.0,
+   "carbs": 62.0,
+   "fat": 28.0,
+   "fiber": 1.5,
+   "sugar": 5.0,
+   "sodium": 700,
+   "servingG": 10.0,
+   "servingLabel": "1 stik",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "superstar",
+   "name": "Superstar",
+   "aliases": [
+    "wafer superstar"
+   ],
+   "category": "camilan",
+   "kcal": 520,
+   "protein": 5.0,
+   "carbs": 62.0,
+   "fat": 28.0,
+   "fiber": 1.5,
+   "sugar": 35.0,
+   "sodium": 120,
+   "servingG": 18.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "astor",
+   "name": "Astor",
+   "aliases": [
+    "astor wafer stick"
+   ],
+   "category": "camilan",
+   "kcal": 505,
+   "protein": 5.0,
+   "carbs": 65.0,
+   "fat": 25.0,
+   "fiber": 1.5,
+   "sugar": 38.0,
+   "sodium": 80,
+   "servingG": 16.0,
+   "servingLabel": "4 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "slai_o_lai",
+   "name": "Slai O'lai",
+   "aliases": [
+    "slai olai"
+   ],
+   "category": "camilan",
+   "kcal": 457,
+   "protein": 6.0,
+   "carbs": 70.0,
+   "fat": 17.0,
+   "fiber": 2.0,
+   "sugar": 30.0,
+   "sodium": 200,
+   "servingG": 24.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "tim_tam",
+   "name": "Tim Tam",
+   "aliases": [
+    "timtam"
+   ],
+   "category": "camilan",
+   "kcal": 510,
+   "protein": 5.0,
+   "carbs": 64.0,
+   "fat": 26.0,
+   "fiber": 1.5,
+   "sugar": 45.0,
+   "sodium": 150,
+   "servingG": 18.0,
+   "servingLabel": "1 keping",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "biskuit_selamat",
+   "name": "Biskuit Selamat",
+   "aliases": [
+    "selamat wafer"
+   ],
+   "category": "camilan",
+   "kcal": 514,
+   "protein": 5.0,
+   "carbs": 65.0,
+   "fat": 26.0,
+   "fiber": 1.5,
+   "sugar": 38.0,
+   "sodium": 150,
+   "servingG": 20.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "nissin_crackers",
+   "name": "Nissin crackers",
+   "aliases": [
+    "crackers kaleng"
+   ],
+   "category": "camilan",
+   "kcal": 461,
+   "protein": 9.0,
+   "carbs": 68.0,
+   "fat": 17.0,
+   "fiber": 3.0,
+   "sugar": 5.0,
+   "sodium": 700,
+   "servingG": 25.0,
+   "servingLabel": "4 keping",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "hatari",
+   "name": "Hatari",
+   "aliases": [
+    "biskuit hatari"
+   ],
+   "category": "camilan",
+   "kcal": 484,
+   "protein": 6.0,
+   "carbs": 70.0,
+   "fat": 20.0,
+   "fiber": 1.5,
+   "sugar": 25.0,
+   "sodium": 300,
+   "servingG": 25.0,
+   "servingLabel": "3 keping",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "indomaret_roti",
+   "name": "Indomaret roti",
+   "aliases": [
+    "roti indomaret",
+    "roti alfamart"
+   ],
+   "category": "camilan",
+   "kcal": 322,
+   "protein": 8.0,
+   "carbs": 50.0,
+   "fat": 10.0,
+   "fiber": 2.0,
+   "sugar": 18.0,
+   "sodium": 380,
+   "servingG": 55.0,
+   "servingLabel": "1 bungkus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "magnum_classic",
+   "name": "Magnum classic",
+   "aliases": [
+    "magnum",
+    "es krim magnum"
+   ],
+   "category": "camilan",
+   "kcal": 316,
+   "protein": 4.0,
+   "carbs": 30.0,
+   "fat": 20.0,
+   "fiber": 1.0,
+   "sugar": 27.0,
+   "sodium": 60,
+   "servingG": 80.0,
+   "servingLabel": "1 batang (80 g)",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "walls_paddle_pop",
+   "name": "Walls Paddle Pop",
+   "aliases": [
+    "paddlepop"
+   ],
+   "category": "camilan",
+   "kcal": 202,
+   "protein": 3.0,
+   "carbs": 25.0,
+   "fat": 10.0,
+   "fiber": 0.5,
+   "sugar": 20.0,
+   "sodium": 50,
+   "servingG": 60.0,
+   "servingLabel": "1 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "walls_cornetto",
+   "name": "Walls Cornetto",
+   "aliases": [],
+   "category": "camilan",
+   "kcal": 279,
+   "protein": 4.0,
+   "carbs": 32.0,
+   "fat": 15.0,
+   "fiber": 1.0,
+   "sugar": 22.0,
+   "sodium": 80,
+   "servingG": 70.0,
+   "servingLabel": "1 cone",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "aice_mochi",
+   "name": "Aice mochi",
+   "aliases": [
+    "mochi aice"
+   ],
+   "category": "camilan",
+   "kcal": 206,
+   "protein": 3.0,
+   "carbs": 35.0,
+   "fat": 6.0,
+   "fiber": 0.5,
+   "sugar": 20.0,
+   "sodium": 40,
+   "servingG": 45.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "aice_cokelat",
+   "name": "Aice cokelat",
+   "aliases": [
+    "aice coklat",
+    "es krim aice"
+   ],
+   "category": "camilan",
+   "kcal": 205,
+   "protein": 3.0,
+   "carbs": 28.0,
+   "fat": 9.0,
+   "fiber": 0.5,
+   "sugar": 22.0,
+   "sodium": 50,
+   "servingG": 60.0,
+   "servingLabel": "1 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "aice_semangka",
+   "name": "Aice semangka",
+   "aliases": [
+    "aice watermelon",
+    "es aice buah"
+   ],
+   "category": "camilan",
+   "kcal": 99,
+   "protein": 0.5,
+   "carbs": 22.0,
+   "fat": 1.0,
+   "fiber": 0.3,
+   "sugar": 18.0,
+   "sodium": 20,
+   "servingG": 60.0,
+   "servingLabel": "1 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "campina",
+   "name": "Campina",
+   "aliases": [
+    "campina hula hula",
+    "es krim campina"
+   ],
+   "category": "camilan",
+   "kcal": 202,
+   "protein": 3.0,
+   "carbs": 25.0,
+   "fat": 10.0,
+   "fiber": 0.5,
+   "sugar": 20.0,
+   "sodium": 50,
+   "servingG": 80.0,
+   "servingLabel": "1 cup",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "haagen_dazs",
+   "name": "Haagen-Dazs",
+   "aliases": [],
+   "category": "camilan",
+   "kcal": 263,
+   "protein": 4.5,
+   "carbs": 23.0,
+   "fat": 17.0,
+   "fiber": 0.0,
+   "sugar": 21.0,
+   "sodium": 70,
+   "servingG": 100.0,
+   "servingLabel": "1 cup kecil",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "onigiri_indomaret",
+   "name": "Onigiri Indomaret",
+   "aliases": [
+    "onigiri minimarket",
+    "onigiri tuna mayo"
+   ],
+   "category": "karbo",
+   "kcal": 185,
+   "protein": 4.5,
+   "carbs": 35.0,
+   "fat": 3.0,
+   "fiber": 0.8,
+   "sugar": 2.0,
+   "sodium": 450,
+   "servingG": 110.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "onigiri_salmon",
+   "name": "Onigiri salmon",
+   "aliases": [
+    "onigiri salmon mayo"
+   ],
+   "category": "karbo",
+   "kcal": 188,
+   "protein": 5.0,
+   "carbs": 34.0,
+   "fat": 3.5,
+   "fiber": 0.8,
+   "sugar": 2.0,
+   "sodium": 430,
+   "servingG": 110.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "lunch_box_minimarket",
+   "name": "Lunch box minimarket",
+   "aliases": [
+    "nasi box indomaret",
+    "nasi kotak alfamart"
+   ],
+   "category": "hidangan",
+   "kcal": 179,
+   "protein": 7.0,
+   "carbs": 22.0,
+   "fat": 7.0,
+   "fiber": 1.0,
+   "sugar": 2.0,
+   "sodium": 450,
+   "servingG": 300.0,
+   "servingLabel": "1 kotak",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "sandwich_minimarket",
+   "name": "Sandwich minimarket",
+   "aliases": [
+    "sandwich alfamart",
+    "sandwich tuna"
+   ],
+   "category": "hidangan",
+   "kcal": 246,
+   "protein": 9.0,
+   "carbs": 30.0,
+   "fat": 10.0,
+   "fiber": 1.5,
+   "sugar": 5.0,
+   "sodium": 550,
+   "servingG": 120.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "siomay_minimarket",
+   "name": "Siomay minimarket",
+   "aliases": [
+    "siomay indomaret"
+   ],
+   "category": "camilan",
+   "kcal": 163,
+   "protein": 9.0,
+   "carbs": 16.0,
+   "fat": 7.0,
+   "fiber": 0.8,
+   "sugar": 2.0,
+   "sodium": 550,
+   "servingG": 90.0,
+   "servingLabel": "4 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "sosis_bakar_minimarket",
+   "name": "Sosis bakar minimarket",
+   "aliases": [
+    "sosis jumbo bakar"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 256,
+   "protein": 11.0,
+   "carbs": 8.0,
+   "fat": 20.0,
+   "fiber": 0.0,
+   "sugar": 3.0,
+   "sodium": 850,
+   "servingG": 70.0,
+   "servingLabel": "1 batang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "bakpao_minimarket",
+   "name": "Bakpao minimarket",
+   "aliases": [
+    "bakpao indomaret"
+   ],
+   "category": "camilan",
+   "kcal": 241,
+   "protein": 7.0,
+   "carbs": 42.0,
+   "fat": 5.0,
+   "fiber": 1.5,
+   "sugar": 8.0,
+   "sodium": 380,
+   "servingG": 90.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "telur_rebus_minimarket",
+   "name": "Telur rebus minimarket",
+   "aliases": [
+    "telur rebus kemasan",
+    "telur rebus alfamart"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 150,
+   "protein": 12.6,
+   "carbs": 1.1,
+   "fat": 10.6,
+   "fiber": 0.0,
+   "sugar": 1.1,
+   "sodium": 200,
+   "servingG": 55.0,
+   "servingLabel": "1 butir",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "ubi_cilembu_panggang",
+   "name": "Ubi cilembu panggang",
+   "aliases": [
+    "ubi panggang",
+    "ubi madu panggang"
+   ],
+   "category": "karbo",
+   "kcal": 136,
+   "protein": 1.6,
+   "carbs": 32.0,
+   "fat": 0.2,
+   "fiber": 3.3,
+   "sugar": 12.0,
+   "sodium": 30,
+   "servingG": 150.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kfc_original_paha_atas",
+   "name": "KFC Original paha atas",
+   "aliases": [
+    "kfc paha atas",
+    "kfc original"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 257,
+   "protein": 19.0,
+   "carbs": 7.0,
+   "fat": 17.0,
+   "fiber": 0.4,
+   "sugar": 0.3,
+   "sodium": 550,
+   "servingG": 130.0,
+   "servingLabel": "1 potong",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kfc_original_dada",
+   "name": "KFC Original dada",
+   "aliases": [
+    "kfc dada"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 242,
+   "protein": 22.0,
+   "carbs": 7.0,
+   "fat": 14.0,
+   "fiber": 0.4,
+   "sugar": 0.3,
+   "sodium": 550,
+   "servingG": 170.0,
+   "servingLabel": "1 potong",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kfc_crispy",
+   "name": "KFC Crispy",
+   "aliases": [
+    "hot crispy"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 274,
+   "protein": 18.0,
+   "carbs": 10.0,
+   "fat": 18.0,
+   "fiber": 0.5,
+   "sugar": 0.3,
+   "sodium": 600,
+   "servingG": 130.0,
+   "servingLabel": "1 potong",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kfc_perkedel",
+   "name": "KFC perkedel",
+   "aliases": [
+    "perkedel kfc"
+   ],
+   "category": "gorengan",
+   "kcal": 178,
+   "protein": 2.5,
+   "carbs": 15.0,
+   "fat": 12.0,
+   "fiber": 1.5,
+   "sugar": 0.5,
+   "sodium": 450,
+   "servingG": 50.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kfc_nasi",
+   "name": "KFC nasi",
+   "aliases": [
+    "nasi kfc"
+   ],
+   "category": "karbo",
+   "kcal": 129,
+   "protein": 2.6,
+   "carbs": 29.0,
+   "fat": 0.3,
+   "fiber": 0.4,
+   "sugar": 0.1,
+   "sodium": 5,
+   "servingG": 150.0,
+   "servingLabel": "1 porsi",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kfc_mocha_float",
+   "name": "KFC Mocha float",
+   "aliases": [
+    "mocha float"
+   ],
+   "category": "minuman",
+   "kcal": 97,
+   "protein": 1.5,
+   "carbs": 16.0,
+   "fat": 3.0,
+   "fiber": 0.0,
+   "sugar": 15.0,
+   "sodium": 50,
+   "servingG": 300.0,
+   "servingLabel": "1 gelas",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mcd_panas",
+   "name": "McD PaNas",
+   "aliases": [
+    "panas mcd",
+    "ayam mcd",
+    "mcdonalds ayam goreng"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 261,
+   "protein": 19.0,
+   "carbs": 8.0,
+   "fat": 17.0,
+   "fiber": 0.4,
+   "sugar": 0.3,
+   "sodium": 550,
+   "servingG": 130.0,
+   "servingLabel": "1 potong",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mcd_big_mac",
+   "name": "McD Big Mac",
+   "aliases": [
+    "big mac"
+   ],
+   "category": "hidangan",
+   "kcal": 249,
+   "protein": 12.0,
+   "carbs": 21.0,
+   "fat": 13.0,
+   "fiber": 1.5,
+   "sugar": 4.0,
+   "sodium": 600,
+   "servingG": 215.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mcd_cheeseburger",
+   "name": "McD Cheeseburger",
+   "aliases": [
+    "cheeseburger mcd"
+   ],
+   "category": "hidangan",
+   "kcal": 263,
+   "protein": 13.0,
+   "carbs": 28.0,
+   "fat": 11.0,
+   "fiber": 1.5,
+   "sugar": 6.5,
+   "sodium": 650,
+   "servingG": 115.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mcd_mcchicken",
+   "name": "McD McChicken",
+   "aliases": [
+    "mcchicken"
+   ],
+   "category": "hidangan",
+   "kcal": 260,
+   "protein": 10.0,
+   "carbs": 28.0,
+   "fat": 12.0,
+   "fiber": 1.5,
+   "sugar": 3.5,
+   "sodium": 550,
+   "servingG": 145.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mcd_kentang_goreng",
+   "name": "McD kentang goreng",
+   "aliases": [
+    "french fries mcd",
+    "fries mcd"
+   ],
+   "category": "gorengan",
+   "kcal": 313,
+   "protein": 3.4,
+   "carbs": 41.0,
+   "fat": 15.0,
+   "fiber": 3.8,
+   "sugar": 0.3,
+   "sodium": 210,
+   "servingG": 80.0,
+   "servingLabel": "1 porsi sedang",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mcd_mcflurry",
+   "name": "McD McFlurry",
+   "aliases": [
+    "mcflurry",
+    "mcflurry oreo"
+   ],
+   "category": "camilan",
+   "kcal": 207,
+   "protein": 4.0,
+   "carbs": 32.0,
+   "fat": 7.0,
+   "fiber": 0.5,
+   "sugar": 28.0,
+   "sodium": 90,
+   "servingG": 200.0,
+   "servingLabel": "1 cup",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "mcd_sundae",
+   "name": "McD sundae",
+   "aliases": [
+    "sundae cokelat mcd"
+   ],
+   "category": "camilan",
+   "kcal": 198,
+   "protein": 4.0,
+   "carbs": 32.0,
+   "fat": 6.0,
+   "fiber": 0.3,
+   "sugar": 28.0,
+   "sodium": 80,
+   "servingG": 120.0,
+   "servingLabel": "1 cup",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "burger_king_whopper",
+   "name": "Burger King Whopper",
+   "aliases": [
+    "whopper"
+   ],
+   "category": "hidangan",
+   "kcal": 233,
+   "protein": 11.0,
+   "carbs": 18.0,
+   "fat": 13.0,
+   "fiber": 1.0,
+   "sugar": 4.0,
+   "sodium": 450,
+   "servingG": 270.0,
+   "servingLabel": "1 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "richeese_factory_fire_wings",
+   "name": "Richeese Factory fire wings",
+   "aliases": [
+    "richeese fire wings",
+    "fire chicken"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 282,
+   "protein": 18.0,
+   "carbs": 12.0,
+   "fat": 18.0,
+   "fiber": 0.5,
+   "sugar": 3.0,
+   "sodium": 800,
+   "servingG": 100.0,
+   "servingLabel": "2 potong",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "richeese_factory_keju",
+   "name": "Richeese Factory keju",
+   "aliases": [
+    "richeese nasi keju",
+    "saus keju richeese"
+   ],
+   "category": "sambal_saus",
+   "kcal": 195,
+   "protein": 5.0,
+   "carbs": 10.0,
+   "fat": 15.0,
+   "fiber": 0.0,
+   "sugar": 3.0,
+   "sodium": 700,
+   "servingG": 30.0,
+   "servingLabel": "1 cup saus",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "hokben_chicken_teriyaki",
+   "name": "HokBen chicken teriyaki",
+   "aliases": [
+    "hokben teriyaki",
+    "hoka hoka bento"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 185,
+   "protein": 18.0,
+   "carbs": 8.0,
+   "fat": 9.0,
+   "fiber": 0.3,
+   "sugar": 7.0,
+   "sodium": 700,
+   "servingG": 120.0,
+   "servingLabel": "1 porsi",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "hokben_beef_yakiniku",
+   "name": "HokBen beef yakiniku",
+   "aliases": [
+    "hokben yakiniku"
+   ],
+   "category": "lauk_hewani",
+   "kcal": 196,
+   "protein": 15.0,
+   "carbs": 7.0,
+   "fat": 12.0,
+   "fiber": 0.3,
+   "sugar": 5.0,
+   "sodium": 650,
+   "servingG": 120.0,
+   "servingLabel": "1 porsi",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "hokben_ekkado",
+   "name": "HokBen ekkado",
+   "aliases": [
+    "ekkado"
+   ],
+   "category": "gorengan",
+   "kcal": 247,
+   "protein": 8.0,
+   "carbs": 20.0,
+   "fat": 15.0,
+   "fiber": 0.5,
+   "sugar": 2.0,
+   "sodium": 500,
+   "servingG": 40.0,
+   "servingLabel": "2 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "yoshinoya_beef_bowl",
+   "name": "Yoshinoya beef bowl",
+   "aliases": [
+    "yoshinoya",
+    "beef bowl yoshinoya"
+   ],
+   "category": "hidangan",
+   "kcal": 166,
+   "protein": 7.0,
+   "carbs": 21.0,
+   "fat": 6.0,
+   "fiber": 0.5,
+   "sugar": 4.0,
+   "sodium": 500,
+   "servingG": 380.0,
+   "servingLabel": "1 mangkuk reguler",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "solaria_nasi_goreng",
+   "name": "Solaria nasi goreng",
+   "aliases": [
+    "nasi goreng solaria"
+   ],
+   "category": "hidangan",
+   "kcal": 192,
+   "protein": 6.0,
+   "carbs": 24.0,
+   "fat": 8.0,
+   "fiber": 0.8,
+   "sugar": 2.0,
+   "sodium": 550,
+   "servingG": 350.0,
+   "servingLabel": "1 piring",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "pizza_hut_pan_pizza",
+   "name": "Pizza Hut pan pizza",
+   "aliases": [
+    "pizza hut",
+    "pan pizza"
+   ],
+   "category": "hidangan",
+   "kcal": 255,
+   "protein": 10.0,
+   "carbs": 29.0,
+   "fat": 11.0,
+   "fiber": 2.0,
+   "sugar": 3.5,
+   "sodium": 600,
+   "servingG": 100.0,
+   "servingLabel": "1 slice",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "domino_s_pizza",
+   "name": "Domino's pizza",
+   "aliases": [
+    "dominos pizza"
+   ],
+   "category": "hidangan",
+   "kcal": 254,
+   "protein": 11.0,
+   "carbs": 30.0,
+   "fat": 10.0,
+   "fiber": 2.0,
+   "sugar": 3.5,
+   "sodium": 620,
+   "servingG": 90.0,
+   "servingLabel": "1 slice",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "gacoan_mie",
+   "name": "Gacoan mie",
+   "aliases": [
+    "mie gacoan level"
+   ],
+   "category": "hidangan",
+   "kcal": 209,
+   "protein": 6.0,
+   "carbs": 26.0,
+   "fat": 9.0,
+   "fiber": 1.0,
+   "sugar": 3.0,
+   "sodium": 700,
+   "servingG": 300.0,
+   "servingLabel": "1 porsi",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "gacoan_udang_keju",
+   "name": "Gacoan udang keju",
+   "aliases": [
+    "udang keju gacoan"
+   ],
+   "category": "gorengan",
+   "kcal": 247,
+   "protein": 8.0,
+   "carbs": 20.0,
+   "fat": 15.0,
+   "fiber": 0.5,
+   "sugar": 2.0,
+   "sodium": 500,
+   "servingG": 60.0,
+   "servingLabel": "3 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "gacoan_siomay",
+   "name": "Gacoan siomay",
+   "aliases": [
+    "siomay gacoan"
+   ],
+   "category": "gorengan",
+   "kcal": 246,
+   "protein": 8.0,
+   "carbs": 22.0,
+   "fat": 14.0,
+   "fiber": 0.5,
+   "sugar": 1.5,
+   "sodium": 500,
+   "servingG": 60.0,
+   "servingLabel": "3 buah",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "starbucks_caffe_latte",
+   "name": "Starbucks caffe latte",
+   "aliases": [
+    "starbucks latte"
+   ],
+   "category": "minuman",
+   "kcal": 57,
+   "protein": 3.3,
+   "carbs": 5.0,
+   "fat": 2.6,
+   "fiber": 0.0,
+   "sugar": 5.0,
+   "sodium": 50,
+   "servingG": 354.0,
+   "servingLabel": "1 tall",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "starbucks_frappuccino",
+   "name": "Starbucks frappuccino",
+   "aliases": [
+    "frappuccino starbucks",
+    "java chip"
+   ],
+   "category": "minuman",
+   "kcal": 120,
+   "protein": 2.0,
+   "carbs": 19.0,
+   "fat": 4.0,
+   "fiber": 0.3,
+   "sugar": 18.0,
+   "sodium": 60,
+   "servingG": 354.0,
+   "servingLabel": "1 tall",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "starbucks_caramel_macchiato",
+   "name": "Starbucks caramel macchiato",
+   "aliases": [
+    "caramel macchiato starbucks"
+   ],
+   "category": "minuman",
+   "kcal": 69,
+   "protein": 2.8,
+   "carbs": 9.5,
+   "fat": 2.2,
+   "fiber": 0.0,
+   "sugar": 9.0,
+   "sodium": 45,
+   "servingG": 354.0,
+   "servingLabel": "1 tall",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kopi_kenangan_mantan",
+   "name": "Kopi Kenangan Mantan",
+   "aliases": [
+    "kopi kenangan",
+    "es kopi kenangan"
+   ],
+   "category": "minuman",
+   "kcal": 68,
+   "protein": 1.5,
+   "carbs": 11.0,
+   "fat": 2.0,
+   "fiber": 0.0,
+   "sugar": 10.0,
+   "sodium": 40,
+   "servingG": 300.0,
+   "servingLabel": "1 cup reguler",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "janji_jiwa_kopi_susu",
+   "name": "Janji Jiwa kopi susu",
+   "aliases": [
+    "janji jiwa",
+    "kopi janji jiwa"
+   ],
+   "category": "minuman",
+   "kcal": 68,
+   "protein": 1.5,
+   "carbs": 11.0,
+   "fat": 2.0,
+   "fiber": 0.0,
+   "sugar": 10.0,
+   "sodium": 40,
+   "servingG": 300.0,
+   "servingLabel": "1 cup",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "fore_kopi_aren",
+   "name": "Fore kopi aren",
+   "aliases": [
+    "fore coffee",
+    "fore aren latte"
+   ],
+   "category": "minuman",
+   "kcal": 65,
+   "protein": 1.8,
+   "carbs": 10.0,
+   "fat": 2.0,
+   "fiber": 0.0,
+   "sugar": 9.5,
+   "sodium": 40,
+   "servingG": 300.0,
+   "servingLabel": "1 cup",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "tomoro_kopi",
+   "name": "Tomoro kopi",
+   "aliases": [
+    "tomoro coffee"
+   ],
+   "category": "minuman",
+   "kcal": 65,
+   "protein": 1.8,
+   "carbs": 10.0,
+   "fat": 2.0,
+   "fiber": 0.0,
+   "sugar": 9.5,
+   "sodium": 40,
+   "servingG": 300.0,
+   "servingLabel": "1 cup",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "point_coffee",
+   "name": "Point Coffee",
+   "aliases": [
+    "point coffee indomaret",
+    "kopi indomaret"
+   ],
+   "category": "minuman",
+   "kcal": 64,
+   "protein": 1.5,
+   "carbs": 10.0,
+   "fat": 2.0,
+   "fiber": 0.0,
+   "sugar": 9.5,
+   "sodium": 40,
+   "servingG": 300.0,
+   "servingLabel": "1 cup",
+   "source": "KEMASAN"
+  },
+  {
+   "id": "kopi_excelso",
+   "name": "Kopi Excelso",
+   "aliases": [
+    "excelso"
+   ],
+   "category": "minuman",
+   "kcal": 64,
+   "protein": 1.5,
+   "carbs": 10.0,
+   "fat": 2.0,
+   "fiber": 0.0,
+   "sugar": 9.5,
+   "sodium": 40,
+   "servingG": 300.0,
+   "servingLabel": "1 cup",
+   "source": "KEMASAN"
   }
  ]
 }

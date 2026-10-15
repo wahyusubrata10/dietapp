@@ -57,6 +57,15 @@ class FoodMatcherTest {
     }
 
     @Test
+    fun `produk minimarket dikenali dari merek`() {
+        assertEquals("hotto_purto", idOf("Hotto Purto"))
+        assertEquals("chitato", idOf("Chitato"))
+        assertEquals("ultra_milk_cokelat", idOf("Ultra Milk Coklat"))
+        assertEquals("milo_kotak", idOf("Milo kotak"))
+        assertEquals("guribee", idOf("Guribee"))
+    }
+
+    @Test
     fun `lauk berbeda tidak tertukar`() {
         assertTrue(idOf("Udang balado") != idOf("Cumi balado"))
         assertTrue(idOf("Tahu bumbu bali") != idOf("Telur bumbu bali"))
