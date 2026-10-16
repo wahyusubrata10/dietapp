@@ -152,11 +152,11 @@ fun WeightProjectionSection(p: WeightProjection) {
                     values = recent.map { if (it.counted) it.balance else null },
                     labels = recent.map { it.date.dayOfMonth.toString() },
                     tooltipLabels = recent.map { Format.dayMonth(it.date) },
-                    emptyText = "Belum ada hari lengkap yang tercatat",
+                    emptyText = "Belum ada hari yang tercatat",
                 )
                 if (p.skippedDays > 0) {
                     Text(
-                        "${p.skippedDays} hari tidak dihitung (tanpa catatan / catatan terlalu sedikit) dan dianggap netral.",
+                        "${p.skippedDays} hari tanpa catatan dianggap netral. Setiap hari yang ada catatannya dihitung apa adanya.",
                         style = MaterialTheme.typography.bodySmall,
                         color = cs.onSurfaceVariant,
                     )

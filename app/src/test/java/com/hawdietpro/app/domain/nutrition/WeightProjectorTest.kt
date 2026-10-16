@@ -38,15 +38,23 @@ class WeightProjectorTest {
     }
 
     @Test
-    fun `hari tanpa catatan atau tercatat sedikit dianggap netral`() {
+    fun `hari tanpa catatan dianggap netral, catatan sedikit tetap dihitung`() {
         val intake = mapOf(
-            start to 300.0, // jauh di bawah setengah BMR → dianggap tidak lengkap
+            start to tdee(80.0) - 770, // catatan kecil tetap dihitung apa adanya
             start.plusDays(2) to tdee(80.0) + 770,
         )
         val p = WeightProjector.project(profile, start, 80.0, start.plusDays(3), intake, emptyList())
+        assertEquals(2, p.countedDays)
+        assertEquals(1, p.skippedDays)
+        assertEquals(80.0, p.estimatedToday, 0.01)
+    }
+
+    @Test
+    fun `asupan sangat rendah tetap valid`() {
+        val intake = mapOf(start to 300.0)
+        val p = WeightProjector.project(profile, start, 80.0, start.plusDays(1), intake, emptyList())
         assertEquals(1, p.countedDays)
-        assertEquals(2, p.skippedDays)
-        assertEquals(80.1, p.estimatedToday, 0.01)
+        assertEquals(80.0 + (300.0 - tdee(80.0)) / WeightProjector.KCAL_PER_KG, p.estimatedToday, 0.001)
     }
 
     @Test

@@ -60,8 +60,8 @@ class AchievementCalculator(
         val gradeA = meals.count { it.grade == Grade.A }
         val breakfastDays = byDay.count { (_, list) -> list.any { it.mealType == MealType.SARAPAN } }
         val vegDays = byDay.count { (_, list) -> list.flatMap { it.items }.any(isVegetable) }
-        // Hari "lengkap": minimal 2 kali makan, agar hari yang baru dicatat sebagian tidak terhitung.
-        val fullDays = byDay.filterValues { it.size >= 2 }.keys
+        // Setiap hari yang punya catatan dianggap valid, berapapun jumlahnya.
+        val fullDays = byDay.keys
         val balancedDays = fullDays.count { d ->
             val n = dayTotals.getValue(d)
             n.sugar <= NutritionLimits.SUGAR_G && n.sodium <= NutritionLimits.SODIUM_MG

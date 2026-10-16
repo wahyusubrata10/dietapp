@@ -18,7 +18,7 @@ data class DayBalance(
     val balance: Double,
     /** Berat perkiraan pada akhir hari. */
     val estimatedWeight: Double,
-    /** false = tidak ada catatan / catatan terlalu sedikit sehingga dianggap netral. */
+    /** false = tidak ada catatan sama sekali sehingga dianggap netral. */
     val counted: Boolean,
 )
 
@@ -50,8 +50,8 @@ data class WeightProjection(
  * Perkiraan berat harian dari keseimbangan energi:
  * berat(besok) = berat(hari ini) + (kalori masuk − TDEE) / 7700.
  * TDEE dihitung ulang setiap hari memakai berat perkiraan (BMR ikut turun saat berat turun).
- * Hari tanpa catatan atau dengan catatan < [minIntakeRatio] × BMR dianggap netral (tidak menambah/mengurangi),
- * karena kemungkinan besar pencatatannya tidak lengkap.
+ * Setiap hari yang punya catatan dihitung apa adanya, berapapun jumlahnya (catatan pengguna dianggap valid).
+ * Hanya hari tanpa catatan sama sekali yang dianggap netral (tidak menambah/mengurangi).
  */
 object WeightProjector {
 
@@ -66,7 +66,6 @@ object WeightProjector {
         today: LocalDate,
         dailyIntake: Map<LocalDate, Double>,
         weights: List<WeightEntry>,
-        minIntakeRatio: Double = 0.5,
     ): WeightProjection {
         val days = ArrayList<DayBalance>()
         var weight = startWeight
@@ -77,8 +76,8 @@ object WeightProjector {
             val bmr = TdeeCalculator.bmr(profile.sex, weight, profile.heightCm, profile.age)
             val tdee = bmr * profile.activityLevel.factor
             val intake = dailyIntake[date]
-            val counted = intake != null && intake >= bmr * minIntakeRatio
-            val balance = if (counted) intake!! - tdee else 0.0
+            val counted = intake != null
+            val balance = if (intake != null) intake - tdee else 0.0
             weight += balance / KCAL_PER_KG
             cumulative += balance
             days += DayBalance(date, intake, tdee, balance, weight, counted)
