@@ -6,6 +6,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Canvas
+import com.hawdietpro.app.ui.feature.exercise.ExerciseSheet
+import com.hawdietpro.app.domain.exercise.ExerciseCatalog
+import com.hawdietpro.app.domain.model.Exercise
+import androidx.compose.runtime.remember
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -122,6 +127,7 @@ fun HomeScreen(
     onOpenWeight: () -> Unit,
     onOpenProfile: () -> Unit,
     onOpenAchievements: () -> Unit,
+    showMessage: (String) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -136,6 +142,17 @@ fun HomeScreen(
 
     var showSuggest by rememberSaveable { mutableStateOf(false) }
     if (showSuggest) MenuSuggestionSheet(onDismiss = { showSuggest = false })
+
+    var showExercise by rememberSaveable { mutableStateOf(false) }
+    var editingExercise by remember { mutableStateOf<Exercise?>(null) }
+    if (showExercise) {
+        ExerciseSheet(
+            date = state.date,
+            editing = editingExercise,
+            onDismiss = { showExercise = false; editingExercise = null },
+            onMessage = showMessage,
+        )
+    }
 
     if (state.loading) {
         LoadingBox()
@@ -283,6 +300,14 @@ fun HomeScreen(
             }
         }
 
+        item(key = "exercise") {
+            ExerciseCard(
+                exercises = state.exercises,
+                onAdd = { editingExercise = null; showExercise = true },
+                onOpen = { editingExercise = it; showExercise = true },
+            )
+        }
+
         if (state.insights.isNotEmpty()) {
             item { SectionHeader("Insight") }
             items(state.insights, key = { it.id }) { InsightCard(it) }
@@ -396,7 +421,7 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CalorieRing(
                     consumed = state.total.calories,
-                    target = target?.calories ?: 2000,
+                    target = state.budget ?: 2000,
                     size = 148.dp,
                     stroke = 13.dp,
                     trackColor = hc.heroTrack,
@@ -408,8 +433,11 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit) {
                 Spacer(Modifier.width(18.dp))
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     HeroStat("Kalori masuk", Format.kcal(state.total.calories))
-                    HeroStat("Target harian", Format.kcal((target?.calories ?: 0).toDouble()))
-                    HeroStat("Waktu makan", "${state.meals.size}× dicatat")
+                    HeroStat("Olahraga", if (state.exerciseKcal > 0) "+${Format.kcal(state.exerciseKcal)}" else "Belum ada")
+                    HeroStat(
+                        if (state.exerciseKcal > 0) "Target + olahraga" else "Target harian",
+                        Format.kcal((state.budget ?: 0).toDouble()),
+                    )
                 }
             }
             if (target != null) {
@@ -434,7 +462,7 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit) {
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
                             Text("Bingung mau makan apa?", style = MaterialTheme.typography.labelLarge, color = hc.heroContent, fontWeight = FontWeight.Bold)
-                            val remaining = target?.let { it.calories - state.total.calories.roundToInt() }
+                            val remaining = state.remaining
                             Text(
                                 when {
                                     remaining == null -> "Minta saran menu dari AI"
@@ -479,6 +507,49 @@ private fun LimitBar(label: String, value: Double, limit: Double, unit: String, 
         }
         Spacer(Modifier.height(6.dp))
         SoftProgress(ratio, color, height = 7.dp)
+    }
+}
+
+/** Olahraga pada hari yang dipilih: menambah jatah kalori. */
+@Composable
+private fun ExerciseCard(exercises: List<Exercise>, onAdd: () -> Unit, onOpen: (Exercise) -> Unit) {
+    val accent = MaterialTheme.colorScheme.tertiary
+    HawCard(contentPadding = 14.dp) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                EmojiBadge("🏃", accent)
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Olahraga", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        if (exercises.isEmpty()) "Kalori olahraga menambah jatah makan"
+                        else "${exercises.size} sesi · +${Format.kcal(exercises.sumOf { it.calories })}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                FilledTonalIconButton(onClick = onAdd) { Icon(Icons.Filled.Add, contentDescription = "Tambah olahraga") }
+            }
+            exercises.forEach { e ->
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).clickable { onOpen(e) }.padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(ExerciseCatalog.find(e.activityId)?.emoji ?: "💪", style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.width(10.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(e.name, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(
+                            "${e.durationMin} menit" + if (e.source == Exercise.SOURCE_MANUAL) " · diisi sendiri" else " · perkiraan",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Text("+${Format.kcal(e.calories)}", style = MaterialTheme.typography.titleSmall, color = accent, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
     }
 }
 

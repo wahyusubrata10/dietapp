@@ -19,12 +19,14 @@ class WeightProjectionRepository @Inject constructor(
     private val mealDao: MealDao,
     private val profiles: ProfileRepository,
     private val weights: WeightRepository,
+    private val exercises: ExerciseRepository,
 ) {
     fun observe(): Flow<WeightProjection?> = combine(
         mealDao.observeCalorieEntries(),
         profiles.observeProfile(),
         weights.observeAll(),
-    ) { entries, profile, logs ->
+        exercises.observeDailyTotals(),
+    ) { entries, profile, logs, burned ->
         if (profile == null) return@combine null
         val zone = ZoneId.systemDefault()
         val today = LocalDate.now()
@@ -32,6 +34,6 @@ class WeightProjectionRepository @Inject constructor(
             .mapValues { (_, list) -> list.sumOf { it.calories } }
         val firstMeal = daily.keys.minByOrNull { it.toEpochDay() }
         val (start, startWeight) = WeightProjector.startPoint(profile, firstMeal, logs, today)
-        WeightProjector.project(profile, start, startWeight, today, daily, logs)
+        WeightProjector.project(profile, start, startWeight, today, daily, logs, burned)
     }.flowOn(Dispatchers.Default)
 }

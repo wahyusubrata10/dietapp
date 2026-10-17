@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.data.prefs.SecureStorage
 import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.data.repository.AchievementRepository
+import com.hawdietpro.app.data.repository.ExerciseRepository
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.PendingRepository
 import com.hawdietpro.app.data.repository.ProfileRepository
@@ -14,6 +15,7 @@ import com.hawdietpro.app.domain.insight.Insight
 import com.hawdietpro.app.domain.insight.InsightEngine
 import com.hawdietpro.app.domain.insight.Period
 import com.hawdietpro.app.domain.insight.PeriodStatsCalculator
+import com.hawdietpro.app.domain.model.Exercise
 import com.hawdietpro.app.domain.model.Meal
 import com.hawdietpro.app.domain.model.MealType
 import com.hawdietpro.app.domain.model.Nutrients
@@ -35,6 +37,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 /** Satu hari di strip tanggal Beranda. */
 data class DayChip(val date: LocalDate, val calories: Double)
@@ -58,7 +61,15 @@ data class HomeState(
     val previousDayByType: Map<MealType, List<Meal>> = emptyMap(),
     /** Badge yang baru terbuka dan belum dilihat. */
     val newAchievements: List<Achievement> = emptyList(),
-)
+    /** Olahraga pada tanggal yang dipilih. */
+    val exercises: List<Exercise> = emptyList(),
+) {
+    val exerciseKcal: Double get() = exercises.sumOf { it.calories }
+    /** Jatah kalori hari itu = target + kalori olahraga. */
+    val budget: Int? get() = target?.let { it.calories + exerciseKcal.roundToInt() }
+    /** Sisa kalori = target − makan + olahraga. */
+    val remaining: Int? get() = budget?.let { it - total.calories.roundToInt() }
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -70,6 +81,7 @@ class HomeViewModel @Inject constructor(
     private val store: RemoteConfigStore,
     projections: WeightProjectionRepository,
     achievements: AchievementRepository,
+    exercises: ExerciseRepository,
 ) : ViewModel() {
 
     private val today = MutableStateFlow(LocalDate.now())
@@ -88,14 +100,15 @@ class HomeViewModel @Inject constructor(
     }
 
     private val base = combine(
-        selected.flatMapLatest { d -> meals.observeDay(d).map { d to it } },
+        selected.flatMapLatest { d -> combine(meals.observeDay(d), exercises.observeDay(d)) { m, e -> Triple(d, m, e) } },
         profiles.observeProfile(),
         pending.observe(),
         secure.hasApiKey,
         store.insightRules,
-    ) { (date, list), profile, queue, hasKey, rules ->
+    ) { (date, list, exerciseList), profile, queue, hasKey, rules ->
         val target = profile?.let(TdeeCalculator::calculate)
-        val stats = PeriodStatsCalculator(rules).compute(list, date, date, target?.calories)
+        val burned = ExerciseRepository.dailyTotals(exerciseList)
+        val stats = PeriodStatsCalculator(rules).compute(list, date, date, target?.calories, exerciseByDay = burned)
         val tips = store.appConfig.value.tips
         HomeState(
             loading = false,
@@ -110,6 +123,7 @@ class HomeViewModel @Inject constructor(
             pendingCount = queue.size,
             tip = tips.takeIf { it.isNotEmpty() }?.let { it[date.dayOfYear % it.size] },
             hasApiKey = hasKey,
+            exercises = exerciseList,
         )
     }
 

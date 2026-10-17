@@ -199,6 +199,10 @@ private fun BadgeTile(a: Achievement, isNew: Boolean, modifier: Modifier = Modif
 }
 
 private fun progressText(a: Achievement): String {
-    fun fmt(v: Double) = if (a.unit == "kg") String.format(Locale("id", "ID"), "%.1f", v) else v.toInt().toString()
+    fun fmt(v: Double) = when (a.unit) {
+        "kg" -> String.format(Locale("id", "ID"), "%.1f", v)
+        "kkal" -> String.format(Locale("id", "ID"), "%,d", v.toInt())
+        else -> v.toInt().toString()
+    }
     return "${fmt(a.progress.coerceAtMost(a.goal))} / ${fmt(a.goal)} ${a.unit}"
 }

@@ -65,3 +65,23 @@ data class WeightEntry(
     val weightKg: Double,
     val note: String? = null,
 )
+
+/** Satu sesi olahraga/aktivitas. [calories] = kalori aktif tambahan di luar kebutuhan harian (TDEE). */
+data class Exercise(
+    val id: Long = 0,
+    val epochDay: Long,
+    val performedAt: Long,
+    /** Id dari [com.hawdietpro.app.domain.exercise.ExerciseCatalog]; null = aktivitas bebas. */
+    val activityId: String?,
+    val name: String,
+    val durationMin: Int,
+    val calories: Double,
+    /** ESTIMASI (dari MET) atau MANUAL (diisi sendiri, mis. dari smartwatch). */
+    val source: String,
+    val note: String? = null,
+) {
+    companion object {
+        const val SOURCE_ESTIMATE = "ESTIMASI"
+        const val SOURCE_MANUAL = "MANUAL"
+    }
+}

@@ -174,17 +174,21 @@ private fun LazyListScope.summaryTab(state: AnalyticsUi, stats: PeriodStats, rev
     val target = state.target
     item { SummaryTiles(stats, state.previous, target?.calories) }
 
+    val hasExercise = stats.days.any { it.exercise > 0 }
     item {
         HawCard {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Kalori harian", style = MaterialTheme.typography.titleMedium)
+                Text(if (hasExercise) "Kalori bersih harian" else "Kalori harian", style = MaterialTheme.typography.titleMedium)
                 Text(
-                    target?.let { "Garis putus-putus = target ${Format.grouped(it.calories)} kkal · merah = >10% di atas target" } ?: "Kalori masuk per hari",
+                    buildString {
+                        if (hasExercise) append("Kalori makan dikurangi kalori olahraga. ")
+                        append(target?.let { "Garis putus-putus = target ${Format.grouped(it.calories)} kkal · merah = >10% di atas target" } ?: "Kalori masuk per hari")
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 BarChart(
-                    values = stats.days.map { it.nutrients.calories },
+                    values = stats.days.map { it.netCalories.coerceAtLeast(0.0) },
                     labels = dayLabels(stats, state.period),
                     tooltipLabels = dayTooltips(stats),
                     target = target?.calories?.toDouble(),
@@ -202,16 +206,16 @@ private fun LazyListScope.summaryTab(state: AnalyticsUi, stats: PeriodStats, rev
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Selisih terhadap target", style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "Hijau = di bawah target · merah = di atas target. Hari tanpa catatan dikosongkan.",
+                        "Kalori bersih (makan − olahraga) dibanding target. Hijau = di bawah target · merah = di atas target. Hari tanpa catatan dikosongkan.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     DivergingBarChart(
-                        values = stats.days.map { if (it.mealCount > 0) it.nutrients.calories - target.calories else null },
+                        values = stats.days.map { if (it.mealCount > 0) it.netCalories - target.calories else null },
                         labels = dayLabels(stats, state.period),
                         tooltipLabels = dayTooltips(stats),
                     )
-                    val total = stats.days.filter { it.mealCount > 0 }.sumOf { it.nutrients.calories - target.calories }
+                    val total = stats.days.filter { it.mealCount > 0 }.sumOf { it.netCalories - target.calories }
                     Text(
                         if (total <= 0) "Total ${Format.grouped((-total).roundToInt())} kkal di bawah target pada hari tercatat (≈ ${Format.oneDecimal(-total / 7700)} kg)."
                         else "Total ${Format.grouped(total.roundToInt())} kkal di atas target pada hari tercatat (≈ ${Format.oneDecimal(total / 7700)} kg).",
@@ -222,11 +226,42 @@ private fun LazyListScope.summaryTab(state: AnalyticsUi, stats: PeriodStats, rev
         }
     }
 
+    if (hasExercise) item { ExerciseSummaryCard(stats, state.period) }
+
     item { ReviewCard(review, stats.daysLogged, viewModel) }
 
     if (state.insights.isNotEmpty()) {
         item { Text("Insight otomatis", style = MaterialTheme.typography.titleMedium) }
         items(state.insights, key = { it.id }) { InsightCard(it) }
+    }
+}
+
+@Composable
+private fun ExerciseSummaryCard(stats: PeriodStats, period: Period) {
+    val active = stats.days.filter { it.exercise > 0 }
+    val total = active.sumOf { it.exercise }
+    HawCard {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Olahraga", style = MaterialTheme.typography.titleMedium)
+            StatRow {
+                StatTile("Terbakar", Format.grouped(total.roundToInt()), Modifier.weight(1f), sub = "kkal total", accent = MaterialTheme.colorScheme.tertiary)
+                StatTile("Hari aktif", "${active.size}/${stats.days.size}", Modifier.weight(1f), sub = "hari")
+                StatTile("Rata-rata", Format.grouped((total / active.size).roundToInt()), Modifier.weight(1f), sub = "kkal/hari aktif")
+            }
+            BarChart(
+                values = stats.days.map { it.exercise },
+                labels = dayLabels(stats, period),
+                tooltipLabels = dayTooltips(stats),
+                valueFormat = { Format.grouped(it.roundToInt()) },
+                emptyText = "Belum ada olahraga",
+                barColor = MaterialTheme.colorScheme.tertiary,
+            )
+            Text(
+                "≈ ${Format.oneDecimal(total / 7700)} kg lemak setara dari olahraga periode ini.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
@@ -409,7 +444,7 @@ private fun LazyListScope.nutritionTab(stats: PeriodStats, target: DailyTarget?)
             val logged = stats.days.filter { it.mealCount > 0 }
             val proteinHit = logged.count { it.nutrients.protein >= target.proteinG * 0.9 }
             val fiberHit = logged.count { it.nutrients.fiber >= target.fiberG * 0.9 }
-            val calHit = logged.count { abs(it.nutrients.calories - target.calories) <= target.calories * 0.1 }
+            val calHit = logged.count { abs(it.netCalories - target.calories) <= target.calories * 0.1 }
             HawCard {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text("Target tercapai", style = MaterialTheme.typography.titleMedium)

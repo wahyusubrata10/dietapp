@@ -64,10 +64,11 @@ class BackupViewModel @Inject constructor(private val backup: BackupRepository) 
     fun exportZip(uri: Uri, onDone: (String) -> Unit) = run(onDone) { "Backup tersimpan: ${backup.exportZip(uri)} catatan makan + foto" }
     fun importZip(uri: Uri, replace: Boolean, onDone: (String) -> Unit) = run(onDone) {
         val r = backup.importZip(uri, replace)
-        "Dipulihkan: ${r.meals} catatan makan, ${r.weights} catatan berat, ${r.photos} foto"
+        "Dipulihkan: ${r.meals} catatan makan, ${r.weights} catatan berat, ${r.exercises} olahraga, ${r.photos} foto"
     }
     fun exportCsv(uri: Uri, onDone: (String) -> Unit) = run(onDone) { "CSV tersimpan: ${backup.exportMealsCsv(uri)} baris" }
     fun exportWeightCsv(uri: Uri, onDone: (String) -> Unit) = run(onDone) { "CSV berat tersimpan: ${backup.exportWeightCsv(uri)} baris" }
+    fun exportExerciseCsv(uri: Uri, onDone: (String) -> Unit) = run(onDone) { "CSV olahraga tersimpan: ${backup.exportExerciseCsv(uri)} baris" }
 }
 
 @Composable
@@ -82,6 +83,9 @@ fun BackupScreen(onBack: () -> Unit, showMessage: (String) -> Unit, viewModel: B
     val importZip = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> pendingImport = uri }
     val exportCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
         uri?.let { viewModel.exportCsv(it, showMessage) }
+    }
+    val exportExercise = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
+        uri?.let { viewModel.exportExerciseCsv(it, showMessage) }
     }
     val exportWeight = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
         uri?.let { viewModel.exportWeightCsv(it, showMessage) }
@@ -117,6 +121,7 @@ fun BackupScreen(onBack: () -> Unit, showMessage: (String) -> Unit, viewModel: B
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = { exportCsv.launch("haw-diet-riwayat-$today.csv") }, enabled = !busy) { Text("Ekspor riwayat makan") }
                     OutlinedButton(onClick = { exportWeight.launch("haw-diet-berat-$today.csv") }, enabled = !busy) { Text("Ekspor log berat") }
+                    OutlinedButton(onClick = { exportExercise.launch("haw-diet-olahraga-$today.csv") }, enabled = !busy) { Text("Ekspor olahraga") }
                 }
             }
             Text(

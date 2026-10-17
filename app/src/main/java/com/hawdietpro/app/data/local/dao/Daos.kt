@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
 import com.hawdietpro.app.data.local.entity.CalorieEntry
+import com.hawdietpro.app.data.local.entity.ExerciseEntity
 import com.hawdietpro.app.data.local.entity.FoodElementEntity
 import com.hawdietpro.app.data.local.entity.FoodReferenceEntity
 import com.hawdietpro.app.data.local.entity.MealEntryEntity
@@ -157,6 +158,30 @@ interface WeightLogDao {
     suspend fun delete(id: Long)
 
     @Query("DELETE FROM weight_log")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface ExerciseDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(entry: ExerciseEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(entries: List<ExerciseEntity>)
+
+    @Query("SELECT * FROM exercise_log WHERE epoch_day BETWEEN :startDay AND :endDay ORDER BY performed_at ASC")
+    fun observeRange(startDay: Long, endDay: Long): Flow<List<ExerciseEntity>>
+
+    @Query("SELECT * FROM exercise_log ORDER BY epoch_day ASC, performed_at ASC")
+    fun observeAll(): Flow<List<ExerciseEntity>>
+
+    @Query("SELECT * FROM exercise_log ORDER BY epoch_day ASC, performed_at ASC")
+    suspend fun getAll(): List<ExerciseEntity>
+
+    @Query("DELETE FROM exercise_log WHERE id = :id")
+    suspend fun delete(id: Long)
+
+    @Query("DELETE FROM exercise_log")
     suspend fun deleteAll()
 }
 

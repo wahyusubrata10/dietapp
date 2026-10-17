@@ -22,5 +22,25 @@ object Migrations {
         }
     }
 
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2)
+    /** v3: catatan olahraga (kalori terbakar). */
+    val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `exercise_log` (" +
+                    "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`epoch_day` INTEGER NOT NULL, " +
+                    "`performed_at` INTEGER NOT NULL, " +
+                    "`activity_id` TEXT, " +
+                    "`name` TEXT NOT NULL, " +
+                    "`duration_min` INTEGER NOT NULL, " +
+                    "`calories` REAL NOT NULL, " +
+                    "`source` TEXT NOT NULL, " +
+                    "`note` TEXT, " +
+                    "`created_at` INTEGER NOT NULL)",
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_exercise_log_epoch_day` ON `exercise_log` (`epoch_day`)")
+        }
+    }
+
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
 }

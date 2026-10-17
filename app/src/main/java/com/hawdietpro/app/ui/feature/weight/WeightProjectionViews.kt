@@ -170,7 +170,7 @@ fun WeightProjectionSection(p: WeightProjection) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("7 hari terakhir", style = MaterialTheme.typography.titleMedium)
                     Row {
-                        listOf("Tanggal" to 1.3f, "Masuk" to 1f, "TDEE" to 1f, "Selisih" to 1f, "Perkiraan" to 1.1f).forEach { (h, w) ->
+                        listOf("Tanggal" to 1.3f, "Masuk" to 1f, "Keluar" to 1f, "Selisih" to 1f, "Perkiraan" to 1.1f).forEach { (h, w) ->
                             Text(h, Modifier.weight(w), style = MaterialTheme.typography.labelSmall, color = cs.onSurfaceVariant)
                         }
                     }
@@ -179,7 +179,11 @@ fun WeightProjectionSection(p: WeightProjection) {
                         Row {
                             Text(Format.dayMonth(d.date), Modifier.weight(1.3f), style = MaterialTheme.typography.bodySmall)
                             Text(d.intake?.let { Format.grouped(it.roundToInt()) } ?: "-", Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
-                            Text(Format.grouped(d.tdee.roundToInt()), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
+                            Text(
+                                Format.grouped((d.tdee + d.exercise).roundToInt()) + if (d.exercise > 0) "*" else "",
+                                Modifier.weight(1f),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
                             Text(
                                 if (d.counted) (if (d.balance > 0) "+" else "") + Format.grouped(d.balance.roundToInt()) else "netral",
                                 Modifier.weight(1f),

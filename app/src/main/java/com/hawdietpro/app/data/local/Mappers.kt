@@ -1,5 +1,6 @@
 package com.hawdietpro.app.data.local
 
+import com.hawdietpro.app.data.local.entity.ExerciseEntity
 import com.hawdietpro.app.data.local.entity.FoodElementEntity
 import com.hawdietpro.app.data.local.entity.FoodReferenceEntity
 import com.hawdietpro.app.data.local.entity.MealEntryEntity
@@ -8,6 +9,7 @@ import com.hawdietpro.app.data.local.entity.UserProfileEntity
 import com.hawdietpro.app.data.local.entity.WeightLogEntity
 import com.hawdietpro.app.domain.config.FoodDbItem
 import com.hawdietpro.app.domain.model.ActivityLevel
+import com.hawdietpro.app.domain.model.Exercise
 import com.hawdietpro.app.domain.model.FoodItem
 import com.hawdietpro.app.domain.model.FoodReference
 import com.hawdietpro.app.domain.model.Goal
@@ -168,3 +170,18 @@ fun UserProfile.toEntity(now: Long): UserProfileEntity = UserProfileEntity(
 )
 
 fun WeightLogEntity.toDomain() = WeightEntry(id, epochDay, weightKg, note)
+
+fun ExerciseEntity.toDomain() = Exercise(id, epochDay, performedAt, activityId, name, durationMin, calories, source, note)
+
+fun Exercise.toEntity(createdAt: Long = System.currentTimeMillis()) = ExerciseEntity(
+    id = id,
+    epochDay = epochDay,
+    performedAt = performedAt,
+    activityId = activityId,
+    name = name,
+    durationMin = durationMin,
+    calories = calories,
+    source = source,
+    note = note,
+    createdAt = createdAt,
+)

@@ -130,6 +130,23 @@ data class WeightLogEntity(
     @ColumnInfo(name = "created_at") val createdAt: Long,
 )
 
+@Entity(
+    tableName = "exercise_log",
+    indices = [Index(value = ["epoch_day"])],
+)
+data class ExerciseEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "epoch_day") val epochDay: Long,
+    @ColumnInfo(name = "performed_at") val performedAt: Long,
+    @ColumnInfo(name = "activity_id") val activityId: String?,
+    val name: String,
+    @ColumnInfo(name = "duration_min") val durationMin: Int,
+    val calories: Double,
+    val source: String,
+    val note: String?,
+    @ColumnInfo(name = "created_at") val createdAt: Long,
+)
+
 @Entity(tableName = "pending_analysis")
 data class PendingAnalysisEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,

@@ -19,17 +19,19 @@ class AchievementRepository @Inject constructor(
     private val profiles: ProfileRepository,
     private val store: RemoteConfigStore,
     private val prefs: AppPreferences,
+    private val exercises: ExerciseRepository,
 ) {
     fun observe(): Flow<List<Achievement>> = combine(
         meals.observeAll(),
         weights.observeAll(),
         profiles.observeProfile(),
         store.insightRules,
-    ) { mealList, weightList, profile, rules ->
+        exercises.observeAll(),
+    ) { mealList, weightList, profile, rules, exerciseList ->
         AchievementCalculator(
             isVegetable = FoodClassifier(rules)::isVegetable,
             targetTolerancePct = rules.targetTolerancePct,
-        ).compute(mealList, weightList, profile?.let(TdeeCalculator::calculate), profile?.goal)
+        ).compute(mealList, weightList, profile?.let(TdeeCalculator::calculate), profile?.goal, exerciseList)
     }
 
     /** Badge yang sudah terbuka tetapi belum pernah dilihat. */

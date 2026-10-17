@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BackupFile(
-    val format: Int = 1,
+    val format: Int = 2,
     val app: String = "Haw Diet Pro",
     val appVersionCode: Int,
     val exportedAt: Long,
@@ -12,6 +12,20 @@ data class BackupFile(
     val meals: List<BackupMeal> = emptyList(),
     val weights: List<BackupWeight> = emptyList(),
     val userFoods: List<BackupFood> = emptyList(),
+    /** Ada sejak format v2; backup lama tanpa olahraga tetap bisa dibaca. */
+    val exercises: List<BackupExercise> = emptyList(),
+)
+
+@Serializable
+data class BackupExercise(
+    val epochDay: Long,
+    val performedAt: Long,
+    val activityId: String? = null,
+    val name: String,
+    val durationMin: Int,
+    val calories: Double,
+    val source: String = "MANUAL",
+    val note: String? = null,
 )
 
 @Serializable

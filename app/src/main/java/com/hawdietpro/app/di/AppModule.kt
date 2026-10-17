@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.hawdietpro.app.data.local.HawDatabase
 import com.hawdietpro.app.data.local.Migrations
 import com.hawdietpro.app.data.local.PreMigrationBackup
+import com.hawdietpro.app.data.local.dao.ExerciseDao
 import com.hawdietpro.app.data.local.dao.FoodReferenceDao
 import com.hawdietpro.app.data.local.dao.MealDao
 import com.hawdietpro.app.data.local.dao.PendingAnalysisDao
@@ -70,4 +71,5 @@ object AppModule {
     @Provides fun provideWeightLogDao(db: HawDatabase): WeightLogDao = db.weightLogDao()
     @Provides fun provideUserProfileDao(db: HawDatabase): UserProfileDao = db.userProfileDao()
     @Provides fun providePendingAnalysisDao(db: HawDatabase): PendingAnalysisDao = db.pendingAnalysisDao()
+    @Provides fun provideExerciseDao(db: HawDatabase): ExerciseDao = db.exerciseDao()
 }

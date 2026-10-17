@@ -114,4 +114,19 @@ class AchievementCalculatorTest {
         val maintaining = calc.compute(emptyList(), weights, target, Goal.JAGA)
         assertNull(maintaining.firstOrNull { it.id == "weight_1" })
     }
+
+    @Test
+    fun `badge olahraga`() {
+        val sessions = (0L until 5L).map {
+            com.hawdietpro.app.domain.model.Exercise(
+                epochDay = start.plusDays(it).toEpochDay(), performedAt = 0, activityId = "lari_santai",
+                name = "Lari", durationMin = 30, calories = 300.0, source = "ESTIMASI",
+            )
+        }
+        val result = calc.compute(emptyList(), emptyList(), target, Goal.TURUN, sessions)
+        assertTrue(result.find("exercise_first").unlocked)
+        assertTrue(result.find("exercise_streak_5").unlocked)
+        assertFalse(result.find("exercise_10").unlocked)
+        assertEquals(1500.0, result.find("burn_5000").progress, 0.0)
+    }
 }

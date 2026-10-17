@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -110,7 +111,7 @@ private fun BarItem(dest: TopLevelDestination, selected: Boolean, onNavigate: (S
     }
 }
 
-enum class QuickAction { CAMERA, GALLERY, RELOG, MANUAL, WEIGHT }
+enum class QuickAction { CAMERA, GALLERY, RELOG, MANUAL, EXERCISE, WEIGHT }
 
 /** Lembar aksi cepat dari tombol "+". */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -125,7 +126,8 @@ fun QuickAddSheet(onDismiss: () -> Unit, onAction: (QuickAction) -> Unit) {
             ActionRow(Icons.Filled.CameraAlt, MaterialTheme.colorScheme.primary, "Foto makanan", "AI mengenali menu & menghitung gizi") { onAction(QuickAction.CAMERA) }
             ActionRow(Icons.Filled.PhotoLibrary, MaterialTheme.colorScheme.tertiary, "Pilih dari galeri", "Analisa foto yang sudah ada") { onAction(QuickAction.GALLERY) }
             ActionRow(Icons.Filled.Replay, MaterialTheme.colorScheme.secondary, "Makan lagi", "Favorit & menu terakhir, 1 ketukan") { onAction(QuickAction.RELOG) }
-            ActionRow(Icons.Filled.EditNote, MacroColors.Carbs, "Input manual", "Cari dari ±290 makanan Indonesia") { onAction(QuickAction.MANUAL) }
+            ActionRow(Icons.Filled.EditNote, MacroColors.Carbs, "Input manual", "Cari dari ±1.750 makanan & produk") { onAction(QuickAction.MANUAL) }
+            ActionRow(Icons.AutoMirrored.Filled.DirectionsRun, MaterialTheme.colorScheme.tertiary, "Catat olahraga", "Kalori terbakar menambah jatah makan") { onAction(QuickAction.EXERCISE) }
             ActionRow(Icons.Filled.MonitorWeight, MacroColors.Protein, "Catat berat badan", "Timbang & lihat tren") { onAction(QuickAction.WEIGHT) }
         }
     }

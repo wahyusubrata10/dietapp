@@ -127,6 +127,12 @@ class PeriodReviewRepository @Inject constructor(
                 put("persen_energi_karbo", split.carbsPct.roundToInt())
                 put("persen_energi_lemak", split.fatPct.roundToInt())
             }
+            putJsonObject("olahraga") {
+                put("total_kkal_terbakar", (stats.metrics["totalExerciseKcal"] ?: 0.0).roundToInt())
+                put("hari_olahraga", (stats.metrics["exerciseDays"] ?: 0.0).roundToInt())
+                put("rata_rata_kalori_bersih_per_hari", (stats.metrics["avgNetCalories"] ?: 0.0).roundToInt())
+            }
+            // Hari sesuai/lebih/kurang target dihitung dari kalori bersih (makan − olahraga).
             put("hari_sesuai_target", stats.daysOnTarget)
             put("hari_lebih_target", stats.daysOver)
             put("hari_kurang_target", stats.daysUnder)

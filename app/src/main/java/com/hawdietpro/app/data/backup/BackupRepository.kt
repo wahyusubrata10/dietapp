@@ -6,10 +6,12 @@ import com.hawdietpro.app.BuildConfig
 import com.hawdietpro.app.core.Format
 import com.hawdietpro.app.core.ImageProcessor
 import com.hawdietpro.app.data.local.HawDatabase
+import com.hawdietpro.app.data.local.dao.ExerciseDao
 import com.hawdietpro.app.data.local.dao.FoodReferenceDao
 import com.hawdietpro.app.data.local.dao.MealDao
 import com.hawdietpro.app.data.local.dao.UserProfileDao
 import com.hawdietpro.app.data.local.dao.WeightLogDao
+import com.hawdietpro.app.data.local.entity.ExerciseEntity
 import com.hawdietpro.app.data.local.entity.WeightLogEntity
 import com.hawdietpro.app.data.local.toDomain
 import com.hawdietpro.app.data.local.toEntity
@@ -52,8 +54,9 @@ class BackupRepository @Inject constructor(
     private val foods: FoodReferenceDao,
     private val images: ImageProcessor,
     private val json: Json,
+    private val exercises: ExerciseDao,
 ) {
-    data class ImportResult(val meals: Int, val weights: Int, val photos: Int)
+    data class ImportResult(val meals: Int, val weights: Int, val photos: Int, val exercises: Int = 0)
 
     suspend fun exportZip(target: Uri): Int = withContext(Dispatchers.IO) {
         val allMeals = meals.getAllMeals().map { it.toDomain() }
@@ -102,6 +105,9 @@ class BackupRepository @Inject constructor(
             userFoods = foods.getUserFoods().map { f ->
                 BackupFood(f.id, f.name, f.category, f.calories, f.protein, f.carbs, f.fat, f.fiber, f.defaultServingG)
             },
+            exercises = exercises.getAll().map { e ->
+                BackupExercise(e.epochDay, e.performedAt, e.activityId, e.name, e.durationMin, e.calories, e.source, e.note)
+            },
         )
         val out = context.contentResolver.openOutputStream(target) ?: error("Tidak bisa menulis file")
         ZipOutputStream(out.buffered()).use { zip ->
@@ -141,11 +147,13 @@ class BackupRepository @Inject constructor(
         val data = backup ?: error("File bukan backup Haw Diet Pro (backup.json tidak ada)")
 
         var mealCount = 0
+        var exerciseCount = 0
         db.withTransaction {
             if (replaceAll) {
                 meals.getAllPhotoPaths().forEach { File(it).delete() }
                 meals.deleteAll()
                 weights.deleteAll()
+                exercises.deleteAll()
             }
             val existing = if (replaceAll) emptySet() else meals.getAllMeals().map { it.meal.eatenAt to it.meal.menuName }.toSet()
             data.meals.forEach { bm ->
@@ -180,6 +188,18 @@ class BackupRepository @Inject constructor(
                 mealCount++
             }
             weights.upsertAll(data.weights.map { WeightLogEntity(epochDay = it.epochDay, weightKg = it.weightKg, note = it.note, createdAt = System.currentTimeMillis()) })
+            val existingExercises = if (replaceAll) emptySet() else exercises.getAll().map { Triple(it.epochDay, it.performedAt, it.name) }.toSet()
+            exercises.upsertAll(
+                data.exercises
+                    .filter { Triple(it.epochDay, it.performedAt, it.name) !in existingExercises }
+                    .map {
+                        ExerciseEntity(
+                            epochDay = it.epochDay, performedAt = it.performedAt, activityId = it.activityId, name = it.name,
+                            durationMin = it.durationMin, calories = it.calories, source = it.source, note = it.note,
+                            createdAt = System.currentTimeMillis(),
+                        )
+                    }.also { exerciseCount = it.size },
+            )
             if (data.userFoods.isNotEmpty()) {
                 foods.upsertAll(
                     data.userFoods.map { f ->
@@ -201,7 +221,7 @@ class BackupRepository @Inject constructor(
         // Foto yang tidak dipakai (catatan duplikat) dibersihkan.
         val used = meals.getAllPhotoPaths().toSet()
         photoMap.values.filter { it !in used }.forEach { File(it).delete() }
-        ImportResult(mealCount, data.weights.size, photoMap.size)
+        ImportResult(mealCount, data.weights.size, photoMap.size, exerciseCount)
     }
 
     /** CSV per elemen makanan; pemisah ";" & desimal koma agar langsung rapi di Excel Indonesia. */
@@ -252,6 +272,28 @@ class BackupRepository @Inject constructor(
             w.write("﻿")
             w.write("Tanggal;Berat (kg);Catatan\n")
             all.forEach { w.write("${LocalDate.ofEpochDay(it.epochDay)};${dec(it.weightKg)};${csv(it.note.orEmpty())}\n") }
+        }
+        all.size
+    }
+
+    suspend fun exportExerciseCsv(target: Uri): Int = withContext(Dispatchers.IO) {
+        val all = exercises.getAll()
+        val out = context.contentResolver.openOutputStream(target) ?: error("Tidak bisa menulis file")
+        OutputStreamWriter(out, Charsets.UTF_8).use { w ->
+            w.write("\uFEFF")
+            w.write("Tanggal;Jam;Aktivitas;Durasi (menit);Kalori terbakar (kkal);Sumber angka\n")
+            all.forEach { e ->
+                w.write(
+                    listOf(
+                        LocalDate.ofEpochDay(e.epochDay).toString(),
+                        Format.time(e.performedAt),
+                        e.name,
+                        e.durationMin.toString(),
+                        dec(e.calories),
+                        if (e.source == "MANUAL") "Diisi sendiri" else "Perkiraan MET",
+                    ).joinToString(";") { csv(it) } + "\n",
+                )
+            }
         }
         all.size
     }

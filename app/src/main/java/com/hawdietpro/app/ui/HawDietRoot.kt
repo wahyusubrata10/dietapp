@@ -39,6 +39,7 @@ import com.hawdietpro.app.ui.components.LoadingBox
 import com.hawdietpro.app.ui.feature.analytics.AnalyticsScreen
 import com.hawdietpro.app.ui.feature.backup.BackupScreen
 import com.hawdietpro.app.ui.feature.camera.CameraScreen
+import com.hawdietpro.app.ui.feature.exercise.ExerciseSheet
 import com.hawdietpro.app.ui.feature.history.HistoryScreen
 import com.hawdietpro.app.ui.feature.home.HomeScreen
 import com.hawdietpro.app.ui.feature.meal.MealEditorScreen
@@ -59,6 +60,7 @@ import com.hawdietpro.app.ui.navigation.TopLevelDestination
 import com.hawdietpro.app.ui.theme.HawDietTheme
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 sealed interface DeepLink {
     data class Meal(val id: Long) : DeepLink
@@ -115,6 +117,10 @@ private fun MainScaffold(
     }
 
     var showQuickAdd by rememberSaveable { mutableStateOf(false) }
+    var showExercise by rememberSaveable { mutableStateOf(false) }
+    if (showExercise) {
+        ExerciseSheet(date = LocalDate.now(), onDismiss = { showExercise = false }, onMessage = showMessage)
+    }
     if (showQuickAdd) {
         QuickAddSheet(
             onDismiss = { showQuickAdd = false },
@@ -125,6 +131,7 @@ private fun MainScaffold(
                     QuickAction.GALLERY -> navController.navigate(Routes.camera(openGallery = true))
                     QuickAction.RELOG -> navController.navigate(Routes.RELOG)
                     QuickAction.MANUAL -> navController.navigate(Routes.manualMeal())
+                    QuickAction.EXERCISE -> showExercise = true
                     QuickAction.WEIGHT -> navController.navigate(Routes.WEIGHT)
                 }
             },
@@ -175,6 +182,7 @@ private fun MainScaffold(
                         onOpenWeight = { navController.navigate(Routes.WEIGHT) },
                         onOpenProfile = { navController.navigateTopLevel(Routes.PROFILE) },
                         onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
+                        showMessage = showMessage,
                     )
                 }
                 composable(Routes.HISTORY) {

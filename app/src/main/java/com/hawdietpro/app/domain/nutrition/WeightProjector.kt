@@ -20,6 +20,8 @@ data class DayBalance(
     val estimatedWeight: Double,
     /** false = tidak ada catatan sama sekali sehingga dianggap netral. */
     val counted: Boolean,
+    /** Kalori aktif dari olahraga yang dicatat (ditambahkan ke energi keluar). */
+    val exercise: Double = 0.0,
 )
 
 data class WeightProjection(
@@ -48,7 +50,7 @@ data class WeightProjection(
 
 /**
  * Perkiraan berat harian dari keseimbangan energi:
- * berat(besok) = berat(hari ini) + (kalori masuk − TDEE) / 7700.
+ * berat(besok) = berat(hari ini) + (kalori masuk − TDEE − kalori olahraga) / 7700.
  * TDEE dihitung ulang setiap hari memakai berat perkiraan (BMR ikut turun saat berat turun).
  * Setiap hari yang punya catatan dihitung apa adanya, berapapun jumlahnya (catatan pengguna dianggap valid).
  * Hanya hari tanpa catatan sama sekali yang dianggap netral (tidak menambah/mengurangi).
@@ -66,6 +68,7 @@ object WeightProjector {
         today: LocalDate,
         dailyIntake: Map<LocalDate, Double>,
         weights: List<WeightEntry>,
+        dailyExercise: Map<LocalDate, Double> = emptyMap(),
     ): WeightProjection {
         val days = ArrayList<DayBalance>()
         var weight = startWeight
@@ -76,11 +79,13 @@ object WeightProjector {
             val bmr = TdeeCalculator.bmr(profile.sex, weight, profile.heightCm, profile.age)
             val tdee = bmr * profile.activityLevel.factor
             val intake = dailyIntake[date]
+            val exercise = dailyExercise[date] ?: 0.0
+            // Hari tanpa catatan makan tetap netral walau ada olahraga: asupan hari itu tidak diketahui.
             val counted = intake != null
-            val balance = if (intake != null) intake - tdee else 0.0
+            val balance = if (intake != null) intake - tdee - exercise else 0.0
             weight += balance / KCAL_PER_KG
             cumulative += balance
-            days += DayBalance(date, intake, tdee, balance, weight, counted)
+            days += DayBalance(date, intake, tdee, balance, weight, counted, exercise)
             date = date.plusDays(1)
         }
 

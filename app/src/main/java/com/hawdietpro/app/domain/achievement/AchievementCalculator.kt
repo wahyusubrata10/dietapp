@@ -18,6 +18,7 @@ enum class AchievementGroup(val label: String) {
     KONSISTENSI("Konsistensi"),
     CATATAN("Catatan"),
     GIZI("Pola makan"),
+    OLAHRAGA("Olahraga"),
     BERAT("Berat badan"),
 }
 
@@ -52,8 +53,13 @@ class AchievementCalculator(
         weights: List<WeightEntry>,
         target: DailyTarget?,
         goal: Goal?,
+        exercises: List<com.hawdietpro.app.domain.model.Exercise> = emptyList(),
     ): List<Achievement> {
         val byDay = meals.groupBy { Instant.ofEpochMilli(it.eatenAt).atZone(zone).toLocalDate() }
+        val exerciseByDay = exercises.groupBy { LocalDate.ofEpochDay(it.epochDay) }.mapValues { (_, l) -> l.sumOf { it.calories } }
+        val activeDays = exerciseByDay.count { it.value > 0 }
+        val burned = exercises.sumOf { it.calories }
+        val bestActiveStreak = longestStreak(exerciseByDay.filterValues { it > 0 }.keys)
         val dayTotals: Map<LocalDate, Nutrients> = byDay.mapValues { (_, list) -> list.map { it.total }.sum() }
         val bestStreak = longestStreak(byDay.keys)
         val photos = meals.count { !it.photoPath.isNullOrBlank() }
@@ -69,7 +75,7 @@ class AchievementCalculator(
         val proteinDays = target?.let { t -> dayTotals.count { (_, n) -> n.protein >= t.proteinG } } ?: 0
         val onTargetDays = target?.takeIf { it.calories > 0 }?.let { t ->
             val tol = targetTolerancePct / 100.0
-            fullDays.count { d -> abs(dayTotals.getValue(d).calories - t.calories) <= t.calories * tol }
+            fullDays.count { d -> abs(dayTotals.getValue(d).calories - (exerciseByDay[d] ?: 0.0) - t.calories) <= t.calories * tol }
         } ?: 0
 
         val sortedWeights = weights.sortedBy { it.epochDay }
@@ -100,6 +106,11 @@ class AchievementCalculator(
             }
             add(Achievement("balanced_7", "🧂", "Gula & garam terkendali", "Gula ≤ ${NutritionLimits.SUGAR_G.toInt()} g dan natrium ≤ ${NutritionLimits.SODIUM_MG.toInt()} mg di 7 hari", AchievementGroup.GIZI, balancedDays.toDouble(), 7.0, "hari"))
 
+            add(Achievement("exercise_first", "👟", "Mulai bergerak", "Catat olahraga pertamamu", AchievementGroup.OLAHRAGA, exercises.size.toDouble().coerceAtMost(1.0), 1.0, "sesi"))
+            add(Achievement("exercise_10", "🏃", "Rajin bergerak", "Catat 10 sesi olahraga", AchievementGroup.OLAHRAGA, exercises.size.toDouble(), 10.0, "sesi"))
+            add(Achievement("exercise_days_20", "📅", "Aktif 20 hari", "Olahraga di 20 hari berbeda", AchievementGroup.OLAHRAGA, activeDays.toDouble(), 20.0, "hari"))
+            add(Achievement("exercise_streak_5", "⚡", "Lima hari aktif", "Olahraga 5 hari berturut-turut", AchievementGroup.OLAHRAGA, bestActiveStreak.toDouble(), 5.0, "hari"))
+            add(Achievement("burn_5000", "🔥", "Pembakar 5.000", "Total 5.000 kkal dari olahraga", AchievementGroup.OLAHRAGA, burned, 5000.0, "kkal"))
             add(Achievement("weigh_8", "⚖️", "Rajin menimbang", "Catat berat badan 8 kali", AchievementGroup.BERAT, weights.size.toDouble(), 8.0, "kali"))
             if (goal != Goal.JAGA) {
                 WEIGHT_STEPS.forEach { (kg, emoji) ->

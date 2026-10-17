@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.data.gemini.GeminiError
 import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.data.repository.CachedReview
+import com.hawdietpro.app.data.repository.ExerciseRepository
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.PeriodReviewRepository
 import com.hawdietpro.app.data.repository.ProfileRepository
@@ -66,6 +67,7 @@ class AnalyticsViewModel @Inject constructor(
     projections: WeightProjectionRepository,
     private val reviews: PeriodReviewRepository,
     private val store: RemoteConfigStore,
+    exercises: ExerciseRepository,
 ) : ViewModel() {
 
     private data class Range(val period: Period, val offset: Int, val start: LocalDate, val end: LocalDate, val prevStart: LocalDate, val prevEnd: LocalDate)
@@ -80,18 +82,19 @@ class AnalyticsViewModel @Inject constructor(
 
     val state: StateFlow<AnalyticsUi> = range.flatMapLatest { r ->
         combine(
-            meals.observeRange(r.prevStart, r.end),
+            combine(meals.observeRange(r.prevStart, r.end), exercises.observeRange(r.prevStart, r.end)) { m, e -> m to e },
             profiles.observeProfile(),
             weights.observeAll(),
             projections.observe(),
             store.insightRules,
-        ) { list, profile, w, projection, rules ->
+        ) { (list, exerciseList), profile, w, projection, rules ->
+            val burned = ExerciseRepository.dailyTotals(exerciseList)
             val today = LocalDate.now()
             val target = profile?.let(TdeeCalculator::calculate)
             val calc = PeriodStatsCalculator(rules)
             val effectiveEnd = if (r.end.isAfter(today)) today else r.end
-            val stats = calc.compute(list, r.start, effectiveEnd, target?.calories, w)
-            val prev = calc.compute(list, r.prevStart, r.prevEnd, target?.calories, w)
+            val stats = calc.compute(list, r.start, effectiveEnd, target?.calories, w, burned)
+            val prev = calc.compute(list, r.prevStart, r.prevEnd, target?.calories, w, burned)
             AnalyticsUi(
                 period = r.period,
                 offset = r.offset,

@@ -168,6 +168,7 @@ Contoh:
   - batas bawah 1200 kkal (wanita) / 1500 kkal (pria),
   - tidak ada defisit bila BMI < 18,5.
 - **Log berat badan** dengan grafik tren dan BMI.
+- **Olahraga / kalori terbakar.** Pilih aktivitas (jalan, lari, sepeda, futsal, badminton, gym, yoga, dll) dan durasi; kalori dihitung dari MET × berat badan (kalori aktif, sudah dikurangi energi istirahat), atau isi sendiri dari jam pintar. Rumus rekap: **sisa = target − makan + olahraga**. Kalori bersih (makan − olahraga) dipakai untuk penilaian sesuai/lebih/kurang target, grafik Analisa, perkiraan berat, dan saran menu AI. Ikut di backup ZIP & ekspor CSV.
 - **Makan lagi & favorit.** Tandai ★ menu favorit, catat ulang menu lama dengan 1 ketukan, atau "Sama seperti kemarin?" untuk menyalin satu waktu makan dari hari sebelumnya.
 - **Porsi cepat.** Tombol ½ · ¾ · 1 · 1½ · 2 porsi untuk menskalakan semua elemen sekaligus.
 - **Gula & natrium.** Dihitung per elemen (DB lokal, atau estimasi AI bila DB belum punya data), dibandingkan batas harian Kemenkes (gula 50 g, natrium 2.000 mg).

@@ -40,6 +40,7 @@ import com.hawdietpro.app.core.Format
 import com.hawdietpro.app.data.gemini.GeminiClient
 import com.hawdietpro.app.data.gemini.GeminiError
 import com.hawdietpro.app.data.gemini.GeminiSuggestion
+import com.hawdietpro.app.data.repository.ExerciseRepository
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.ProfileRepository
 import com.hawdietpro.app.domain.model.MealType
@@ -83,6 +84,7 @@ class MenuSuggestionViewModel @Inject constructor(
     private val gemini: GeminiClient,
     private val meals: MealRepository,
     private val profiles: ProfileRepository,
+    private val exercises: ExerciseRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SuggestUi())
@@ -95,7 +97,8 @@ class MenuSuggestionViewModel @Inject constructor(
             val target = profiles.getTarget()
             val today = meals.observeDay(LocalDate.now()).first()
             val total = today.map { it.total }.sum()
-            _state.update { it.copy(remainingKcal = target?.let { t -> t.calories - total.calories.roundToInt() }) }
+            val burned = exercises.observeDay(LocalDate.now()).first().sumOf { it.calories }
+            _state.update { it.copy(remainingKcal = target?.let { t -> (t.calories + burned - total.calories).roundToInt() }) }
         }
     }
 
@@ -112,6 +115,7 @@ class MenuSuggestionViewModel @Inject constructor(
                 val today = meals.observeDay(LocalDate.now()).first()
                 val total = today.map { it.total }.sum()
                 val favorites = meals.observeFavorites().first().take(8)
+                val burned = exercises.observeDay(LocalDate.now()).first().sumOf { it.calories }
                 val s = _state.value
                 val context = buildJsonObject {
                     profile?.let {
@@ -121,7 +125,8 @@ class MenuSuggestionViewModel @Inject constructor(
                     }
                     target?.let { t ->
                         put("target_kalori", t.calories)
-                        put("sisa_kalori", t.calories - total.calories.roundToInt())
+                        put("kalori_olahraga_hari_ini", burned.roundToInt())
+                        put("sisa_kalori", (t.calories + burned - total.calories).roundToInt())
                         put("target_protein_g", t.proteinG)
                         put("sisa_protein_g", (t.proteinG - total.protein).roundToInt())
                         put("target_serat_g", t.fiberG)

@@ -2,11 +2,13 @@ package com.hawdietpro.app.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.hawdietpro.app.data.local.dao.ExerciseDao
 import com.hawdietpro.app.data.local.dao.FoodReferenceDao
 import com.hawdietpro.app.data.local.dao.MealDao
 import com.hawdietpro.app.data.local.dao.PendingAnalysisDao
 import com.hawdietpro.app.data.local.dao.UserProfileDao
 import com.hawdietpro.app.data.local.dao.WeightLogDao
+import com.hawdietpro.app.data.local.entity.ExerciseEntity
 import com.hawdietpro.app.data.local.entity.FoodElementEntity
 import com.hawdietpro.app.data.local.entity.FoodReferenceEntity
 import com.hawdietpro.app.data.local.entity.MealEntryEntity
@@ -27,6 +29,7 @@ import com.hawdietpro.app.data.local.entity.WeightLogEntity
         FoodReferenceEntity::class,
         WeightLogEntity::class,
         PendingAnalysisEntity::class,
+        ExerciseEntity::class,
     ],
     version = HawDatabase.DATABASE_VERSION,
     exportSchema = true,
@@ -37,9 +40,10 @@ abstract class HawDatabase : RoomDatabase() {
     abstract fun weightLogDao(): WeightLogDao
     abstract fun userProfileDao(): UserProfileDao
     abstract fun pendingAnalysisDao(): PendingAnalysisDao
+    abstract fun exerciseDao(): ExerciseDao
 
     companion object {
-        const val DATABASE_VERSION = 2
+        const val DATABASE_VERSION = 3
         const val DATABASE_NAME = "haw_diet.db"
     }
 }

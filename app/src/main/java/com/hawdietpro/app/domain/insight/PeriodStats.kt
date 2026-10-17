@@ -20,7 +20,16 @@ enum class Period(val label: String) {
     MONTH("bulan ini"),
 }
 
-data class DayTotal(val date: LocalDate, val nutrients: Nutrients, val mealCount: Int)
+data class DayTotal(
+    val date: LocalDate,
+    val nutrients: Nutrients,
+    val mealCount: Int,
+    /** Kalori aktif dari olahraga yang dicatat hari itu. */
+    val exercise: Double = 0.0,
+) {
+    /** Kalori bersih = kalori masuk − kalori olahraga (yang dibandingkan dengan target). */
+    val netCalories: Double get() = nutrients.calories - exercise
+}
 
 data class RankedItem(val name: String, val count: Int, val calories: Double, val sharePct: Double)
 
@@ -62,6 +71,7 @@ class PeriodStatsCalculator(private val rules: InsightRulesFile, private val zon
         endInclusive: LocalDate,
         dailyTargetCalories: Int?,
         weights: List<WeightEntry> = emptyList(),
+        exerciseByDay: Map<LocalDate, Double> = emptyMap(),
     ): PeriodStats {
         val inRange = meals.filter {
             val d = it.date()
@@ -72,7 +82,7 @@ class PeriodStatsCalculator(private val rules: InsightRulesFile, private val zon
         val days = (0 until dayCount.coerceAtLeast(0)).map { offset ->
             val date = start.plusDays(offset.toLong())
             val list = byDay[date].orEmpty()
-            DayTotal(date, list.map { it.total }.sum(), list.size)
+            DayTotal(date, list.map { it.total }.sum(), list.size, exerciseByDay[date] ?: 0.0)
         }
         val logged = days.filter { it.mealCount > 0 }
         val daysLogged = logged.size
@@ -86,8 +96,8 @@ class PeriodStatsCalculator(private val rules: InsightRulesFile, private val zon
             val tol = rules.targetTolerancePct / 100.0
             logged.forEach { d ->
                 when {
-                    d.nutrients.calories > dailyTargetCalories * (1 + tol) -> over++
-                    d.nutrients.calories < dailyTargetCalories * (1 - tol) -> under++
+                    d.netCalories > dailyTargetCalories * (1 + tol) -> over++
+                    d.netCalories < dailyTargetCalories * (1 - tol) -> under++
                     else -> onTarget++
                 }
             }
@@ -155,6 +165,10 @@ class PeriodStatsCalculator(private val rules: InsightRulesFile, private val zon
             put("avgFatG", avg.fat)
             put("avgFiberG", avg.fiber)
             put("avgSugarG", avg.sugar)
+            val exerciseDays = days.filter { it.exercise > 0 }
+            put("totalExerciseKcal", exerciseDays.sumOf { it.exercise })
+            put("exerciseDays", exerciseDays.size.toDouble())
+            put("avgNetCalories", if (daysLogged > 0) logged.sumOf { it.netCalories } / daysLogged else 0.0)
             put("avgSodiumMg", avg.sodium)
             put("daysSugarOver", logged.count { it.nutrients.sugar > 50.0 }.toDouble())
             put("daysSodiumOver", logged.count { it.nutrients.sodium > 2000.0 }.toDouble())
