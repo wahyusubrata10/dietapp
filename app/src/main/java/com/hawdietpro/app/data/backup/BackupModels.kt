@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BackupFile(
-    val format: Int = 2,
+    val format: Int = 3,
     val app: String = "Haw Diet Pro",
     val appVersionCode: Int,
     val exportedAt: Long,
@@ -14,6 +14,26 @@ data class BackupFile(
     val userFoods: List<BackupFood> = emptyList(),
     /** Ada sejak format v2; backup lama tanpa olahraga tetap bisa dibaca. */
     val exercises: List<BackupExercise> = emptyList(),
+    /** Produk kemasan hasil scan barcode (format v3). */
+    val barcodeProducts: List<BackupBarcodeProduct> = emptyList(),
+)
+
+@Serializable
+data class BackupBarcodeProduct(
+    val barcode: String,
+    val name: String,
+    val brand: String? = null,
+    val calories: Double,
+    val protein: Double,
+    val carbs: Double,
+    val fat: Double,
+    val fiber: Double = 0.0,
+    val sugar: Double = 0.0,
+    val sodium: Double = 0.0,
+    val servingG: Double? = null,
+    val packageG: Double? = null,
+    val source: String,
+    val complete: Boolean = true,
 )
 
 @Serializable

@@ -49,5 +49,30 @@ object Migrations {
         }
     }
 
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+    /** v5: cache produk kemasan dari scan barcode. */
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `barcode_product` (" +
+                    "`barcode` TEXT NOT NULL, " +
+                    "`name` TEXT NOT NULL, " +
+                    "`brand` TEXT, " +
+                    "`calories` REAL NOT NULL, " +
+                    "`protein` REAL NOT NULL, " +
+                    "`carbs` REAL NOT NULL, " +
+                    "`fat` REAL NOT NULL, " +
+                    "`fiber` REAL NOT NULL, " +
+                    "`sugar` REAL NOT NULL, " +
+                    "`sodium` REAL NOT NULL, " +
+                    "`serving_g` REAL, " +
+                    "`package_g` REAL, " +
+                    "`source` TEXT NOT NULL, " +
+                    "`complete` INTEGER NOT NULL, " +
+                    "`updated_at` INTEGER NOT NULL, " +
+                    "PRIMARY KEY(`barcode`))",
+            )
+        }
+    }
+
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
 }

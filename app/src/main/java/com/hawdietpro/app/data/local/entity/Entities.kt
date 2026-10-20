@@ -147,6 +147,26 @@ data class ExerciseEntity(
     @ColumnInfo(name = "created_at") val createdAt: Long,
 )
 
+/** Cache produk kemasan per barcode (dari Open Food Facts, label dibaca AI, atau isian sendiri). Gizi per 100 g. */
+@Entity(tableName = "barcode_product")
+data class BarcodeProductEntity(
+    @PrimaryKey val barcode: String,
+    val name: String,
+    val brand: String?,
+    val calories: Double,
+    val protein: Double,
+    val carbs: Double,
+    val fat: Double,
+    val fiber: Double,
+    val sugar: Double,
+    val sodium: Double,
+    @ColumnInfo(name = "serving_g") val servingG: Double?,
+    @ColumnInfo(name = "package_g") val packageG: Double?,
+    val source: String,
+    val complete: Boolean,
+    @ColumnInfo(name = "updated_at") val updatedAt: Long,
+)
+
 @Entity(tableName = "pending_analysis")
 data class PendingAnalysisEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,

@@ -111,6 +111,30 @@ class GeminiClient @Inject constructor(
             .getOrElse { throw GeminiError.BadResponse("JSON saran") }
     }
 
+    fun labelAvailable(): Boolean = store.geminiPrompt.value.let {
+        it.labelSystemPrompt != null && it.labelPrompt != null && it.labelSchema != null
+    }
+
+    /** Membaca tabel Informasi Nilai Gizi dari foto label kemasan. */
+    suspend fun readLabel(jpeg: ByteArray): GeminiLabel {
+        val config = store.geminiPrompt.value
+        val system = config.labelSystemPrompt ?: throw GeminiError.Other("fitur belum tersedia")
+        val schema = config.labelSchema ?: throw GeminiError.Other("fitur belum tersedia")
+        val text = generate(
+            "Baca label gizi",
+            system,
+            listOf(
+                Part(inlineData = InlineData("image/jpeg", Base64.encodeToString(jpeg, Base64.NO_WRAP))),
+                Part(text = config.labelPrompt ?: "Baca label ini."),
+            ),
+            schema,
+            temperature = 0.0,
+        )
+        val cleaned = text.trim().removePrefix("```json").removePrefix("```").removeSuffix("```").trim()
+        return runCatching { json.decodeFromString(GeminiLabel.serializer(), cleaned) }
+            .getOrElse { throw GeminiError.BadResponse("JSON label") }
+    }
+
     /**
      * Memanggil generateContent dengan rantai model (override → utama → cadangan, hanya model yang masih aktif).
      * - Tiap percobaan dibatasi [GeminiPromptConfig.attemptTimeoutSeconds]; timeout/sibuk/kuota → pindah model.

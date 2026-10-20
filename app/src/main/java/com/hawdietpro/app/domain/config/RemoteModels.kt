@@ -70,6 +70,10 @@ data class GeminiPromptConfig(
     val suggestSystemPrompt: String? = null,
     val suggestPrompt: String? = null,
     val suggestSchema: JsonObject? = null,
+    /** Membaca tabel Informasi Nilai Gizi dari foto label kemasan (opsional). */
+    val labelSystemPrompt: String? = null,
+    val labelPrompt: String? = null,
+    val labelSchema: JsonObject? = null,
 ) : VersionedConfig
 
 @Serializable

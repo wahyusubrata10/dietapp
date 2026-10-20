@@ -38,6 +38,7 @@ import com.hawdietpro.app.data.prefs.ThemeMode
 import com.hawdietpro.app.ui.components.LoadingBox
 import com.hawdietpro.app.ui.feature.analytics.AnalyticsScreen
 import com.hawdietpro.app.ui.feature.backup.BackupScreen
+import com.hawdietpro.app.ui.feature.barcode.BarcodeScreen
 import com.hawdietpro.app.ui.feature.camera.CameraScreen
 import com.hawdietpro.app.ui.feature.exercise.ExerciseSheet
 import com.hawdietpro.app.ui.feature.history.HistoryScreen
@@ -130,6 +131,7 @@ private fun MainScaffold(
                 when (action) {
                     QuickAction.CAMERA -> navController.navigate(Routes.camera())
                     QuickAction.GALLERY -> navController.navigate(Routes.camera(openGallery = true))
+                    QuickAction.BARCODE -> navController.navigate(Routes.BARCODE)
                     QuickAction.RELOG -> navController.navigate(Routes.RELOG)
                     QuickAction.MANUAL -> navController.navigate(Routes.manualMeal())
                     QuickAction.EXERCISE -> showExercise = true
@@ -272,6 +274,15 @@ private fun MainScaffold(
                 composable(Routes.RELOG) { RelogScreen(onBack = { navController.popBackStack() }) }
                 composable(Routes.ACHIEVEMENTS) { AchievementsScreen(onBack = { navController.popBackStack() }) }
                 composable(Routes.AI_LOG) { AiLogScreen(onBack = { navController.popBackStack() }) }
+                composable(Routes.BARCODE) {
+                    BarcodeScreen(
+                        onBack = { navController.popBackStack() },
+                        onDone = { message ->
+                            navController.popBackStack()
+                            showMessage(message)
+                        },
+                    )
+                }
                 composable(Routes.BACKUP) { BackupScreen(onBack = { navController.popBackStack() }, showMessage = showMessage) }
             }
         }

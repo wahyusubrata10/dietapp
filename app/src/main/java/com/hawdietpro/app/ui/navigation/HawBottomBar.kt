@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -111,7 +112,7 @@ private fun BarItem(dest: TopLevelDestination, selected: Boolean, onNavigate: (S
     }
 }
 
-enum class QuickAction { CAMERA, GALLERY, RELOG, MANUAL, EXERCISE, WEIGHT }
+enum class QuickAction { CAMERA, GALLERY, BARCODE, RELOG, MANUAL, EXERCISE, WEIGHT }
 
 /** Lembar aksi cepat dari tombol "+". */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -125,6 +126,7 @@ fun QuickAddSheet(onDismiss: () -> Unit, onAction: (QuickAction) -> Unit) {
             Spacer(Modifier.height(4.dp))
             ActionRow(Icons.Filled.CameraAlt, MaterialTheme.colorScheme.primary, "Foto makanan", "AI mengenali menu & menghitung gizi") { onAction(QuickAction.CAMERA) }
             ActionRow(Icons.Filled.PhotoLibrary, MaterialTheme.colorScheme.tertiary, "Pilih dari galeri", "Analisa foto yang sudah ada") { onAction(QuickAction.GALLERY) }
+            ActionRow(Icons.Filled.QrCodeScanner, MaterialTheme.colorScheme.primary, "Scan barcode", "Produk kemasan: gizi dari label / Open Food Facts") { onAction(QuickAction.BARCODE) }
             ActionRow(Icons.Filled.Replay, MaterialTheme.colorScheme.secondary, "Makan lagi", "Favorit & menu terakhir, 1 ketukan") { onAction(QuickAction.RELOG) }
             ActionRow(Icons.Filled.EditNote, MacroColors.Carbs, "Input manual", "Cari dari ±1.750 makanan & produk") { onAction(QuickAction.MANUAL) }
             ActionRow(Icons.AutoMirrored.Filled.DirectionsRun, MaterialTheme.colorScheme.tertiary, "Catat olahraga", "Kalori terbakar menambah jatah makan") { onAction(QuickAction.EXERCISE) }

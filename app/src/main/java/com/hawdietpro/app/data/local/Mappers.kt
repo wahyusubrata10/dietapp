@@ -1,5 +1,6 @@
 package com.hawdietpro.app.data.local
 
+import com.hawdietpro.app.data.local.entity.BarcodeProductEntity
 import com.hawdietpro.app.data.local.entity.ExerciseEntity
 import com.hawdietpro.app.data.local.entity.FoodElementEntity
 import com.hawdietpro.app.data.local.entity.FoodReferenceEntity
@@ -184,4 +185,33 @@ fun Exercise.toEntity(createdAt: Long = System.currentTimeMillis()) = ExerciseEn
     source = source,
     note = note,
     createdAt = createdAt,
+)
+
+fun BarcodeProductEntity.toDomain() = com.hawdietpro.app.domain.product.PackagedProduct(
+    barcode = barcode,
+    name = name,
+    brand = brand,
+    per100 = Nutrients(calories, protein, carbs, fat, fiber, sugar, sodium),
+    servingG = servingG,
+    packageG = packageG,
+    source = source,
+    complete = complete,
+)
+
+fun com.hawdietpro.app.domain.product.PackagedProduct.toEntity(updatedAt: Long = System.currentTimeMillis()) = BarcodeProductEntity(
+    barcode = barcode,
+    name = name,
+    brand = brand,
+    calories = per100.calories,
+    protein = per100.protein,
+    carbs = per100.carbs,
+    fat = per100.fat,
+    fiber = per100.fiber,
+    sugar = per100.sugar,
+    sodium = per100.sodium,
+    servingG = servingG,
+    packageG = packageG,
+    source = source,
+    complete = complete,
+    updatedAt = updatedAt,
 )

@@ -1,5 +1,5 @@
 {
-  "version": 8,
+  "version": 9,
   "minAppVersionCode": 1,
   "model": "gemini-flash-latest",
   "fallbackModels": [
@@ -307,5 +307,85 @@
   "hedgeAfterSeconds": 18,
   "totalTimeoutSeconds": 100,
   "sendReferenceNames": false,
-  "autoDiscoverModels": true
+  "autoDiscoverModels": true,
+  "labelSystemPrompt": "Kamu membaca tabel INFORMASI NILAI GIZI (nutrition facts) pada foto kemasan makanan/minuman Indonesia. Salin angka PERSIS seperti tertulis di label, jangan menebak dari jenis produk.\n\nAturan:\n- basis = \"per_sajian\" bila angka di label per takaran saji (paling umum di Indonesia), atau \"per_100g\" bila label menulis per 100 g/100 ml.\n- takaran_saji_g: angka gram/ml takaran saji (mis. \"Takaran saji 30 g\" → 30). isi_kemasan_g: isi bersih/netto kemasan bila terlihat. sajian_per_kemasan: \"Jumlah sajian per kemasan\".\n- kalori = Energi total (kkal). Bila hanya ada kJ, bagi 4,184. Abaikan \"energi dari lemak\".\n- protein_g, karbo_g (karbohidrat total), lemak_g (lemak total), serat_g (serat pangan), gula_g, natrium_mg (natrium/sodium dalam mg; bila gram kalikan 1000).\n- Isi nama_produk & merek dari kemasan bila terbaca.\n- Bila tabel gizi tidak terlihat/tidak terbaca jelas, set terbaca = false dan kosongkan angka. Jangan mengarang.",
+  "labelPrompt": "Baca tabel Informasi Nilai Gizi pada foto ini.",
+  "labelSchema": {
+    "type": "OBJECT",
+    "properties": {
+      "terbaca": {
+        "type": "BOOLEAN",
+        "description": "true bila tabel gizi terbaca jelas"
+      },
+      "nama_produk": {
+        "type": "STRING",
+        "nullable": true
+      },
+      "merek": {
+        "type": "STRING",
+        "nullable": true
+      },
+      "basis": {
+        "type": "STRING",
+        "enum": [
+          "per_sajian",
+          "per_100g"
+        ]
+      },
+      "takaran_saji_g": {
+        "type": "NUMBER",
+        "nullable": true,
+        "description": "takaran saji (g/ml)"
+      },
+      "isi_kemasan_g": {
+        "type": "NUMBER",
+        "nullable": true,
+        "description": "isi bersih kemasan (g/ml)"
+      },
+      "sajian_per_kemasan": {
+        "type": "NUMBER",
+        "nullable": true,
+        "description": "jumlah sajian per kemasan"
+      },
+      "kalori": {
+        "type": "NUMBER",
+        "nullable": true,
+        "description": "energi total kkal"
+      },
+      "protein_g": {
+        "type": "NUMBER",
+        "nullable": true,
+        "description": "protein g"
+      },
+      "karbo_g": {
+        "type": "NUMBER",
+        "nullable": true,
+        "description": "karbohidrat total g"
+      },
+      "lemak_g": {
+        "type": "NUMBER",
+        "nullable": true,
+        "description": "lemak total g"
+      },
+      "serat_g": {
+        "type": "NUMBER",
+        "nullable": true,
+        "description": "serat pangan g"
+      },
+      "gula_g": {
+        "type": "NUMBER",
+        "nullable": true,
+        "description": "gula g"
+      },
+      "natrium_mg": {
+        "type": "NUMBER",
+        "nullable": true,
+        "description": "natrium mg"
+      }
+    },
+    "required": [
+      "terbaca",
+      "basis"
+    ]
+  }
 }

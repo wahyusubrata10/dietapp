@@ -721,6 +721,7 @@ private fun ItemCard(item: FoodItem, onClick: () -> Unit) {
         NutritionSource.DB -> MaterialTheme.colorScheme.primary
         NutritionSource.AI -> MaterialTheme.colorScheme.tertiary
         NutritionSource.MANUAL -> MaterialTheme.colorScheme.secondary
+        NutritionSource.KEMASAN -> MaterialTheme.colorScheme.primary
     }
     HawCard(onClick = onClick, contentPadding = 0.dp) {
         Row(Modifier.height(IntrinsicSize.Min), verticalAlignment = Alignment.CenterVertically) {

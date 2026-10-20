@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
+import com.hawdietpro.app.data.local.entity.BarcodeProductEntity
 import com.hawdietpro.app.data.local.entity.CalorieEntry
 import com.hawdietpro.app.data.local.entity.ExerciseEntity
 import com.hawdietpro.app.data.local.entity.FoodElementEntity
@@ -183,6 +184,27 @@ interface ExerciseDao {
 
     @Query("DELETE FROM exercise_log")
     suspend fun deleteAll()
+}
+
+@Dao
+interface BarcodeProductDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(entry: BarcodeProductEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(entries: List<BarcodeProductEntity>)
+
+    @Query("SELECT * FROM barcode_product WHERE barcode = :barcode")
+    suspend fun get(barcode: String): BarcodeProductEntity?
+
+    @Query("SELECT * FROM barcode_product ORDER BY updated_at DESC")
+    suspend fun getAll(): List<BarcodeProductEntity>
+
+    @Query("SELECT * FROM barcode_product ORDER BY updated_at DESC LIMIT :limit")
+    fun observeRecent(limit: Int): Flow<List<BarcodeProductEntity>>
+
+    @Query("DELETE FROM barcode_product WHERE barcode = :barcode")
+    suspend fun delete(barcode: String)
 }
 
 @Dao

@@ -186,6 +186,7 @@ fun SourceBadge(source: NutritionSource, modifier: Modifier = Modifier) {
         NutritionSource.DB -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
         NutritionSource.AI -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
         NutritionSource.MANUAL -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
+        NutritionSource.KEMASAN -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
     }
     Surface(modifier, shape = RoundedCornerShape(6.dp), color = bg) {
         Text(

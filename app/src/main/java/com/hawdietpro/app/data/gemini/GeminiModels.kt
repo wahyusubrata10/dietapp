@@ -153,3 +153,24 @@ data class ModelInfo(
     val name: String = "",
     val supportedGenerationMethods: List<String> = emptyList(),
 )
+
+// ---------- Label Informasi Nilai Gizi (sesuai labelSchema) ----------
+
+@Serializable
+data class GeminiLabel(
+    @SerialName("terbaca") val readable: Boolean = false,
+    @SerialName("nama_produk") val name: String? = null,
+    @SerialName("merek") val brand: String? = null,
+    /** "per_sajian" atau "per_100g". */
+    @SerialName("basis") val basis: String = "per_sajian",
+    @SerialName("takaran_saji_g") val servingG: Double? = null,
+    @SerialName("isi_kemasan_g") val packageG: Double? = null,
+    @SerialName("sajian_per_kemasan") val servingsPerPackage: Double? = null,
+    @SerialName("kalori") val calories: Double? = null,
+    @SerialName("protein_g") val protein: Double? = null,
+    @SerialName("karbo_g") val carbs: Double? = null,
+    @SerialName("lemak_g") val fat: Double? = null,
+    @SerialName("serat_g") val fiber: Double? = null,
+    @SerialName("gula_g") val sugar: Double? = null,
+    @SerialName("natrium_mg") val sodium: Double? = null,
+)

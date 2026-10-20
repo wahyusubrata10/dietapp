@@ -25,7 +25,9 @@ enum class MealType(val label: String, val emoji: String) {
 enum class NutritionSource(val label: String) {
     AI("AI"),
     DB("DB lokal"),
-    MANUAL("Manual");
+    MANUAL("Manual"),
+    /** Dari label gizi kemasan (scan barcode / foto label). */
+    KEMASAN("Label kemasan");
 
     companion object {
         fun parse(value: String?): NutritionSource = entries.firstOrNull { it.name == value } ?: AI

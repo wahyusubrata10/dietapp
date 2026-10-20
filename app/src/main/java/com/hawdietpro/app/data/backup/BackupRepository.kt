@@ -6,11 +6,13 @@ import com.hawdietpro.app.BuildConfig
 import com.hawdietpro.app.core.Format
 import com.hawdietpro.app.core.ImageProcessor
 import com.hawdietpro.app.data.local.HawDatabase
+import com.hawdietpro.app.data.local.dao.BarcodeProductDao
 import com.hawdietpro.app.data.local.dao.ExerciseDao
 import com.hawdietpro.app.data.local.dao.FoodReferenceDao
 import com.hawdietpro.app.data.local.dao.MealDao
 import com.hawdietpro.app.data.local.dao.UserProfileDao
 import com.hawdietpro.app.data.local.dao.WeightLogDao
+import com.hawdietpro.app.data.local.entity.BarcodeProductEntity
 import com.hawdietpro.app.data.local.entity.ExerciseEntity
 import com.hawdietpro.app.data.local.entity.WeightLogEntity
 import com.hawdietpro.app.data.local.toDomain
@@ -55,6 +57,7 @@ class BackupRepository @Inject constructor(
     private val images: ImageProcessor,
     private val json: Json,
     private val exercises: ExerciseDao,
+    private val barcodes: BarcodeProductDao,
 ) {
     data class ImportResult(val meals: Int, val weights: Int, val photos: Int, val exercises: Int = 0)
 
@@ -107,6 +110,12 @@ class BackupRepository @Inject constructor(
             },
             exercises = exercises.getAll().map { e ->
                 BackupExercise(e.epochDay, e.performedAt, e.activityId, e.name, e.durationMin, e.calories, e.source, e.note)
+            },
+            barcodeProducts = barcodes.getAll().map { b ->
+                BackupBarcodeProduct(
+                    b.barcode, b.name, b.brand, b.calories, b.protein, b.carbs, b.fat, b.fiber, b.sugar, b.sodium,
+                    b.servingG, b.packageG, b.source, b.complete,
+                )
             },
         )
         val out = context.contentResolver.openOutputStream(target) ?: error("Tidak bisa menulis file")
@@ -188,6 +197,14 @@ class BackupRepository @Inject constructor(
                 mealCount++
             }
             weights.upsertAll(data.weights.map { WeightLogEntity(epochDay = it.epochDay, weightKg = it.weightKg, note = it.note, createdAt = System.currentTimeMillis()) })
+            barcodes.upsertAll(
+                data.barcodeProducts.map { b ->
+                    BarcodeProductEntity(
+                        b.barcode, b.name, b.brand, b.calories, b.protein, b.carbs, b.fat, b.fiber, b.sugar, b.sodium,
+                        b.servingG, b.packageG, b.source, b.complete, System.currentTimeMillis(),
+                    )
+                },
+            )
             val existingExercises = if (replaceAll) emptySet() else exercises.getAll().map { Triple(it.epochDay, it.performedAt, it.name) }.toSet()
             exercises.upsertAll(
                 data.exercises
