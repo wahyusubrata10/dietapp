@@ -118,6 +118,9 @@ class SettingsViewModel @Inject constructor(
     fun setAnalysisMode(mode: AnalysisMode) {
         viewModelScope.launch { prefs.setAnalysisMode(mode) }
     }
+    fun setBackgroundAnalysis(v: Boolean) {
+        viewModelScope.launch { prefs.setBackgroundAnalysis(v) }
+    }
 
     fun setTheme(mode: ThemeMode) {
         viewModelScope.launch { prefs.setThemeMode(mode) }
@@ -151,6 +154,7 @@ fun SettingsScreen(
     onUpdate: () -> Unit,
     onBackup: () -> Unit,
     showMessage: (String) -> Unit,
+    onAiLog: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
@@ -245,6 +249,17 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            HawCard {
+                Column {
+                    ToggleRow(
+                        "Analisa di latar belakang",
+                        "Setelah foto diambil langsung kembali ke Beranda; hasil tercatat otomatis & muncul notifikasi. Matikan bila ingin menunggu & mengedit hasil saat itu juga.",
+                        settings.backgroundAnalysis,
+                        viewModel::setBackgroundAnalysis,
+                    )
+                    TextButton(onClick = onAiLog) { Text("Lihat riwayat analisa AI (diagnosa)") }
+                }
+            }
 
             SectionHeader("Model AI")
             HawCard {

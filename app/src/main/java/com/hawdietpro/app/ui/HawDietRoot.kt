@@ -49,6 +49,7 @@ import com.hawdietpro.app.ui.feature.profile.ProfileScreen
 import com.hawdietpro.app.ui.feature.queue.QueueScreen
 import com.hawdietpro.app.ui.feature.relog.RelogScreen
 import com.hawdietpro.app.ui.feature.achievements.AchievementsScreen
+import com.hawdietpro.app.ui.feature.settings.AiLogScreen
 import com.hawdietpro.app.ui.feature.settings.SettingsScreen
 import com.hawdietpro.app.ui.feature.update.UpdateScreen
 import com.hawdietpro.app.ui.feature.weight.WeightScreen
@@ -215,8 +216,14 @@ private fun MainScaffold(
                     CameraScreen(
                         onClose = { navController.popBackStack() },
                         onPhotoReady = { path, type, time, hint ->
-                            navController.navigate(Routes.analyzePhoto(path, type, time, hint)) {
-                                popUpTo(Routes.CAMERA) { inclusive = true }
+                            if (viewModel.backgroundAnalysis.value) {
+                                viewModel.analyzeInBackground(path, type, time, hint)
+                                navController.popBackStack()
+                                showMessage("Foto sedang dianalisa. Hasilnya tercatat otomatis & muncul notifikasi.")
+                            } else {
+                                navController.navigate(Routes.analyzePhoto(path, type, time, hint)) {
+                                    popUpTo(Routes.CAMERA) { inclusive = true }
+                                }
                             }
                         },
                         onManual = { type ->
@@ -250,6 +257,7 @@ private fun MainScaffold(
                         onUpdate = { navController.navigate(Routes.UPDATE) },
                         onBackup = { navController.navigate(Routes.BACKUP) },
                         showMessage = showMessage,
+                        onAiLog = { navController.navigate(Routes.AI_LOG) },
                     )
                 }
                 composable(Routes.WEIGHT) { WeightScreen(onBack = { navController.popBackStack() }) }
@@ -263,6 +271,7 @@ private fun MainScaffold(
                 composable(Routes.UPDATE) { UpdateScreen(onBack = { navController.popBackStack() }) }
                 composable(Routes.RELOG) { RelogScreen(onBack = { navController.popBackStack() }) }
                 composable(Routes.ACHIEVEMENTS) { AchievementsScreen(onBack = { navController.popBackStack() }) }
+                composable(Routes.AI_LOG) { AiLogScreen(onBack = { navController.popBackStack() }) }
                 composable(Routes.BACKUP) { BackupScreen(onBack = { navController.popBackStack() }, showMessage = showMessage) }
             }
         }

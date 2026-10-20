@@ -49,6 +49,16 @@ data class GeminiPromptConfig(
     val fastThinkingLevel: String? = null,
     val maxImageSize: Int = 1024,
     val jpegQuality: Int = 80,
+    /** Batas waktu satu percobaan ke satu model (detik). Lewat → dianggap timeout & pindah model. */
+    val attemptTimeoutSeconds: Int = 45,
+    /** Bila model utama belum menjawab setelah sekian detik, kirim permintaan yang sama ke model cadangan secara paralel. 0 = mati. */
+    val hedgeAfterSeconds: Int = 18,
+    /** Batas waktu total satu analisa (detik). */
+    val totalTimeoutSeconds: Int = 100,
+    /** Kirim daftar nama makanan DB di prompt (memperlambat; pencocokan tetap dilakukan di HP). */
+    val sendReferenceNames: Boolean = false,
+    /** Cek daftar model yang masih aktif lewat API & buang model yang sudah dimatikan Google. */
+    val autoDiscoverModels: Boolean = true,
     val systemPrompt: String,
     val userPrompt: String,
     val responseSchema: JsonObject,

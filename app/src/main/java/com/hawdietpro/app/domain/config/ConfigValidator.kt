@@ -21,6 +21,9 @@ object ConfigValidator {
             if (config.maxImageSize !in 256..2048) add("maxImageSize di luar 256–2048")
             if (config.jpegQuality !in 40..100) add("jpegQuality di luar 40–100")
             if (config.temperature !in 0.0..2.0) add("temperature di luar 0–2")
+            if (config.attemptTimeoutSeconds !in 10..120) add("attemptTimeoutSeconds di luar 10–120")
+            if (config.hedgeAfterSeconds !in 0..90) add("hedgeAfterSeconds di luar 0–90")
+            if (config.totalTimeoutSeconds !in 20..300) add("totalTimeoutSeconds di luar 20–300")
         }
         is FoodDbFile -> buildList {
             if (config.foods.isEmpty()) add("foods kosong")

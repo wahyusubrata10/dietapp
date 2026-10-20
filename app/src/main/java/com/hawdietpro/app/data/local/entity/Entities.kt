@@ -158,6 +158,8 @@ data class PendingAnalysisEntity(
     val attempts: Int,
     @ColumnInfo(name = "last_error") val lastError: String?,
     @ColumnInfo(name = "created_at") val createdAt: Long,
+    /** Catatan pengguna untuk AI (mis. "nasi setengah"), ikut dikirim saat analisa di latar belakang. */
+    val hint: String? = null,
 )
 
 /** Proyeksi ringan untuk perhitungan kalori harian (tanpa elemen). */

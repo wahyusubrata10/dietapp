@@ -169,7 +169,7 @@ class MealEditorViewModel @Inject constructor(
         val m = _state.value.meal
         val photo = m.photoPath ?: return
         viewModelScope.launch {
-            pending.enqueue(photo, m.mealType, m.eatenAt)
+            pending.enqueue(photo, m.mealType, m.eatenAt, _state.value.hint)
             committed = true
             _state.update { it.copy(finishedMessage = "Dianalisa di background. Anda akan dapat notifikasi saat selesai.") }
         }

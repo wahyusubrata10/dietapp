@@ -30,6 +30,7 @@ object Routes {
     const val BACKUP = "backup"
     const val RELOG = "makan-lagi"
     const val ACHIEVEMENTS = "pencapaian"
+    const val AI_LOG = "riwayat-ai"
 
     fun camera(type: MealType? = null, openGallery: Boolean = false) =
         "kamera?type=${type?.name.orEmpty()}&gallery=${if (openGallery) "1" else ""}"

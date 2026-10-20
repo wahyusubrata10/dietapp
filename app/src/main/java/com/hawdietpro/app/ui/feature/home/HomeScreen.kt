@@ -266,8 +266,8 @@ fun HomeScreen(
         if (state.pendingCount > 0) {
             item {
                 Banner(
-                    title = "${state.pendingCount} foto di antrian",
-                    text = "Akan dianalisa otomatis saat online. Ketuk untuk melihat.",
+                    title = "${state.pendingCount} foto sedang dianalisa",
+                    text = "Hasil tercatat otomatis & muncul notifikasi (saat online). Ketuk untuk melihat antrian.",
                     icon = Icons.Filled.CloudQueue,
                     onClick = onOpenQueue,
                 )

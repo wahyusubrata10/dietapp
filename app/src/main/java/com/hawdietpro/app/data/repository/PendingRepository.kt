@@ -27,7 +27,7 @@ class PendingRepository @Inject constructor(
 ) {
     fun observe(): Flow<List<PendingAnalysisEntity>> = dao.observeAll()
 
-    suspend fun enqueue(photoPath: String, mealType: MealType, capturedAt: Long): Long {
+    suspend fun enqueue(photoPath: String, mealType: MealType, capturedAt: Long, hint: String? = null): Long {
         val id = dao.insert(
             PendingAnalysisEntity(
                 photoPath = photoPath,
@@ -37,6 +37,7 @@ class PendingRepository @Inject constructor(
                 attempts = 0,
                 lastError = null,
                 createdAt = System.currentTimeMillis(),
+                hint = hint?.takeIf { it.isNotBlank() },
             ),
         )
         scheduler.enqueuePendingAnalysis()

@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.hawdietpro.app.data.repository.PendingRepository
+import com.hawdietpro.app.domain.model.MealType
 import javax.inject.Inject
 
 sealed interface StartState {
@@ -35,6 +37,7 @@ class MainViewModel @Inject constructor(
     private val sync: RemoteConfigSync,
     private val scheduler: WorkScheduler,
     store: RemoteConfigStore,
+    private val pending: PendingRepository,
 ) : ViewModel() {
 
     val startState: StateFlow<StartState> = profiles.observeProfile()
@@ -65,6 +68,15 @@ class MainViewModel @Inject constructor(
                 scheduler.enqueueUpdateDownload(s.updatesWifiOnly)
             }
         }
+    }
+
+    /** Setelan "analisa di latar belakang" (default aktif). */
+    val backgroundAnalysis: StateFlow<Boolean> = prefs.settings.map { it.backgroundAnalysis }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
+    /** Foto langsung masuk antrian analisa; hasil tercatat otomatis + notifikasi. */
+    fun analyzeInBackground(photoPath: String, type: MealType, time: Long, hint: String?) {
+        viewModelScope.launch { pending.enqueue(photoPath, type, time, hint) }
     }
 
     fun dismissAnnouncement(id: String) {

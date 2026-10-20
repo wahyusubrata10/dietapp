@@ -17,7 +17,7 @@ sealed class GeminiError(message: String, val retryable: Boolean, val queueable:
     class Network : GeminiError(
         "Tidak ada koneksi internet. Foto bisa disimpan ke antrian dan dianalisa otomatis saat online.", retryable = true, queueable = true,
     )
-    class Server(code: Int) : GeminiError(
+    class Server(val code: Int) : GeminiError(
         "Server Gemini sedang sibuk (kode $code). Coba lagi atau simpan ke antrian.", retryable = true, queueable = true,
     )
     class ModelNotFound(model: String) : GeminiError(
@@ -32,7 +32,27 @@ sealed class GeminiError(message: String, val retryable: Boolean, val queueable:
     class BadResponse(detail: String) : GeminiError(
         "Jawaban AI tidak bisa dibaca ($detail). Coba lagi.", retryable = true, queueable = true,
     )
+    class Timeout : GeminiError(
+        "AI terlalu lama menjawab. Coba lagi, atau biarkan dianalisa di latar belakang.", retryable = true, queueable = true,
+    )
     /** Model tidak menerima pengaturan thinking → dicoba ulang tanpa pengaturan itu. */
     class UnsupportedThinking : GeminiError("Pengaturan thinking tidak didukung model", retryable = true, queueable = true)
     class Other(detail: String) : GeminiError("Analisa gagal: $detail", retryable = true, queueable = true)
+
+    /** Kode singkat untuk riwayat analisa (diagnosa). */
+    val shortCode: String
+        get() = when (this) {
+            is MissingApiKey -> "tanpa API key"
+            is InvalidApiKey -> "API key ditolak"
+            is RateLimited -> "429 kuota" + (retryAfterSeconds?.let { " (tunggu ${it}s)" } ?: "")
+            is Network -> "jaringan"
+            is Server -> "$code sibuk"
+            is ModelNotFound -> "404 model tidak ada"
+            is Blocked -> "diblokir"
+            is NotFood -> "bukan makanan"
+            is BadResponse -> "jawaban rusak"
+            is Timeout -> "timeout"
+            is UnsupportedThinking -> "thinking tidak didukung"
+            is Other -> message?.removePrefix("Analisa gagal: ")?.take(40) ?: "lainnya"
+        }
 }

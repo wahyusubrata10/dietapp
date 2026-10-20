@@ -1,5 +1,18 @@
 package com.hawdietpro.app.ui.feature.onboarding
 
+import javax.inject.Inject
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import dagger.hilt.android.lifecycle.HiltViewModel
+import com.hawdietpro.app.data.backup.BackupRepository
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.ViewModel
+import androidx.compose.material3.Surface
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.compose.rememberLauncherForActivityResult
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -71,9 +84,16 @@ private const val STEPS = 7
 
 /** Onboarding: data diri → tubuh → aktivitas → tujuan → target → API key. Selesai = profil tersimpan. */
 @Composable
-fun OnboardingScreen(viewModel: ProfileFormViewModel = hiltViewModel()) {
+fun OnboardingScreen(
+    viewModel: ProfileFormViewModel = hiltViewModel(),
+    restoreViewModel: RestoreViewModel = hiltViewModel(),
+) {
     val form by viewModel.form.collectAsStateWithLifecycle()
+    val restore by restoreViewModel.state.collectAsStateWithLifecycle()
     var step by rememberSaveable { mutableIntStateOf(0) }
+    val pickBackup = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let(restoreViewModel::restore)
+    }
 
     BackHandler(enabled = step > 0) { step-- }
 
@@ -102,7 +122,12 @@ fun OnboardingScreen(viewModel: ProfileFormViewModel = hiltViewModel()) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 when (s) {
-                    0 -> Welcome()
+                    0 -> {
+                        Welcome()
+                        RestoreCard(restore) {
+                            pickBackup.launch(arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed"))
+                        }
+                    }
                     1 -> StepPage("Kenalan dulu", "Data ini dipakai untuk menghitung kebutuhan kalori Anda. Semua tersimpan hanya di HP ini.") {
                         PersonalFields(form, viewModel::update)
                     }
@@ -226,4 +251,49 @@ private fun ApiKeyStep(form: ProfileForm, onChange: ((ProfileForm) -> ProfileFor
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
+}
+
+/** Pindah HP: pulihkan semua data dari file backup ZIP tanpa mengisi profil dulu. */
+@Composable
+private fun RestoreCard(state: RestoreUi, onPick: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Pindah dari HP lama?", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            Text(
+                "Pulihkan semua catatan, foto, berat, olahraga & profil dari file backup ZIP (Profil → Backup & ekspor di HP lama).",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
+            if (state.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+            state.message?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
+            OutlinedButton(onClick = onPick, enabled = !state.busy) { Text("Pulihkan dari backup") }
+        }
+    }
+}
+
+data class RestoreUi(val busy: Boolean = false, val message: String? = null)
+
+@HiltViewModel
+class RestoreViewModel @Inject constructor(private val backup: BackupRepository) : ViewModel() {
+    private val _state = MutableStateFlow(RestoreUi())
+    val state: StateFlow<RestoreUi> = _state.asStateFlow()
+
+    /** Setelah berhasil, profil terisi sehingga aplikasi otomatis masuk ke Beranda. */
+    fun restore(uri: Uri) {
+        _state.value = RestoreUi(busy = true)
+        viewModelScope.launch {
+            _state.value = try {
+                val r = backup.importZip(uri, replaceAll = true)
+                RestoreUi(message = if (r.meals == 0 && r.weights == 0) "File backup kosong atau tanpa profil. Lanjutkan dengan mengisi data diri." else null)
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                RestoreUi(message = "Gagal memulihkan: ${e.message ?: "file tidak valid"}")
+            }
+        }
+    }
 }

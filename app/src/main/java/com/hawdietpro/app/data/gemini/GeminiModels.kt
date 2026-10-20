@@ -139,3 +139,17 @@ data class GeminiMenuOption(
     @SerialName("alasan") val reason: String = "",
     @SerialName("tips") val tips: String = "",
 )
+
+// ---------- Daftar model (models.list) ----------
+
+@Serializable
+data class ModelListResponse(
+    val models: List<ModelInfo> = emptyList(),
+    val nextPageToken: String? = null,
+)
+
+@Serializable
+data class ModelInfo(
+    val name: String = "",
+    val supportedGenerationMethods: List<String> = emptyList(),
+)

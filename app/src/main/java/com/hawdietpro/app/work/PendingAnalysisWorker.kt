@@ -44,7 +44,7 @@ class PendingAnalysisWorker @AssistedInject constructor(
             }
             dao.update(item.copy(status = PendingStatus.DIPROSES.name))
             try {
-                val meal = analyzer.analyze(item.photoPath, MealType.parse(item.mealType), item.capturedAt, null)
+                val meal = analyzer.analyze(item.photoPath, MealType.parse(item.mealType), item.capturedAt, item.hint)
                 val id = meals.save(meal)
                 dao.delete(item.id)
                 Notifications.mealAnalyzed(

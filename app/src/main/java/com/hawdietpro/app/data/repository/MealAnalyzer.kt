@@ -55,8 +55,10 @@ class MealAnalyzer @Inject constructor(
                 mealType = mealType.label,
                 time = time,
                 userHint = userHint,
-                // Kombinasi otomatis (PERKIRAAN) tidak dikirim agar prompt tetap ringkas; matcher tetap mengenalinya.
-                referenceNames = foods.all().filter { it.source != "USER" && it.source != "PERKIRAAN" }.map { it.name },
+                // Daftar nama DB memperlambat AI; secara default tidak dikirim. Pencocokan ke DB tetap dilakukan di HP.
+                referenceNames = if (store.geminiPrompt.value.sendReferenceNames) {
+                    foods.all().filter { it.source != "USER" && it.source != "PERKIRAAN" }.map { it.name }
+                } else emptyList(),
             ),
         )
         val meal = Meal(
