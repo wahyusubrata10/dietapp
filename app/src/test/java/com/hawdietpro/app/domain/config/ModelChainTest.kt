@@ -8,9 +8,9 @@ class ModelChainTest {
     private val fallbacks = listOf("gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-2.0-flash")
 
     @Test
-    fun `tanpa daftar model, pakai urutan config dan buang lite di mode teliti`() {
+    fun `tanpa daftar model, lite dipindah ke akhir di mode teliti`() {
         assertEquals(
-            listOf("gemini-flash-latest", "gemini-2.5-flash", "gemini-2.0-flash"),
+            listOf("gemini-flash-latest", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-lite-latest"),
             ModelChain.build(null, "gemini-flash-latest", fallbacks, null, allowLite = false),
         )
     }
@@ -19,11 +19,11 @@ class ModelChainTest {
     fun `model yang sudah mati dibuang dan flash terbaru ditambahkan`() {
         val alive = setOf("gemini-3.5-flash", "gemini-3-flash", "gemini-3.1-flash-lite", "gemini-3.5-flash-image", "gemini-pro-latest")
         assertEquals(
-            listOf("gemini-flash-latest", "gemini-3.5-flash", "gemini-3-flash"),
+            listOf("gemini-flash-latest", "gemini-3.5-flash", "gemini-3-flash", "gemini-flash-lite-latest", "gemini-3.1-flash-lite"),
             ModelChain.build(null, "gemini-flash-latest", fallbacks, alive, allowLite = false),
         )
         assertEquals(
-            listOf("gemini-flash-latest", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-3-flash"),
+            listOf("gemini-flash-latest", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-3-flash", "gemini-3.1-flash-lite"),
             ModelChain.build(null, "gemini-flash-latest", fallbacks, alive, allowLite = true),
         )
     }

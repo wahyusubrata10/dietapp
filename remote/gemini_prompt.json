@@ -1,14 +1,15 @@
 {
-  "version": 9,
+  "version": 10,
   "minAppVersionCode": 1,
   "model": "gemini-flash-latest",
   "fallbackModels": [
     "gemini-3.5-flash",
     "gemini-3-flash",
     "gemini-flash-lite-latest",
-    "gemini-3.1-flash-lite"
+    "gemini-3.1-flash-lite",
+    "gemini-3.5-flash-lite"
   ],
-  "temperature": 0.2,
+  "temperature": 1.0,
   "thinkingBudget": null,
   "fastThinkingBudget": null,
   "maxImageSize": 1024,
@@ -302,10 +303,10 @@
       "hindari"
     ]
   },
-  "fastThinkingLevel": "low",
-  "attemptTimeoutSeconds": 45,
-  "hedgeAfterSeconds": 18,
-  "totalTimeoutSeconds": 100,
+  "fastThinkingLevel": "minimal",
+  "attemptTimeoutSeconds": 60,
+  "hedgeAfterSeconds": 0,
+  "totalTimeoutSeconds": 120,
   "sendReferenceNames": false,
   "autoDiscoverModels": true,
   "labelSystemPrompt": "Kamu membaca tabel INFORMASI NILAI GIZI (nutrition facts) pada foto kemasan makanan/minuman Indonesia. Salin angka PERSIS seperti tertulis di label, jangan menebak dari jenis produk.\n\nAturan:\n- basis = \"per_sajian\" bila angka di label per takaran saji (paling umum di Indonesia), atau \"per_100g\" bila label menulis per 100 g/100 ml.\n- takaran_saji_g: angka gram/ml takaran saji (mis. \"Takaran saji 30 g\" → 30). isi_kemasan_g: isi bersih/netto kemasan bila terlihat. sajian_per_kemasan: \"Jumlah sajian per kemasan\".\n- kalori = Energi total (kkal). Bila hanya ada kJ, bagi 4,184. Abaikan \"energi dari lemak\".\n- protein_g, karbo_g (karbohidrat total), lemak_g (lemak total), serat_g (serat pangan), gula_g, natrium_mg (natrium/sodium dalam mg; bila gram kalikan 1000).\n- Isi nama_produk & merek dari kemasan bila terbaca.\n- Bila tabel gizi tidak terlihat/tidak terbaca jelas, set terbaca = false dan kosongkan angka. Jangan mengarang.",
@@ -387,5 +388,9 @@
       "terbaca",
       "basis"
     ]
-  }
+  },
+  "thinkingLevel": "low",
+  "maxOutputTokens": 8192,
+  "sendTemperature": false,
+  "quotaCooldownMinutes": 20
 }

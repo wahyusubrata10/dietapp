@@ -49,6 +49,14 @@ data class GeminiPromptConfig(
     val fastThinkingLevel: String? = null,
     val maxImageSize: Int = 1024,
     val jpegQuality: Int = 80,
+    /** Mode Teliti (Gemini 3+): "minimal"/"low"/"medium"/"high". Null = bawaan model (high, lambat). */
+    val thinkingLevel: String? = null,
+    /** Gemini 3 disarankan temperature bawaan (1.0); nilai rendah bisa membuat model berputar-putar. */
+    val sendTemperature: Boolean = false,
+    /** Batas token jawaban agar model yang "berputar" tidak jalan terus. */
+    val maxOutputTokens: Int? = 8192,
+    /** Model yang kuotanya habis (429) / sudah tidak ada (404) dilewati selama sekian menit. */
+    val quotaCooldownMinutes: Int = 20,
     /** Batas waktu satu percobaan ke satu model (detik). Lewat → dianggap timeout & pindah model. */
     val attemptTimeoutSeconds: Int = 45,
     /** Bila model utama belum menjawab setelah sekian detik, kirim permintaan yang sama ke model cadangan secara paralel. 0 = mati. */

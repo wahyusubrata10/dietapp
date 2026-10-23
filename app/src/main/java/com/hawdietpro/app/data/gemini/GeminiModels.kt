@@ -34,6 +34,7 @@ data class GenerationConfig(
     val responseMimeType: String? = null,
     val responseSchema: JsonObject? = null,
     val thinkingConfig: ThinkingConfig? = null,
+    val maxOutputTokens: Int? = null,
 )
 
 /** Mengatur "thinking" model. Untuk mengenali makanan cukup minimal agar jauh lebih cepat. */

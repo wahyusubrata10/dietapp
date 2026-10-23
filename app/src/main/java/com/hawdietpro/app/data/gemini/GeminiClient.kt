@@ -165,18 +165,23 @@ class GeminiClient @Inject constructor(
         val config = store.geminiPrompt.value
         val settings = prefs.current()
         val fast = settings.analysisMode == AnalysisMode.CEPAT
-        // Mode Teliti: thinking bawaan model (kualitas maksimal). Mode Cepat: thinking diperkecil sesuai remote config.
-        val thinking = if (fast && (config.fastThinkingBudget != null || config.fastThinkingLevel != null)) {
-            ThinkingConfig(thinkingBudget = config.fastThinkingBudget, thinkingLevel = config.fastThinkingLevel)
-        } else null
+        // Tingkat "thinking" dari remote config (Teliti vs Cepat). Model yang tidak mendukung → diulang tanpa pengaturan ini.
+        val thinking = when {
+            fast && (config.fastThinkingBudget != null || config.fastThinkingLevel != null) ->
+                ThinkingConfig(thinkingBudget = config.fastThinkingBudget, thinkingLevel = config.fastThinkingLevel)
+            !fast && config.thinkingLevel != null -> ThinkingConfig(thinkingLevel = config.thinkingLevel)
+            else -> null
+        }
         val request = GenerateContentRequest(
             systemInstruction = Content(parts = listOf(Part(text = systemPrompt))),
             contents = listOf(Content(role = "user", parts = parts)),
             generationConfig = GenerationConfig(
-                temperature = temperature,
+                // Gemini 3: temperature dibiarkan bawaan (1.0) kecuali remote config memintanya.
+                temperature = if (config.sendTemperature) temperature else null,
                 responseMimeType = "application/json",
                 responseSchema = schema,
                 thinkingConfig = thinking,
+                maxOutputTokens = config.maxOutputTokens,
             ),
         )
         val body = json.encodeToString(GenerateContentRequest.serializer(), request)
@@ -186,9 +191,15 @@ class GeminiClient @Inject constructor(
         )
 
         val available = if (config.autoDiscoverModels) availableModels(apiKey, trace) else null
-        // Mode Teliti tidak pernah turun ke model "lite" yang kurang teliti.
-        val models = ModelChain.build(settings.geminiModelOverride, config.model, config.fallbackModels, available, allowLite = fast)
+        // Mode Teliti: model "lite" hanya cadangan terakhir (mis. saat kuota Flash habis), bukan dilarang.
+        val chain = ModelChain.build(settings.geminiModelOverride, config.model, config.fallbackModels, available, allowLite = fast)
+        val now = System.currentTimeMillis()
+        val ready = chain.filter { (cooldownUntil[it] ?: 0L) <= now }
+        val models = ready.ifEmpty { chain.sortedBy { cooldownUntil[it] ?: 0L } }
+        val skipped = chain - ready.toSet()
+        if (skipped.isNotEmpty()) trace.note("dilewati sementara (kuota habis/tidak ada): ${skipped.joinToString()}")
         trace.note("urutan model: ${models.joinToString()}")
+        cooldownMinutes = config.quotaCooldownMinutes
 
         val attemptTimeout = config.attemptTimeoutSeconds.toLong()
         val hedgeAfterMs = config.hedgeAfterSeconds * 1000L
@@ -286,9 +297,19 @@ class GeminiClient @Inject constructor(
             throw e
         } catch (e: GeminiError) {
             trace.attempt(model, start, e.shortCode)
+            // Kuota harian/menit habis atau model dimatikan: jangan dicoba lagi tiap foto (hemat waktu & kuota).
+            val cooldownMs = when (e) {
+                is GeminiError.RateLimited -> maxOf((e.retryAfterSeconds ?: 0L) * 1000, cooldownMinutes * 60_000L)
+                is GeminiError.ModelNotFound -> 6 * 60 * 60_000L
+                else -> 0L
+            }
+            if (cooldownMs > 0) cooldownUntil[model] = System.currentTimeMillis() + cooldownMs
             throw e
         }
     }
+
+    private val cooldownUntil = java.util.concurrent.ConcurrentHashMap<String, Long>()
+    @Volatile private var cooldownMinutes = 20
 
     /** Daftar model aktif (cache 6 jam). Null bila gagal dicek → rantai dari config dipakai apa adanya. */
     private suspend fun availableModels(apiKey: String, trace: AiCallTrace): Set<String>? {
