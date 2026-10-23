@@ -236,6 +236,9 @@ interface PendingAnalysisDao {
     @Query("SELECT * FROM pending_analysis WHERE id = :id")
     suspend fun getById(id: Long): PendingAnalysisEntity?
 
+    @Query("SELECT * FROM pending_analysis ORDER BY captured_at ASC")
+    suspend fun getAll(): List<PendingAnalysisEntity>
+
     @Query("UPDATE pending_analysis SET status = 'MENUNGGU' WHERE status = 'DIPROSES'")
     suspend fun resetStuck()
 

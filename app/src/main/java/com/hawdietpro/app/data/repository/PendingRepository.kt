@@ -48,6 +48,15 @@ class PendingRepository @Inject constructor(
     /** Status koneksi untuk keterangan antrian. */
     val online: StateFlow<Boolean> get() = processor.online
 
+    /** Foto yang sedang dianalisa (id ke waktu mulai). */
+    val current: StateFlow<Pair<Long, Long>?> get() = processor.current
+
+    /** Dipanggil saat layar antrian dibuka: cek ulang jaringan & proses yang tertunda. */
+    fun refresh() {
+        processor.refreshOnline()
+        processor.kick()
+    }
+
     /** Coba ulang sekarang (jumlah percobaan direset). */
     suspend fun retry(id: Long) {
         dao.getById(id)?.let { reset(it) }
@@ -55,12 +64,12 @@ class PendingRepository @Inject constructor(
     }
 
     suspend fun retryAll() {
-        dao.getProcessable().forEach { reset(it) }
+        dao.getAll().forEach { reset(it) }
         processor.kick()
     }
 
     private suspend fun reset(item: PendingAnalysisEntity) {
-        if (item.status == PendingStatus.DIPROSES.name) return
+        if (processor.isProcessing(item.id)) return
         dao.update(item.copy(status = PendingStatus.MENUNGGU.name, attempts = 0, lastError = null))
     }
 

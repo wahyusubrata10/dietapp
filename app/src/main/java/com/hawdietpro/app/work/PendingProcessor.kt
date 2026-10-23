@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -60,6 +61,17 @@ class PendingProcessor @Inject constructor(
     private val _online = MutableStateFlow(true)
     val online: StateFlow<Boolean> = _online.asStateFlow()
 
+    /** Foto yang benar-benar sedang dianalisa saat ini (id ke waktu mulai), untuk tampilan antrian. */
+    private val _current = MutableStateFlow<Pair<Long, Long>?>(null)
+    val current: StateFlow<Pair<Long, Long>?> = _current.asStateFlow()
+
+    fun isProcessing(id: Long) = _current.value?.first == id
+
+    /** Cek ulang status jaringan (callback sistem kadang datang tidak berurutan saat Wi-Fi ↔ data seluler). */
+    fun refreshOnline() {
+        _online.value = isOnline()
+    }
+
     fun start() {
         if (!started.compareAndSet(false, true)) return
         _online.value = isOnline()
@@ -71,8 +83,17 @@ class PendingProcessor @Inject constructor(
                         kick()
                     }
 
+                    override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
+                        refreshOnline()
+                    }
+
+                    // Saat pindah Wi-Fi → data seluler, onLost jaringan lama bisa datang setelah jaringan baru aktif.
                     override fun onLost(network: Network) {
-                        _online.value = false
+                        scope.launch {
+                            delay(1_500)
+                            refreshOnline()
+                            if (_online.value) kick()
+                        }
                     }
                 },
             )
@@ -97,8 +118,8 @@ class PendingProcessor @Inject constructor(
     /** @return true bila masih ada foto yang perlu dicoba lagi nanti. */
     suspend fun process(fromWorker: Boolean): Boolean = mutex.withLock {
         dao.resetStuck()
-        if (!fromWorker && !isOnline()) {
-            _online.value = false
+        refreshOnline()
+        if (!fromWorker && !_online.value) {
             // Tunggu jaringan: callback jaringan & WorkManager (constraint online) akan memicu lagi.
             if (hasProcessable()) scheduler.enqueuePendingAnalysis() else scheduler.cancelPendingAnalysis()
             return@withLock false
@@ -117,8 +138,18 @@ class PendingProcessor @Inject constructor(
                 continue
             }
             dao.update(item.copy(status = PendingStatus.DIPROSES.name, lastError = null))
+            _current.value = item.id to System.currentTimeMillis()
             try {
-                val meal = analyzer.analyze(item.photoPath, MealType.parse(item.mealType), item.capturedAt, item.hint)
+                // Batas keras per foto: apa pun yang macet, antrian tidak boleh berputar tanpa akhir.
+                val meal = withTimeoutOrNull(ITEM_TIMEOUT_SECONDS * 1000) {
+                    analyzer.analyze(item.photoPath, MealType.parse(item.mealType), item.capturedAt, item.hint)
+                }
+                if (meal == null) {
+                    needsRetry = markFailed(
+                        item, "AI tidak menjawab dalam 2,5 menit. Akan dicoba lagi otomatis.", temporary = true,
+                    ) || needsRetry
+                    continue
+                }
                 val id = meals.save(meal)
                 dao.delete(item.id)
                 Notifications.mealAnalyzed(
@@ -145,6 +176,8 @@ class PendingProcessor @Inject constructor(
                 if (e is GeminiError.MissingApiKey || e is GeminiError.InvalidApiKey) break
             } catch (e: Exception) {
                 needsRetry = markFailed(item, e.message ?: e.javaClass.simpleName, temporary = true) || needsRetry
+            } finally {
+                _current.value = null
             }
         }
 
@@ -191,6 +224,7 @@ class PendingProcessor @Inject constructor(
 
     companion object {
         const val MAX_ATTEMPTS = 6
+        private const val ITEM_TIMEOUT_SECONDS = 150L
         private const val BACKUP_DELAY_SECONDS = 180L
         private const val DEFAULT_RETRY_SECONDS = 120L
         private const val RATE_LIMIT_RETRY_SECONDS = 600L

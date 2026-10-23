@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ import com.hawdietpro.app.ui.components.HawScaffold
 import com.hawdietpro.app.ui.components.MealPhoto
 import com.hawdietpro.app.work.PendingProcessor
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -55,6 +57,11 @@ class QueueViewModel @Inject constructor(private val pending: PendingRepository)
     val items: StateFlow<List<PendingAnalysisEntity>> = pending.observe()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val online: StateFlow<Boolean> = pending.online
+    val current: StateFlow<Pair<Long, Long>?> = pending.current
+
+    init {
+        pending.refresh()
+    }
 
     fun retry(id: Long) {
         viewModelScope.launch { pending.retry(id) }
@@ -78,6 +85,14 @@ fun QueueScreen(
 ) {
     val items by viewModel.items.collectAsStateWithLifecycle()
     val online by viewModel.online.collectAsStateWithLifecycle()
+    val current by viewModel.current.collectAsStateWithLifecycle()
+    // Detik berjalan untuk foto yang sedang dianalisa.
+    val now by produceState(System.currentTimeMillis(), current) {
+        while (current != null) {
+            value = System.currentTimeMillis()
+            delay(1_000)
+        }
+    }
     HawScaffold(
         title = "Antrian analisa",
         onBack = onBack,
@@ -101,14 +116,19 @@ fun QueueScreen(
         ) {
             item {
                 Text(
-                    if (online) "Foto diproses satu per satu secara otomatis. Hasilnya langsung tercatat dan bisa diedit."
+                    if (online || current != null) "Foto diproses satu per satu secara otomatis. Hasilnya langsung tercatat dan bisa diedit."
                     else "Tidak ada internet. Foto akan diproses otomatis begitu tersambung.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             items(items, key = { it.id }) { item ->
-                val status = PendingStatus.parse(item.status)
+                val processingSince = current?.takeIf { it.first == item.id }?.second
+                // DIPROSES tanpa proses yang berjalan = sisa proses yang terhenti → dianggap menunggu.
+                val status = PendingStatus.parse(item.status).let {
+                    if (processingSince != null) PendingStatus.DIPROSES
+                    else if (it == PendingStatus.DIPROSES) PendingStatus.MENUNGGU else it
+                }
                 val type = MealType.parse(item.mealType)
                 HawCard {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -123,7 +143,7 @@ fun QueueScreen(
                                         Spacer(Modifier.width(6.dp))
                                     }
                                     Text(
-                                        statusText(item, status, online),
+                                        statusText(item, status, online, processingSince?.let { ((now - it) / 1000).coerceAtLeast(0) }),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = if (status == PendingStatus.GAGAL) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
@@ -157,9 +177,9 @@ fun QueueScreen(
     }
 }
 
-private fun statusText(item: PendingAnalysisEntity, status: PendingStatus, online: Boolean): String {
+private fun statusText(item: PendingAnalysisEntity, status: PendingStatus, online: Boolean, elapsedSeconds: Long?): String {
     val base = when {
-        status == PendingStatus.DIPROSES -> status.label
+        status == PendingStatus.DIPROSES -> status.label + (elapsedSeconds?.let { " ${it} dtk" } ?: "")
         status == PendingStatus.GAGAL -> "Gagal · ketuk Coba lagi atau Isi manual"
         item.attempts >= PendingProcessor.MAX_ATTEMPTS -> "Berhenti otomatis · ketuk Coba lagi"
         !online -> "Menunggu koneksi internet"
