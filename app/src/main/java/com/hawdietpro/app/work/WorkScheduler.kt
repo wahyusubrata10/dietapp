@@ -21,13 +21,21 @@ class WorkScheduler @Inject constructor(@ApplicationContext private val context:
 
     private val online = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
-    /** Proses antrian foto begitu ada koneksi. */
-    fun enqueuePendingAnalysis() {
+    /**
+     * Cadangan pemrosesan antrian saat aplikasi tidak aktif (pemrosesan utama di [PendingProcessor]).
+     * KEEP agar worker yang sedang jalan tidak dibatalkan; backoff linear agar tidak menunggu berjam-jam.
+     */
+    fun enqueuePendingAnalysis(delaySeconds: Long = 0) {
         val request = OneTimeWorkRequestBuilder<PendingAnalysisWorker>()
             .setConstraints(online)
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 2, TimeUnit.MINUTES)
+            .setInitialDelay(delaySeconds, TimeUnit.SECONDS)
+            .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.MINUTES)
             .build()
-        wm.enqueueUniqueWork(PendingAnalysisWorker.NAME, ExistingWorkPolicy.APPEND_OR_REPLACE, request)
+        wm.enqueueUniqueWork(PendingAnalysisWorker.NAME, ExistingWorkPolicy.KEEP, request)
+    }
+
+    fun cancelPendingAnalysis() {
+        wm.cancelUniqueWork(PendingAnalysisWorker.NAME)
     }
 
     /** Cek update APK + remote config secara berkala. */

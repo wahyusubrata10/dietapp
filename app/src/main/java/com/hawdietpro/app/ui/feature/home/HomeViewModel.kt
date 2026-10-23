@@ -8,6 +8,7 @@ import com.hawdietpro.app.data.repository.AchievementRepository
 import com.hawdietpro.app.data.repository.ExerciseRepository
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.PendingRepository
+import com.hawdietpro.app.data.repository.PendingStatus
 import com.hawdietpro.app.data.repository.ProfileRepository
 import com.hawdietpro.app.data.repository.WeightProjectionRepository
 import com.hawdietpro.app.domain.achievement.Achievement
@@ -53,6 +54,7 @@ data class HomeState(
     val byType: Map<MealType, List<Meal>> = emptyMap(),
     val insights: List<Insight> = emptyList(),
     val pendingCount: Int = 0,
+    val pendingFailed: Int = 0,
     val tip: String? = null,
     val hasApiKey: Boolean = true,
     val projection: WeightProjection? = null,
@@ -121,6 +123,7 @@ class HomeViewModel @Inject constructor(
             byType = list.sortedBy { it.eatenAt }.groupBy { it.mealType },
             insights = if (store.appConfig.value.isEnabled("insights")) InsightEngine(rules).evaluate(stats, Period.DAY) else emptyList(),
             pendingCount = queue.size,
+            pendingFailed = queue.count { it.status == PendingStatus.GAGAL.name },
             tip = tips.takeIf { it.isNotEmpty() }?.let { it[date.dayOfYear % it.size] },
             hasApiKey = hasKey,
             exercises = exerciseList,

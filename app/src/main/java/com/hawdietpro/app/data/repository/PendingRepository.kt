@@ -3,15 +3,16 @@ package com.hawdietpro.app.data.repository
 import com.hawdietpro.app.data.local.dao.PendingAnalysisDao
 import com.hawdietpro.app.data.local.entity.PendingAnalysisEntity
 import com.hawdietpro.app.domain.model.MealType
-import com.hawdietpro.app.work.WorkScheduler
+import com.hawdietpro.app.work.PendingProcessor
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 enum class PendingStatus(val label: String) {
-    MENUNGGU("Menunggu koneksi"),
-    DIPROSES("Sedang dianalisa"),
+    MENUNGGU("Menunggu giliran"),
+    DIPROSES("Sedang dianalisa…"),
     GAGAL("Gagal");
 
     companion object {
@@ -23,7 +24,7 @@ enum class PendingStatus(val label: String) {
 @Singleton
 class PendingRepository @Inject constructor(
     private val dao: PendingAnalysisDao,
-    private val scheduler: WorkScheduler,
+    private val processor: PendingProcessor,
 ) {
     fun observe(): Flow<List<PendingAnalysisEntity>> = dao.observeAll()
 
@@ -40,16 +41,28 @@ class PendingRepository @Inject constructor(
                 hint = hint?.takeIf { it.isNotBlank() },
             ),
         )
-        scheduler.enqueuePendingAnalysis()
+        processor.kick()
         return id
     }
 
+    /** Status koneksi untuk keterangan antrian. */
+    val online: StateFlow<Boolean> get() = processor.online
+
+    /** Coba ulang sekarang (jumlah percobaan direset). */
     suspend fun retry(id: Long) {
-        dao.getById(id)?.let { dao.update(it.copy(status = PendingStatus.MENUNGGU.name, lastError = null)) }
-        scheduler.enqueuePendingAnalysis()
+        dao.getById(id)?.let { reset(it) }
+        processor.kick()
     }
 
-    suspend fun retryAll() = scheduler.enqueuePendingAnalysis()
+    suspend fun retryAll() {
+        dao.getProcessable().forEach { reset(it) }
+        processor.kick()
+    }
+
+    private suspend fun reset(item: PendingAnalysisEntity) {
+        if (item.status == PendingStatus.DIPROSES.name) return
+        dao.update(item.copy(status = PendingStatus.MENUNGGU.name, attempts = 0, lastError = null))
+    }
 
     suspend fun get(id: Long) = dao.getById(id)
 

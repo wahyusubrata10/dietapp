@@ -266,8 +266,9 @@ fun HomeScreen(
         if (state.pendingCount > 0) {
             item {
                 Banner(
-                    title = "${state.pendingCount} foto sedang dianalisa",
-                    text = "Hasil tercatat otomatis & muncul notifikasi (saat online). Ketuk untuk melihat antrian.",
+                    title = if (state.pendingFailed > 0) "${state.pendingFailed} foto gagal dianalisa" else "${state.pendingCount} foto sedang dianalisa",
+                    text = if (state.pendingFailed > 0) "Ketuk untuk coba lagi atau isi manual."
+                    else "Hasil tercatat otomatis & muncul notifikasi. Ketuk untuk melihat antrian.",
                     icon = Icons.Filled.CloudQueue,
                     onClick = onOpenQueue,
                 )

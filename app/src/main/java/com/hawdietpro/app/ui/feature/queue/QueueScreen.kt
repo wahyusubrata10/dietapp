@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,6 +40,7 @@ import com.hawdietpro.app.ui.components.EmptyState
 import com.hawdietpro.app.ui.components.HawCard
 import com.hawdietpro.app.ui.components.HawScaffold
 import com.hawdietpro.app.ui.components.MealPhoto
+import com.hawdietpro.app.work.PendingProcessor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -51,13 +54,14 @@ import javax.inject.Inject
 class QueueViewModel @Inject constructor(private val pending: PendingRepository) : ViewModel() {
     val items: StateFlow<List<PendingAnalysisEntity>> = pending.observe()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val online: StateFlow<Boolean> = pending.online
 
     fun retry(id: Long) {
         viewModelScope.launch { pending.retry(id) }
     }
 
     fun retryAll() {
-        viewModelScope.launch { items.value.forEach { pending.retry(it.id) } }
+        viewModelScope.launch { pending.retryAll() }
     }
 
     fun remove(id: Long) {
@@ -73,6 +77,7 @@ fun QueueScreen(
     viewModel: QueueViewModel = hiltViewModel(),
 ) {
     val items by viewModel.items.collectAsStateWithLifecycle()
+    val online by viewModel.online.collectAsStateWithLifecycle()
     HawScaffold(
         title = "Antrian analisa",
         onBack = onBack,
@@ -96,7 +101,8 @@ fun QueueScreen(
         ) {
             item {
                 Text(
-                    "Foto diproses otomatis saat ada internet. Hasilnya langsung tercatat dan bisa diedit.",
+                    if (online) "Foto diproses satu per satu secara otomatis. Hasilnya langsung tercatat dan bisa diedit."
+                    else "Tidak ada internet. Foto akan diproses otomatis begitu tersambung.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -111,18 +117,24 @@ fun QueueScreen(
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) {
                                 Text("${type.label} · ${Format.relativeDay(Instant.ofEpochMilli(item.capturedAt).atZone(ZoneId.systemDefault()).toLocalDate())} ${Format.time(item.capturedAt)}", style = MaterialTheme.typography.titleSmall)
-                                Text(
-                                    status.label + if (item.attempts > 0) " · dicoba ${item.attempts}×" else "",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = if (status == PendingStatus.GAGAL) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    if (status == PendingStatus.DIPROSES) {
+                                        CircularProgressIndicator(Modifier.size(12.dp), strokeWidth = 2.dp)
+                                        Spacer(Modifier.width(6.dp))
+                                    }
+                                    Text(
+                                        statusText(item, status, online),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = if (status == PendingStatus.GAGAL) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
                             }
                         }
                         item.lastError?.let {
                             Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            TextButton(onClick = { viewModel.retry(item.id) }) {
+                            TextButton(onClick = { viewModel.retry(item.id) }, enabled = status != PendingStatus.DIPROSES) {
                                 Icon(Icons.Filled.Refresh, null)
                                 Text(" Coba lagi")
                             }
@@ -143,4 +155,16 @@ fun QueueScreen(
             }
         }
     }
+}
+
+private fun statusText(item: PendingAnalysisEntity, status: PendingStatus, online: Boolean): String {
+    val base = when {
+        status == PendingStatus.DIPROSES -> status.label
+        status == PendingStatus.GAGAL -> "Gagal · ketuk Coba lagi atau Isi manual"
+        item.attempts >= PendingProcessor.MAX_ATTEMPTS -> "Berhenti otomatis · ketuk Coba lagi"
+        !online -> "Menunggu koneksi internet"
+        item.attempts > 0 -> "Akan dicoba lagi otomatis"
+        else -> status.label
+    }
+    return base + if (item.attempts > 0 && status != PendingStatus.DIPROSES) " · dicoba ${item.attempts}×" else ""
 }

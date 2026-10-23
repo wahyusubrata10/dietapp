@@ -7,6 +7,7 @@ import com.hawdietpro.app.core.Notifications
 import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.data.repository.FoodRepository
 import com.hawdietpro.app.di.ApplicationScope
+import com.hawdietpro.app.work.PendingProcessor
 import com.hawdietpro.app.work.WorkScheduler
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +21,7 @@ class HawDietApp : Application(), Configuration.Provider {
     @Inject lateinit var foods: FoodRepository
     @Inject lateinit var scheduler: WorkScheduler
     @Inject lateinit var remoteConfig: RemoteConfigStore
+    @Inject lateinit var pendingProcessor: PendingProcessor
 
     @Inject
     @field:ApplicationScope
@@ -37,6 +39,6 @@ class HawDietApp : Application(), Configuration.Provider {
             runCatching { foods.seedIfNeeded() }
         }
         scheduler.schedulePeriodic(remoteConfig.appConfig.value.updateCheckIntervalHours)
-        scheduler.enqueuePendingAnalysis()
+        pendingProcessor.start()
     }
 }
