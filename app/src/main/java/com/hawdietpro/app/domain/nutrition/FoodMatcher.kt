@@ -2,6 +2,7 @@ package com.hawdietpro.app.domain.nutrition
 
 import com.hawdietpro.app.domain.model.FoodReference
 import com.hawdietpro.app.domain.util.TextNormalizer
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -85,7 +86,9 @@ class FoodMatcher(references: List<FoodReference>) {
         if (key.tokens.isEmpty()) return 0.0
         val common = queryTokens.count { it in key.tokens }
         val dice = 2.0 * common / (queryTokens.size + key.tokens.size)
-        val typo = if (min(normalized.length, key.text.length) >= 5) {
+        val longest = max(normalized.length, key.text.length)
+        // Selisih panjang > 12% tidak mungkin mencapai ambang 0,88 → lewati Levenshtein (hemat waktu di DB besar).
+        val typo = if (min(normalized.length, key.text.length) >= 5 && abs(normalized.length - key.text.length) <= longest * 0.12) {
             val dist = levenshtein(normalized, key.text)
             1.0 - dist.toDouble() / max(normalized.length, key.text.length)
         } else 0.0

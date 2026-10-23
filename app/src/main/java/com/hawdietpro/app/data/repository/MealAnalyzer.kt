@@ -15,6 +15,8 @@ import com.hawdietpro.app.domain.scoring.MealScorer
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -67,7 +69,7 @@ class MealAnalyzer @Inject constructor(
             menuName = result.menuName.ifBlank { "Makanan" },
             photoPath = photoPath,
             confidence = result.confidence.coerceIn(0.0, 1.0),
-            items = toItems(result, matcher),
+            items = withContext(Dispatchers.Default) { toItems(result, matcher) },
             aiNotes = result.notes?.takeIf { it.isNotBlank() },
         )
         return evaluator.evaluate(meal)

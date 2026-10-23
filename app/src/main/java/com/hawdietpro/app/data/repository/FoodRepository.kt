@@ -12,6 +12,8 @@ import com.hawdietpro.app.domain.nutrition.FoodMatcher
 import com.hawdietpro.app.domain.util.TextNormalizer
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -39,7 +41,7 @@ class FoodRepository @Inject constructor(
     }
 
     suspend fun matcher(): FoodMatcher = mutex.withLock {
-        cachedMatcher ?: run {
+        cachedMatcher ?: withContext(Dispatchers.Default) {
             val refs = dao.getAll().map { it.toDomain() }
             cachedRefs = refs.associateBy { it.id }
             FoodMatcher(refs).also { cachedMatcher = it }
@@ -51,7 +53,16 @@ class FoodRepository @Inject constructor(
         return cachedRefs[id] ?: dao.getById(id)?.toDomain()
     }
 
-    suspend fun search(query: String, limit: Int = 30): List<FoodReference> = matcher().search(query, limit)
+    /** Pencocokan nama ke DB di thread latar (DB besar). */
+    suspend fun match(name: String, cookingMethod: String? = null): FoodMatcher.Match? {
+        val m = matcher()
+        return withContext(Dispatchers.Default) { m.match(name, cookingMethod) }
+    }
+
+    suspend fun search(query: String, limit: Int = 30): List<FoodReference> {
+        val m = matcher()
+        return withContext(Dispatchers.Default) { m.search(query, limit) }
+    }
 
     suspend fun all(): List<FoodReference> = dao.getAll().map { it.toDomain() }
 

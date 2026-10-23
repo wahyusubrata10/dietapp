@@ -227,7 +227,7 @@ class MealEditorViewModel @Inject constructor(
         viewModelScope.launch {
             val item = _state.value.meal.items.getOrNull(index) ?: return@launch
             val renamed = item.copy(name = name.trim())
-            val match = foods.matcher().match(renamed.name, renamed.cookingMethod)
+            val match = foods.match(renamed.name, renamed.cookingMethod)
             val updated = when {
                 match != null -> NutritionCalculator.applyReference(renamed, match.reference)
                 item.source == NutritionSource.DB -> renamed.copy(source = NutritionSource.MANUAL, foodRefId = null)
@@ -262,7 +262,7 @@ class MealEditorViewModel @Inject constructor(
             val newName = name.trim().ifBlank { item.name }
             if (newName != item.name) {
                 val renamed = item.copy(name = newName)
-                val match = foods.matcher().match(renamed.name, renamed.cookingMethod)
+                val match = foods.match(renamed.name, renamed.cookingMethod)
                 item = when {
                     match != null -> NutritionCalculator.applyReference(renamed, match.reference)
                     item.source == NutritionSource.DB -> renamed.copy(source = NutritionSource.MANUAL, foodRefId = null)

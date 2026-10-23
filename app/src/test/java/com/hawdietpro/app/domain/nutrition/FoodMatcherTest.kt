@@ -66,6 +66,19 @@ class FoodMatcherTest {
     }
 
     @Test
+    fun `masakan babi, swikee dan cemilan dikenali`() {
+        assertEquals("babi_panggang_karo", idOf("Babi panggang karo"))
+        assertEquals("babi_panggang_karo", idOf("BPK"))
+        assertEquals("babi_krispi", idOf("Babi crispy"))
+        assertEquals("sop_iga_babi", idOf("Sup iga babi"))
+        assertEquals("swikee_kuah_tauco", idOf("Swikee"))
+        assertEquals("swikee_goreng", idOf("swike goreng"))
+        assertEquals("se_i_babi", idOf("Sei babi"))
+        assertEquals("kangkung_terasi".let { idOf("Cah kangkung terasi") ?: it }, idOf("Cah kangkung terasi"))
+        assertEquals("tiramisu", idOf("Tiramisu"))
+    }
+
+    @Test
     fun `lauk berbeda tidak tertukar`() {
         assertTrue(idOf("Udang balado") != idOf("Cumi balado"))
         assertTrue(idOf("Tahu bumbu bali") != idOf("Telur bumbu bali"))

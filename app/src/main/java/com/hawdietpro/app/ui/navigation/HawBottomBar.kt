@@ -128,7 +128,7 @@ fun QuickAddSheet(onDismiss: () -> Unit, onAction: (QuickAction) -> Unit) {
             ActionRow(Icons.Filled.PhotoLibrary, MaterialTheme.colorScheme.tertiary, "Pilih dari galeri", "Analisa foto yang sudah ada") { onAction(QuickAction.GALLERY) }
             ActionRow(Icons.Filled.QrCodeScanner, MaterialTheme.colorScheme.primary, "Scan barcode", "Produk kemasan: gizi dari label / Open Food Facts") { onAction(QuickAction.BARCODE) }
             ActionRow(Icons.Filled.Replay, MaterialTheme.colorScheme.secondary, "Makan lagi", "Favorit & menu terakhir, 1 ketukan") { onAction(QuickAction.RELOG) }
-            ActionRow(Icons.Filled.EditNote, MacroColors.Carbs, "Input manual", "Cari dari ±1.750 makanan & produk") { onAction(QuickAction.MANUAL) }
+            ActionRow(Icons.Filled.EditNote, MacroColors.Carbs, "Input manual", "Cari dari ±3.500 makanan & produk") { onAction(QuickAction.MANUAL) }
             ActionRow(Icons.AutoMirrored.Filled.DirectionsRun, MaterialTheme.colorScheme.tertiary, "Catat olahraga", "Kalori terbakar menambah jatah makan") { onAction(QuickAction.EXERCISE) }
             ActionRow(Icons.Filled.MonitorWeight, MacroColors.Protein, "Catat berat badan", "Timbang & lihat tren") { onAction(QuickAction.WEIGHT) }
         }
