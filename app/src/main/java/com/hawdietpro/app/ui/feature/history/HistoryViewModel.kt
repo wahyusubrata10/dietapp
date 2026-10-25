@@ -2,6 +2,7 @@ package com.hawdietpro.app.ui.feature.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hawdietpro.app.data.repository.ExerciseRepository
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.ProfileRepository
 import com.hawdietpro.app.domain.model.Grade
@@ -53,14 +54,19 @@ data class HistoryUi(
     val selectedDate: LocalDate = LocalDate.now(),
     val selectedMeals: List<Meal> = emptyList(),
     val targetCalories: Int? = null,
+    /** Kalori olahraga per hari: jatah hari itu = target + olahraga (sama seperti Beranda). */
+    val exerciseByDay: Map<LocalDate, Double> = emptyMap(),
     val loading: Boolean = true,
-)
+) {
+    fun budgetFor(date: LocalDate): Int? = targetCalories?.let { it + (exerciseByDay[date] ?: 0.0).toInt() }
+}
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val meals: MealRepository,
     profiles: ProfileRepository,
+    exercises: ExerciseRepository,
 ) : ViewModel() {
 
     private val mode = MutableStateFlow(HistoryMode.TIMELINE)
@@ -92,7 +98,8 @@ class HistoryViewModel @Inject constructor(
         timeline,
         monthData,
         profiles.observeTarget(),
-    ) { p, groups, monthMeals, target ->
+        exercises.observeDailyTotals(),
+    ) { p, groups, monthMeals, target, burned ->
         val filteredMonth = p.filters.apply(monthMeals)
         val byDay = filteredMonth.groupBy { Instant.ofEpochMilli(it.eatenAt).atZone(zone).toLocalDate() }
         HistoryUi(
@@ -105,6 +112,7 @@ class HistoryViewModel @Inject constructor(
             selectedDate = p.selected,
             selectedMeals = byDay[p.selected].orEmpty().sortedBy { it.eatenAt },
             targetCalories = target?.calories,
+            exerciseByDay = burned,
             loading = false,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HistoryUi())

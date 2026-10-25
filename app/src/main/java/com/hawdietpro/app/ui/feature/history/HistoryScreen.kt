@@ -117,7 +117,7 @@ fun HistoryScreen(
                     }
                 }
                 items(state.groups, key = { it.date.toEpochDay() }) { group ->
-                    DayCard(group, state.targetCalories, onOpenMeal)
+                    DayCard(group, state.budgetFor(group.date), onOpenMeal)
                 }
                 if (state.filters.query.isBlank() && state.groups.isNotEmpty()) {
                     item {
@@ -268,7 +268,7 @@ private fun CalendarCard(state: HistoryUi, viewModel: HistoryViewModel) {
                                 DayCell(
                                     date = date,
                                     calories = state.dayCalories[date],
-                                    target = state.targetCalories,
+                                    target = state.budgetFor(date),
                                     selected = date == state.selectedDate,
                                     isToday = date == today,
                                     onClick = { viewModel.select(date) },

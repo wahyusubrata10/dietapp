@@ -41,7 +41,8 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 
 /** Satu hari di strip tanggal Beranda. */
-data class DayChip(val date: LocalDate, val calories: Double)
+/** [exercise] = kalori olahraga hari itu, menambah jatah seperti di kartu utama. */
+data class DayChip(val date: LocalDate, val calories: Double, val exercise: Double = 0.0)
 
 data class HomeState(
     val loading: Boolean = true,
@@ -91,12 +92,14 @@ class HomeViewModel @Inject constructor(
 
     /** Strip 14 hari terakhir (kalori per hari). */
     private val strip = today.flatMapLatest { t ->
-        meals.observeRange(t.minusDays(STRIP_DAYS - 1L), t).map { list ->
+        val start = t.minusDays(STRIP_DAYS - 1L)
+        combine(meals.observeRange(start, t), exercises.observeRange(start, t)) { list, ex ->
             val zone = ZoneId.systemDefault()
             val byDay = list.groupBy { Instant.ofEpochMilli(it.eatenAt).atZone(zone).toLocalDate() }
+            val burned = ExerciseRepository.dailyTotals(ex)
             (0 until STRIP_DAYS).map { i ->
                 val d = t.minusDays((STRIP_DAYS - 1 - i).toLong())
-                DayChip(d, byDay[d].orEmpty().sumOf { it.total.calories })
+                DayChip(d, byDay[d].orEmpty().sumOf { it.total.calories }, burned[d] ?: 0.0)
             }
         }
     }

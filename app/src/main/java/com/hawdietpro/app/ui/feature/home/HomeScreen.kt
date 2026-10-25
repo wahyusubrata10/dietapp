@@ -376,7 +376,9 @@ private fun DayItem(day: DayChip, selected: Boolean, target: Int?, onClick: () -
     val bg by animateColorAsState(if (selected) primary else HawTheme.colors.card, label = "dayBg")
     val fg = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
     val sub = if (selected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
-    val ratio = if (target != null && target > 0) (day.calories / target).toFloat() else if (day.calories > 0) 1f else 0f
+    // Sama dengan kartu utama: jatah = target + kalori olahraga hari itu.
+    val budget = target?.let { it + day.exercise }
+    val ratio = if (budget != null && budget > 0) (day.calories / budget).toFloat() else if (day.calories > 0) 1f else 0f
     val ringColor = when {
         ratio > 1.1f -> if (selected) Color.White else MaterialTheme.colorScheme.error
         else -> if (selected) Color.White else primary
