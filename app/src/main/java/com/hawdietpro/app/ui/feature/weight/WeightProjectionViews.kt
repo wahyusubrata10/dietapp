@@ -105,7 +105,7 @@ fun WeightProjectionSection(p: WeightProjection) {
                 sub = "kkal sejak ${Format.dayMonth(p.startDate)}",
             )
             StatTile(
-                "Rata-rata 14 hari",
+                "Rata-rata ${minOf(p.countedDays, 14)} hari",
                 p.recentDailyBalance?.let { (if (it > 0) "+" else "") + Format.grouped(it.roundToInt()) } ?: "-",
                 Modifier.weight(1f),
                 sub = "kkal/hari",
@@ -231,6 +231,11 @@ private fun ProjectionText(p: WeightProjection) {
                     append(" Target ${Format.kg(p.targetWeight)} diperkirakan tercapai sekitar ${Format.shortDate(p.targetDate)}.")
                 p.targetWeight != null ->
                     append(" Dengan pola saat ini, berat belum bergerak ke arah target ${Format.kg(p.targetWeight)}.")
+            }
+            // Penurunan > 1% berat badan/minggu berisiko mengurangi massa otot & sulit dipertahankan.
+            val safeMax = p.estimatedToday * 0.01
+            if (-perWeek > safeMax) {
+                append(" Catatan: laju ini lebih cepat dari batas yang umum dianjurkan (maks ±${Format.oneDecimal(safeMax)} kg/minggu untuk berat Anda); pastikan protein cukup agar otot tidak ikut hilang.")
             }
         }
     }

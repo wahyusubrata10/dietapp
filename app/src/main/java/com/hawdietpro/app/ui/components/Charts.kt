@@ -152,15 +152,25 @@ private fun DrawScope.drawXLabels(
     style: ChartStyle,
 ) {
     if (labels.isEmpty()) return
-    val maxLabels = max(1, (plot.width / 34.dp.toPx()).toInt())
-    val every = max(1, ceil(labels.size / maxLabels.toDouble()).toInt())
-    labels.forEachIndexed { i, label ->
-        if (i % every != 0 && i != labels.lastIndex) return@forEachIndexed
-        if (i == labels.lastIndex && i % every != 0 && labels.size - 1 - (i / every) * every < every / 2) return@forEachIndexed
-        val layout = measurer.measure(label, style.label)
-        val x = (xOf(i) - layout.size.width / 2f).coerceIn(plot.left - 8f, size.width - layout.size.width.toFloat())
+    val gap = 6.dp.toPx()
+    fun left(i: Int, width: Int) = (xOf(i) - width / 2f).coerceIn(plot.left - 8f, size.width - width.toFloat())
+    // Jarak antar label dari lebar label sebenarnya, agar tidak saling menimpa (mis. "13 Okt18 Okt").
+    val widest = max(measurer.measure(labels.first(), style.label).size.width, measurer.measure(labels.last(), style.label).size.width)
+    val step = if (labels.size > 1) (xOf(labels.lastIndex) - xOf(0)) / labels.lastIndex else Float.MAX_VALUE
+    val every = max(1, ceil((widest + gap) / step.coerceAtLeast(1f)).toInt())
+    val lastLayout = measurer.measure(labels.last(), style.label)
+    val lastLeft = left(labels.lastIndex, lastLayout.size.width)
+    var prevRight = Float.NEGATIVE_INFINITY
+    for (i in labels.indices step every) {
+        if (i == labels.lastIndex) break
+        val layout = measurer.measure(labels[i], style.label)
+        val x = left(i, layout.size.width)
+        // Label terakhir selalu tampil; label lain yang terlalu dekat dengannya dilewati.
+        if (x < prevRight + gap || x + layout.size.width > lastLeft - gap) continue
         drawText(layout, topLeft = Offset(x, plot.bottom + 6f))
+        prevRight = x + layout.size.width
     }
+    if (lastLeft >= prevRight + gap || labels.size == 1) drawText(lastLayout, topLeft = Offset(lastLeft, plot.bottom + 6f))
 }
 
 private fun DrawScope.drawTooltip(text: String, anchor: Offset, measurer: TextMeasurer, style: ChartStyle) {
