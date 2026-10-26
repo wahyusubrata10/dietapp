@@ -39,6 +39,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
+import java.io.BufferedInputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -134,26 +135,32 @@ class BackupRepository @Inject constructor(
 
     /** [replaceAll] = hapus semua catatan lama dulu; false = gabungkan (catatan identik dilewati). */
     suspend fun importZip(source: Uri, replaceAll: Boolean): ImportResult = withContext(Dispatchers.IO) {
-        var backup: BackupFile? = null
-        val photoMap = mutableMapOf<String, String>()
+        val found = ScanResult()
         val input = context.contentResolver.openInputStream(source) ?: error("Tidak bisa membuka file")
-        ZipInputStream(input.buffered()).use { zip ->
-            while (true) {
-                val entry = zip.nextEntry ?: break
-                when {
-                    entry.name == JSON_NAME -> backup = json.decodeFromString(BackupFile.serializer(), zip.readBytes().decodeToString())
-                    entry.name.startsWith("photos/") && !entry.isDirectory -> {
-                        val original = entry.name.substringAfterLast('/')
-                        // Nama file dibuat baru agar aman (tidak ada path traversal).
-                        val dest = File(images.photoDir, "imp_${UUID.randomUUID().toString().take(8)}_${original.filter { it.isLetterOrDigit() || it == '.' || it == '_' }}")
-                        dest.outputStream().use { zip.copyTo(it) }
-                        photoMap[original] = dest.path
-                    }
+        BufferedInputStream(input).use { stream ->
+            stream.mark(4)
+            val head = ByteArray(2).also { stream.read(it) }
+            stream.reset()
+            when {
+                // ZIP ("PK"): normal, atau ZIP yang dibungkus lagi (mis. unduhan Google Drive / dikompres ulang).
+                head[0] == 'P'.code.toByte() && head[1] == 'K'.code.toByte() -> try {
+                    scanZip(ZipInputStream(stream), found, depth = 0)
+                } catch (e: java.io.IOException) {
+                    // ZIP rusak/terpotong di bagian akhir: data tetap dipulihkan bila backup.json sudah terbaca.
+                    if (found.backup == null) throw IllegalStateException("File ZIP rusak atau tidak lengkap (${e.message}). Coba kirim ulang file backup-nya.")
                 }
-                zip.closeEntry()
+                // File backup.json yang sudah diekstrak: data pulih, tanpa foto.
+                else -> found.backup = runCatching { json.decodeFromString(BackupFile.serializer(), stream.readBytes().decodeToString()) }.getOrNull()
             }
         }
-        val data = backup ?: error("File bukan backup Haw Diet Pro (backup.json tidak ada)")
+        val backup = found.backup
+        val photoMap = found.photos
+        if (backup == null) {
+            photoMap.values.forEach { File(it).delete() }
+            val sample = found.entryNames.take(4).joinToString().ifBlank { "kosong / bukan ZIP" }
+            error("File bukan backup Haw Diet Pro (backup.json tidak ditemukan). Isi file: $sample")
+        }
+        val data: BackupFile = backup
 
         var mealCount = 0
         var exerciseCount = 0
@@ -239,6 +246,39 @@ class BackupRepository @Inject constructor(
         val used = meals.getAllPhotoPaths().toSet()
         photoMap.values.filter { it !in used }.forEach { File(it).delete() }
         ImportResult(mealCount, data.weights.size, photoMap.size, exerciseCount)
+    }
+
+    private class ScanResult {
+        var backup: BackupFile? = null
+        val photos = mutableMapOf<String, String>()
+        val entryNames = mutableListOf<String>()
+    }
+
+    /**
+     * Mencari backup.json & foto di mana pun di dalam ZIP (boleh di dalam folder), termasuk ZIP di dalam ZIP
+     * (mis. unduhan Google Drive yang membungkus file, atau folder yang dikompres ulang oleh pengelola file).
+     */
+    private fun scanZip(zip: ZipInputStream, found: ScanResult, depth: Int) {
+        while (true) {
+            val entry = zip.nextEntry ?: break
+            val name = entry.name.replace('\\', '/')
+            if (found.entryNames.size < 20) found.entryNames += name
+            val base = name.substringAfterLast('/')
+            when {
+                entry.isDirectory -> Unit
+                base == JSON_NAME && found.backup == null ->
+                    found.backup = json.decodeFromString(BackupFile.serializer(), zip.readBytes().decodeToString())
+                (name.startsWith("photos/") || name.contains("/photos/")) && base.isNotBlank() -> {
+                    // Nama file dibuat baru agar aman (tidak ada path traversal).
+                    val dest = File(images.photoDir, "imp_${UUID.randomUUID().toString().take(8)}_${base.filter { it.isLetterOrDigit() || it == '.' || it == '_' }}")
+                    dest.outputStream().use { zip.copyTo(it) }
+                    found.photos[base] = dest.path
+                }
+                // ZIP di dalam ZIP: stream bersarang sengaja tidak ditutup agar ZIP luar tetap terbaca.
+                base.endsWith(".zip", ignoreCase = true) && depth < 2 -> scanZip(ZipInputStream(zip), found, depth + 1)
+            }
+            zip.closeEntry()
+        }
     }
 
     /** CSV per elemen makanan; pemisah ";" & desimal koma agar langsung rapi di Excel Indonesia. */
