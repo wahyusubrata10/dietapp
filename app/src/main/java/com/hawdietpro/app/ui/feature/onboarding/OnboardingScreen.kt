@@ -125,7 +125,7 @@ fun OnboardingScreen(
                     0 -> {
                         Welcome()
                         RestoreCard(restore) {
-                            pickBackup.launch(arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed"))
+                            pickBackup.launch(arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed", "application/json"))
                         }
                     }
                     1 -> StepPage("Kenalan dulu", "Data ini dipakai untuk menghitung kebutuhan kalori Anda. Semua tersimpan hanya di HP ini.") {

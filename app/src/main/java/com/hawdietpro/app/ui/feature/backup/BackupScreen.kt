@@ -109,7 +109,7 @@ fun BackupScreen(onBack: () -> Unit, showMessage: (String) -> Unit, viewModel: B
                 "Pulihkan dari backup",
                 "Pilih file ZIP hasil backup Haw Diet Pro.",
             ) {
-                OutlinedButton(onClick = { importZip.launch(arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed")) }, enabled = !busy) {
+                OutlinedButton(onClick = { importZip.launch(arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed", "application/json")) }, enabled = !busy) {
                     Text("Pilih file backup")
                 }
             }
