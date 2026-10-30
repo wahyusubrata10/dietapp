@@ -86,4 +86,5 @@ jobs:
 
       - name: Ringkasan error
         if: failure()
-        run: grep -E "^e: |Error:|FAILED|What went wrong|Lint found" "$RUNNER_TEMP/release.log" | head -80
+        run: |
+          grep -E "^e: |Error:|FAILED|What went wrong|Lint found" "$RUNNER_TEMP/release.log" | head -80
