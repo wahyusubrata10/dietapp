@@ -32,6 +32,10 @@ object Routes {
     const val ACHIEVEMENTS = "pencapaian"
     const val AI_LOG = "riwayat-ai"
     const val BARCODE = "scan-barcode"
+    const val WRAP = "rekap?week={week}"
+
+    /** [weekStart] = Senin minggu yang direkap; null = minggu lalu. */
+    fun wrap(weekStart: java.time.LocalDate? = null) = "rekap?week=${weekStart?.toEpochDay() ?: ""}"
 
     fun camera(type: MealType? = null, openGallery: Boolean = false) =
         "kamera?type=${type?.name.orEmpty()}&gallery=${if (openGallery) "1" else ""}"

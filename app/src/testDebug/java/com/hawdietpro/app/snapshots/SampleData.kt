@@ -112,4 +112,35 @@ object SampleData {
             adaptive = AdaptiveTdeeEstimator.estimate(profile, today, emptyMap(), emptyList()),
         )
     }
+
+    /** Data minggu lalu untuk rekap (rentang 7 hari dengan pola realistis). */
+    fun wrap(): com.hawdietpro.app.domain.insight.WeeklyWrap {
+        val start = com.hawdietpro.app.domain.insight.WeeklyWrapCalculator.lastWeekStart(today)
+        val names = listOf("Nasi uduk telur balado", "Ayam suwir bumbu Bali", "Pecel lele", "Ayam suwir bumbu Bali", "Gado-gado", "Soto ayam", "Ayam suwir bumbu Bali")
+        val weekMeals = (0 until 6).flatMap { i ->
+            val d = start.plusDays(i.toLong())
+            val t = d.atTime(12, 0).atZone(zone).toInstant().toEpochMilli()
+            listOf(
+                Meal(id = 100L + i, eatenAt = t, mealType = MealType.MAKAN_SIANG, menuName = names[i], photoPath = "x.jpg", confidence = 0.8,
+                    items = listOf(item(names[i], 300.0, 1250.0 + i * 140, 70.0 + i * 5, 150.0, 40.0, 14.0)), grade = if (i % 2 == 0) Grade.B else Grade.C),
+            )
+        }
+        val ws = listOf(WeightEntry(10, start.toEpochDay(), 88.6), WeightEntry(11, start.plusDays(6).toEpochDay(), 87.6))
+        return com.hawdietpro.app.domain.insight.WeeklyWrapCalculator.compute(
+            start, weekMeals, { 1900 }, 2600, mapOf(start.plusDays(1) to 300.0, start.plusDays(3) to 250.0), ws, 140, zone,
+        )
+    }
+
+    /** Statistik mingguan contoh untuk ringkasan Analisa. */
+    fun weekStats(): com.hawdietpro.app.domain.insight.PeriodStats {
+        val calc = com.hawdietpro.app.domain.insight.PeriodStatsCalculator(com.hawdietpro.app.domain.config.InsightRulesFile(version = 1), zone)
+        val start = today.minusDays(6)
+        val list = (0 until 7).filter { it != 2 }.map { i ->
+            val d = start.plusDays(i.toLong())
+            Meal(id = 200L + i, eatenAt = d.atTime(13, 0).atZone(zone).toInstant().toEpochMilli(), mealType = MealType.MAKAN_SIANG,
+                menuName = if (i % 2 == 0) "Ayam suwir bumbu Bali" else "Pecel lele", photoPath = null, confidence = 0.8,
+                items = listOf(item("Menu", 300.0, listOf(1700.0, 2300.0, 0.0, 1900.0, 1500.0, 2000.0, 1850.0)[i], 80.0, 200.0, 50.0, 12.0)))
+        }
+        return calc.compute(list, start, today, 1900)
+    }
 }

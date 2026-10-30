@@ -77,6 +77,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -160,6 +161,7 @@ data class HomeActions(
     val onOpenProfile: () -> Unit = {},
     val onOpenAchievements: () -> Unit = {},
     val onDismissAnnouncement: (String) -> Unit = {},
+    val onOpenWrap: (LocalDate) -> Unit = {},
 )
 
 @Composable
@@ -175,6 +177,7 @@ fun HomeScreen(
     onOpenProfile: () -> Unit,
     onOpenAchievements: () -> Unit,
     onOpenBarcode: () -> Unit = {},
+    onOpenWrap: (LocalDate) -> Unit = {},
     showMessage: (String) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -233,6 +236,7 @@ fun HomeScreen(
             onOpenProfile = onOpenProfile,
             onOpenAchievements = onOpenAchievements,
             onDismissAnnouncement = mainViewModel::dismissAnnouncement,
+            onOpenWrap = onOpenWrap,
         ),
     )
 }
@@ -457,6 +461,9 @@ private fun androidx.compose.foundation.lazy.LazyListScope.noticeItems(
             )
         }
     }
+    state.wrapWeek?.let { week ->
+        item(key = "wrap") { WrapTeaser(week) { actions.onOpenWrap(week) } }
+    }
     if (state.newAchievements.isNotEmpty()) {
         item(key = "badges") {
             val fresh = state.newAchievements
@@ -479,6 +486,32 @@ private fun androidx.compose.foundation.lazy.LazyListScope.noticeItems(
                 onClick = actions.onOpenQueue,
             )
         }
+    }
+}
+
+/** Ajakan membuka rekap minggu lalu (gradasi mencolok agar terlihat istimewa). */
+@Composable
+private fun WrapTeaser(week: LocalDate, onClick: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(22.dp))
+            .background(Brush.linearGradient(listOf(Color(0xFF3F3FC2), Color(0xFFC0306E), Color(0xFFFF9E4F))))
+            .bouncyClick(onClick = onClick)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text("✨", style = MaterialTheme.typography.headlineSmall)
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text("Rekap minggumu sudah siap!", style = MaterialTheme.typography.titleSmall, color = Color.White, fontWeight = FontWeight.Bold)
+            Text(
+                "${Format.dayMonth(week)} – ${Format.dayMonth(week.plusDays(6))} · ketuk untuk melihat",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.85f),
+            )
+        }
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = Color.White)
     }
 }
 
@@ -525,7 +558,7 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit, modifier: Modifier
                 size = 232.dp,
                 stroke = 18.dp,
                 track = hc.heroTrack,
-                fill = Brush.linearGradient(listOf(Color(0xFFB8FFE2), Color.White)),
+                fill = Brush.linearGradient(listOf(lerp(MaterialTheme.colorScheme.primary, Color.White, 0.7f), Color.White)),
                 bonusColor = Color(0xFFB9C2FF),
                 overColor = Color(0xFFFFB4A6),
                 modifier = Modifier.padding(top = 4.dp),

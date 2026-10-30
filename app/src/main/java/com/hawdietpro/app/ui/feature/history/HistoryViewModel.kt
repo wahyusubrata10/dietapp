@@ -26,7 +26,7 @@ import java.time.YearMonth
 import java.time.ZoneId
 import javax.inject.Inject
 
-enum class HistoryMode { TIMELINE, CALENDAR }
+enum class HistoryMode(val label: String) { TIMELINE("Timeline"), CALENDAR("Kalender"), GALLERY("Galeri") }
 
 data class DayGroup(val date: LocalDate, val meals: List<Meal>) {
     val calories: Double get() = meals.sumOf { it.total.calories }

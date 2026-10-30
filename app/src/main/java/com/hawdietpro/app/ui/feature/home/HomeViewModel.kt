@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.data.prefs.SecureStorage
 import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.data.repository.AchievementRepository
+import com.hawdietpro.app.data.prefs.AppPreferences
 import com.hawdietpro.app.data.repository.EnergyRepository
+import com.hawdietpro.app.domain.insight.WeeklyWrapCalculator
 import com.hawdietpro.app.data.repository.ExerciseRepository
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.PendingRepository
@@ -71,6 +73,8 @@ data class HomeState(
     val adaptive: AdaptiveTdee? = null,
     /** Hari berturut-turut dengan catatan makan (sampai hari ini/kemarin). */
     val streak: Int = 0,
+    /** Senin minggu lalu bila rekapnya siap & belum dilihat. */
+    val wrapWeek: LocalDate? = null,
 ) {
     val exerciseKcal: Double get() = exercises.sumOf { it.calories }
     /** Jatah kalori hari itu = target + kalori olahraga. */
@@ -91,6 +95,7 @@ class HomeViewModel @Inject constructor(
     achievements: AchievementRepository,
     exercises: ExerciseRepository,
     energy: EnergyRepository,
+    prefs: AppPreferences,
 ) : ViewModel() {
 
     private val today = MutableStateFlow(LocalDate.now())
@@ -143,12 +148,22 @@ class HomeViewModel @Inject constructor(
 
     val state: StateFlow<HomeState> = combine(
         base,
-        combine(projections.observe(), energy.observeAdaptive(), energy.observeDailyIntake()) { p, a, intake -> Triple(p, a, streakOf(intake.keys)) },
+        combine(projections.observe(), energy.observeAdaptive(), energy.observeDailyIntake(), prefs.settings, today) { p, a, intake, settings, t ->
+            Extras(p, a, streakOf(intake.keys, t), wrapWeekToShow(intake.keys, settings.lastWrapWeek, t))
+        },
         strip,
         previousDay,
         achievements.observeNew(),
-    ) { home, (proj, adaptive, streak), days, prev, fresh ->
-        home.copy(projection = proj, adaptive = adaptive, streak = streak, days = days, previousDayByType = prev, newAchievements = fresh)
+    ) { home, extras, days, prev, fresh ->
+        home.copy(
+            projection = extras.projection,
+            adaptive = extras.adaptive,
+            streak = extras.streak,
+            wrapWeek = extras.wrapWeek,
+            days = days,
+            previousDayByType = prev,
+            newAchievements = fresh,
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState())
 
     /** Salin semua makan [type] dari hari sebelumnya ke hari yang sedang dilihat (jam sama). */
@@ -178,8 +193,17 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private data class Extras(val projection: WeightProjection?, val adaptive: AdaptiveTdee?, val streak: Int, val wrapWeek: LocalDate?)
+
     companion object {
         private const val STRIP_DAYS = 14
+
+        /** Rekap minggu lalu ditawarkan bila belum dilihat & minggu itu ada catatan. */
+        fun wrapWeekToShow(days: Set<LocalDate>, lastSeenWeek: Long, today: LocalDate): LocalDate? {
+            val start = WeeklyWrapCalculator.lastWeekStart(today)
+            if (lastSeenWeek >= start.toEpochDay()) return null
+            return start.takeIf { s -> (0L until 7L).any { s.plusDays(it) in days } }
+        }
 
         /** Jumlah hari berturut-turut yang punya catatan, dihitung mundur dari hari ini (atau kemarin bila hari ini belum). */
         fun streakOf(days: Set<LocalDate>, today: LocalDate = LocalDate.now()): Int {

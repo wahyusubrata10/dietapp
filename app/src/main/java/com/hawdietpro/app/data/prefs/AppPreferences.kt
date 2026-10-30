@@ -35,7 +35,7 @@ enum class AccentColor(val label: String, val light: Long, val dark: Long) {
     OCEAN("Biru", 0xFF1F6FE0, 0xFF8AB8FF),
     GRAPE("Ungu", 0xFF6E49E0, 0xFFB7A2FF),
     SUNSET("Oranye", 0xFFDB5A12, 0xFFFFAA72),
-    ROSE("Merah muda", 0xFFD0336C, 0xFFFF92B8);
+    ROSE("Pink", 0xFFD0336C, 0xFFFF92B8);
 
     companion object {
         fun parse(value: String?) = entries.firstOrNull { it.name == value } ?: EMERALD

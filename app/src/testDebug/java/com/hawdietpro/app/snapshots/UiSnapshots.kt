@@ -127,4 +127,17 @@ class UiSnapshots {
             AppearanceCard(Settings(themeMode = ThemeMode.DARK, accent = AccentColor.SUNSET), {}, {}, {}, {})
         }
     }
+
+    @Test
+    fun wrap_page1() = snap("wrap_page1") { com.hawdietpro.app.ui.feature.wrap.WrapContent(SampleData.wrap(), onClose = {}, initialPage = 1) }
+
+    @Test
+    fun wrap_page3() = snap("wrap_page3") { com.hawdietpro.app.ui.feature.wrap.WrapContent(SampleData.wrap(), onClose = {}, initialPage = 3) }
+
+    @Test
+    fun analytics_summary_dark() = snap("analytics_summary_dark") {
+        androidx.compose.foundation.layout.Column(Modifier.padding(16.dp)) {
+            com.hawdietpro.app.ui.feature.analytics.SummaryTiles(SampleData.weekStats(), null, 1900)
+        }
+    }
 }

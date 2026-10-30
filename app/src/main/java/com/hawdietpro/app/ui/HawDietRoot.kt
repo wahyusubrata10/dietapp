@@ -54,6 +54,7 @@ import com.hawdietpro.app.ui.feature.settings.AiLogScreen
 import com.hawdietpro.app.ui.feature.settings.SettingsScreen
 import com.hawdietpro.app.ui.feature.update.UpdateScreen
 import com.hawdietpro.app.ui.feature.weight.WeightScreen
+import com.hawdietpro.app.ui.feature.wrap.WrapScreen
 import com.hawdietpro.app.ui.navigation.HawBottomBar
 import com.hawdietpro.app.ui.navigation.QuickAction
 import com.hawdietpro.app.ui.navigation.QuickAddSheet
@@ -197,6 +198,7 @@ private fun MainScaffold(
                         onOpenProfile = { navController.navigateTopLevel(Routes.PROFILE) },
                         onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
                         onOpenBarcode = { navController.navigate(Routes.BARCODE) },
+                        onOpenWrap = { week -> navController.navigate(Routes.wrap(week)) },
                         showMessage = showMessage,
                     )
                 }
@@ -207,7 +209,10 @@ private fun MainScaffold(
                     )
                 }
                 composable(Routes.ANALYTICS) {
-                    AnalyticsScreen(onOpenWeight = { navController.navigate(Routes.WEIGHT) })
+                    AnalyticsScreen(
+                        onOpenWeight = { navController.navigate(Routes.WEIGHT) },
+                        onOpenWrap = { navController.navigate(Routes.wrap()) },
+                    )
                 }
                 composable(Routes.PROFILE) {
                     ProfileScreen(
@@ -295,6 +300,10 @@ private fun MainScaffold(
                         },
                     )
                 }
+                composable(
+                    Routes.WRAP,
+                    arguments = listOf(navArgument("week") { type = NavType.StringType; nullable = true; defaultValue = null }),
+                ) { WrapScreen(onClose = { navController.popBackStack() }) }
                 composable(Routes.BACKUP) { BackupScreen(onBack = { navController.popBackStack() }, showMessage = showMessage) }
             }
         }

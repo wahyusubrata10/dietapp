@@ -1,5 +1,12 @@
 package com.hawdietpro.app.ui.feature.history
 
+import com.hawdietpro.app.domain.nutrition.DayStatus
+import com.hawdietpro.app.ui.components.color
+import com.hawdietpro.app.ui.components.onColor
+import com.hawdietpro.app.ui.components.GradeBadge
+import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.ui.unit.sp
+import kotlin.math.roundToInt
 import com.hawdietpro.app.ui.components.hawSegmentedColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -89,14 +96,16 @@ fun HistoryScreen(
         ) {
             item {
                 PillTabs(
-                    listOf("Timeline", "Kalender"),
-                    if (state.mode == HistoryMode.TIMELINE) 0 else 1,
-                    { viewModel.setMode(if (it == 0) HistoryMode.TIMELINE else HistoryMode.CALENDAR) },
+                    HistoryMode.entries.map { it.label },
+                    HistoryMode.entries.indexOf(state.mode),
+                    { viewModel.setMode(HistoryMode.entries[it]) },
                 )
             }
             item { Filters(state, viewModel) }
 
-            if (state.mode == HistoryMode.TIMELINE) {
+            if (state.mode == HistoryMode.GALLERY) {
+                galleryItems(state, onOpenMeal, viewModel)
+            } else if (state.mode == HistoryMode.TIMELINE) {
                 if (state.groups.isEmpty()) {
                     item {
                         EmptyState(
@@ -216,8 +225,19 @@ private fun DayCard(group: DayGroup, target: Int?, onOpenMeal: (Long) -> Unit) {
 private fun CalendarCard(state: HistoryUi, viewModel: HistoryViewModel) {
     val month = state.month
     val today = LocalDate.now()
+    val statuses = (1..month.lengthOfMonth()).map { month.atDay(it) }
+        .filter { !it.isAfter(today) }
+        .map { DayStatus.of(state.dayCalories[it], state.budgetFor(it)) }
+    val logged = statuses.count { it != DayStatus.KOSONG }
     HawCard {
         Column {
+            // Ringkasan bulan.
+            Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                MonthStat("Tercatat", "$logged hari", MaterialTheme.colorScheme.onSurface, Modifier.weight(1f))
+                MonthStat("Sesuai", "${statuses.count { it == DayStatus.SESUAI }}", DayStatus.SESUAI.color(), Modifier.weight(1f))
+                MonthStat("Kurang", "${statuses.count { it == DayStatus.KURANG }}", DayStatus.KURANG.color(), Modifier.weight(1f))
+                MonthStat("Lebih", "${statuses.count { it == DayStatus.LEBIH }}", DayStatus.LEBIH.color(), Modifier.weight(1f))
+            }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { viewModel.setMonth(month.minusMonths(1)) }) {
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Bulan sebelumnya")
@@ -270,9 +290,9 @@ private fun CalendarCard(state: HistoryUi, viewModel: HistoryViewModel) {
             }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Legend(MaterialTheme.colorScheme.primary, "Sesuai target")
-                Legend(MaterialTheme.colorScheme.error, "Lebih")
-                Legend(MaterialTheme.colorScheme.tertiary, "Kurang")
+                Legend(DayStatus.SESUAI.color(), "Sesuai (±10%)")
+                Legend(DayStatus.KURANG.color(), "Kurang")
+                Legend(DayStatus.LEBIH.color(), "Lebih")
             }
         }
     }
@@ -280,19 +300,22 @@ private fun CalendarCard(state: HistoryUi, viewModel: HistoryViewModel) {
 
 @Composable
 private fun DayCell(date: LocalDate, calories: Double?, target: Int?, selected: Boolean, isToday: Boolean, onClick: () -> Unit) {
-    val status = when {
-        calories == null -> null
-        target == null -> MaterialTheme.colorScheme.primary
-        calories > target * 1.1 -> MaterialTheme.colorScheme.error
-        calories < target * 0.9 -> MaterialTheme.colorScheme.tertiary
-        else -> MaterialTheme.colorScheme.primary
-    }
+    // Heatmap: sel diwarnai penuh sesuai status hari (hari depan tetap kosong).
+    val status = if (date.isAfter(LocalDate.now())) DayStatus.KOSONG else DayStatus.of(calories, target)
+    val filled = status != DayStatus.KOSONG
+    val shape = RoundedCornerShape(12.dp)
     Column(
         Modifier
             .fillMaxSize()
-            .clip(RoundedCornerShape(10.dp))
-            .background(if (selected) MaterialTheme.colorScheme.primaryContainer else androidx.compose.ui.graphics.Color.Transparent)
-            .then(if (isToday) Modifier.border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(10.dp)) else Modifier)
+            .clip(shape)
+            .background(if (filled) status.color().copy(alpha = 0.85f) else MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.5f))
+            .then(
+                when {
+                    selected -> Modifier.border(2.5.dp, MaterialTheme.colorScheme.onSurface, shape)
+                    isToday -> Modifier.border(1.5.dp, MaterialTheme.colorScheme.primary, shape)
+                    else -> Modifier
+                },
+            )
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -300,9 +323,84 @@ private fun DayCell(date: LocalDate, calories: Double?, target: Int?, selected: 
         Text(
             "${date.dayOfMonth}",
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
+            fontWeight = if (isToday || selected) FontWeight.Bold else FontWeight.Medium,
+            color = if (filled) status.onColor() else MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Box(Modifier.size(6.dp).clip(CircleShape).background(status ?: androidx.compose.ui.graphics.Color.Transparent))
+        if (filled && calories != null) {
+            Text(
+                Format.grouped(calories.roundToInt()),
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+                color = status.onColor().copy(alpha = 0.85f),
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+@Composable
+private fun MonthStat(label: String, value: String, color: androidx.compose.ui.graphics.Color, modifier: Modifier) {
+    Column(modifier) {
+        Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, style = MaterialTheme.typography.titleSmall, color = color)
+    }
+}
+
+/** Galeri: semua foto makanan (sesuai filter) dalam grid 3 kolom. */
+private fun androidx.compose.foundation.lazy.LazyListScope.galleryItems(state: HistoryUi, onOpenMeal: (Long) -> Unit, viewModel: HistoryViewModel) {
+    val photos = state.groups.flatMap { it.meals }.filter { m -> m.photoPath?.let { java.io.File(it).exists() } == true }
+    if (photos.isEmpty()) {
+        item {
+            EmptyState(
+                Icons.Filled.PhotoLibrary,
+                "Belum ada foto",
+                if (state.filters.active) "Tidak ada foto yang cocok dengan filter." else "Foto makanan yang kamu analisa akan terkumpul di sini.",
+            )
+        }
+        return
+    }
+    item {
+        Text(
+            "${photos.size} foto · ${state.windowDays} hari terakhir",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+    items(photos.chunked(3), key = { row -> "g_" + row.first().id }) { row ->
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            row.forEach { meal -> GalleryTile(meal, Modifier.weight(1f)) { onOpenMeal(meal.id) } }
+            repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+        }
+    }
+    if (state.filters.query.isBlank()) {
+        item {
+            TextButton(onClick = viewModel::loadMore, modifier = Modifier.fillMaxWidth()) {
+                Text("Tampilkan lebih lama")
+            }
+        }
+    }
+}
+
+@Composable
+private fun GalleryTile(meal: com.hawdietpro.app.domain.model.Meal, modifier: Modifier, onClick: () -> Unit) {
+    Box(modifier.aspectRatio(1f).clip(RoundedCornerShape(16.dp)).clickable(onClick = onClick)) {
+        coil.compose.AsyncImage(
+            model = java.io.File(meal.photoPath!!),
+            contentDescription = meal.menuName,
+            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
+        Box(
+            Modifier.fillMaxSize().background(
+                androidx.compose.ui.graphics.Brush.verticalGradient(0.55f to androidx.compose.ui.graphics.Color.Transparent, 1f to androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.7f)),
+            ),
+        )
+        Text(
+            Format.kcal(meal.total.calories),
+            style = MaterialTheme.typography.labelMedium,
+            color = androidx.compose.ui.graphics.Color.White,
+            modifier = Modifier.align(Alignment.BottomStart).padding(8.dp),
+        )
+        meal.grade?.let { GradeBadge(it, size = 22.dp, modifier = Modifier.align(Alignment.TopEnd).padding(6.dp)) }
     }
 }
 

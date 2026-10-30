@@ -1,5 +1,18 @@
 package com.hawdietpro.app.ui.feature.analytics
 
+import com.hawdietpro.app.domain.nutrition.DayStatus
+import com.hawdietpro.app.ui.components.AnimatedCount
+import com.hawdietpro.app.ui.components.BentoCard
+import com.hawdietpro.app.ui.components.IconTile
+import com.hawdietpro.app.ui.components.NoticeCard
+import com.hawdietpro.app.ui.components.ProgressBar
+import com.hawdietpro.app.ui.components.StatusChip
+import com.hawdietpro.app.ui.components.color
+import com.hawdietpro.app.ui.theme.HawTheme
+import com.hawdietpro.app.ui.theme.NumberLarge
+import com.hawdietpro.app.ui.theme.NumberMedium
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.material.icons.filled.Restaurant
 import com.hawdietpro.app.ui.components.StatRow
 import com.hawdietpro.app.ui.components.hawSegmentedColors
 import androidx.compose.foundation.background
@@ -85,7 +98,7 @@ private val TABS = listOf("Ringkasan", "Nutrisi", "Pola", "Berat")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnalyticsScreen(onOpenWeight: () -> Unit, viewModel: AnalyticsViewModel = hiltViewModel()) {
+fun AnalyticsScreen(onOpenWeight: () -> Unit, onOpenWrap: () -> Unit = {}, viewModel: AnalyticsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val tab by viewModel.tab.collectAsStateWithLifecycle()
     val review by viewModel.review.collectAsStateWithLifecycle()
@@ -105,7 +118,7 @@ fun AnalyticsScreen(onOpenWeight: () -> Unit, viewModel: AnalyticsViewModel = hi
             ) {
                 if (tab != 3) periodHeader(state, viewModel)
                 when (tab) {
-                    0 -> summaryTab(state, stats, review, viewModel)
+                    0 -> summaryTab(state, stats, review, viewModel, onOpenWrap)
                     1 -> nutritionTab(stats, state.target)
                     2 -> patternTab(stats, state.period)
                     else -> weightTab(state, onOpenWeight)
@@ -158,9 +171,18 @@ private fun dayTooltips(stats: PeriodStats) = stats.days.map { Format.dayName(it
 
 // ------------------------------------------ Ringkasan ------------------------------------------
 
-private fun LazyListScope.summaryTab(state: AnalyticsUi, stats: PeriodStats, review: ReviewState, viewModel: AnalyticsViewModel) {
+private fun LazyListScope.summaryTab(state: AnalyticsUi, stats: PeriodStats, review: ReviewState, viewModel: AnalyticsViewModel, onOpenWrap: () -> Unit) {
     val target = state.target
     item { SummaryTiles(stats, state.previous, target?.calories) }
+    item {
+        NoticeCard(
+            "Rekap minggu lalu",
+            "Slide ringkas: defisit, menu favorit, gizi, berat · bisa dibagikan",
+            Icons.Filled.AutoAwesome,
+            MaterialTheme.colorScheme.tertiary,
+            onClick = onOpenWrap,
+        )
+    }
 
     val hasExercise = stats.days.any { it.exercise > 0 }
     item {
@@ -254,39 +276,99 @@ private fun ExerciseSummaryCard(stats: PeriodStats, period: Period) {
 }
 
 @Composable
-private fun SummaryTiles(stats: PeriodStats, prev: PeriodStats?, target: Int?) {
+internal fun SummaryTiles(stats: PeriodStats, prev: PeriodStats?, target: Int?) {
+    val cs = MaterialTheme.colorScheme
+    val hc = HawTheme.colors
     val avg = stats.averagePerDay.calories
     val prevAvg = prev?.takeIf { it.daysLogged > 0 }?.averagePerDay?.calories
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        StatRow {
-            StatTile(
-                "Rata-rata/hari",
-                Format.grouped(avg.roundToInt()),
-                Modifier.weight(1f),
-                sub = buildString {
-                    append("kkal")
-                    target?.let { append(" · target ").append(Format.grouped(it)) }
-                },
-                color = MaterialTheme.colorScheme.primaryContainer,
-            )
-            StatTile(
-                "vs periode lalu",
+    val statuses = stats.days.map { d ->
+        if (d.date.isAfter(LocalDate.now())) null
+        else DayStatus.of(d.nutrients.calories.takeIf { d.mealCount > 0 }, target?.let { it + d.exercise.roundToInt() })
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        BentoCard(Modifier.fillMaxWidth()) {
+            Row(verticalAlignment = Alignment.Top) {
+                Column(Modifier.weight(1f)) {
+                    Text("Rata-rata per hari", style = MaterialTheme.typography.labelLarge, color = cs.onSurfaceVariant)
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        AnimatedCount(avg.roundToInt(), NumberLarge, cs.onSurface)
+                        Spacer(Modifier.width(4.dp))
+                        Text("kkal", style = MaterialTheme.typography.labelMedium, color = cs.onSurfaceVariant, modifier = Modifier.padding(bottom = 3.dp))
+                    }
+                    target?.let { Text("target ${Format.grouped(it)} kkal", style = MaterialTheme.typography.bodySmall, color = cs.onSurfaceVariant) }
+                }
                 if (prevAvg != null && prevAvg > 0 && stats.daysLogged > 0) {
-                    val pct = (avg - prevAvg) / prevAvg * 100
-                    (if (pct > 0) "+" else "") + "${pct.roundToInt()}%"
-                } else "-",
-                Modifier.weight(1f),
-                sub = prevAvg?.let { "lalu ${Format.grouped(it.roundToInt())} kkal" } ?: "belum ada data",
-            )
+                    val pct = ((avg - prevAvg) / prevAvg * 100).roundToInt()
+                    StatusChip(
+                        (if (pct > 0) "+" else "") + "$pct% vs lalu",
+                        if (pct <= 0) hc.success else hc.warning,
+                    )
+                }
+            }
+            if (target != null && target > 0) {
+                Spacer(Modifier.height(10.dp))
+                ProgressBar((avg / target).toFloat(), if (avg > target * 1.1) cs.error else cs.primary, height = 8.dp)
+            }
+            Spacer(Modifier.height(14.dp))
+            Text("Konsistensi", style = MaterialTheme.typography.labelLarge, color = cs.onSurfaceVariant)
+            Spacer(Modifier.height(6.dp))
+            ConsistencyGrid(statuses)
         }
-        StatRow {
-            StatTile("Tercatat", "${stats.daysLogged}/${stats.days.size}", Modifier.weight(1f), sub = "hari")
-            if (target != null) {
-                StatTile("Sesuai", "${stats.daysOnTarget}", Modifier.weight(1f), sub = "hari (±10%)")
-                StatTile("Lebih", "${stats.daysOver}", Modifier.weight(1f), sub = "hari", color = MaterialTheme.colorScheme.errorContainer)
-                StatTile("Kurang", "${stats.daysUnder}", Modifier.weight(1f), sub = "hari", color = MaterialTheme.colorScheme.tertiaryContainer)
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            MiniStat("Tercatat", "${stats.daysLogged}/${statuses.count { it != null }}", "hari", Modifier.weight(1f).fillMaxHeight())
+            MiniStat("Sesuai target", "${statuses.count { it == DayStatus.SESUAI }}", "hari (±10%)", Modifier.weight(1f).fillMaxHeight(), DayStatus.SESUAI.color())
+            MiniStat("Beruntun", "${stats.currentStreak}", "hari 🔥", Modifier.weight(1f).fillMaxHeight(), hc.warning)
+        }
+        stats.topMenus.firstOrNull()?.let { top ->
+            BentoCard(Modifier.fillMaxWidth(), padding = 14.dp) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconTile(Icons.Filled.Restaurant, hc.food, size = 38.dp)
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text("Menu paling sering", style = MaterialTheme.typography.labelMedium, color = cs.onSurfaceVariant)
+                        Text(top.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    Text("${top.count}×", style = NumberMedium, color = hc.food)
+                }
             }
         }
+    }
+}
+
+/** Kotak kecil per hari diwarnai status (seperti grafik kontribusi). */
+@Composable
+private fun ConsistencyGrid(statuses: List<DayStatus?>) {
+    val rows = statuses.chunked(7)
+    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        rows.forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                row.forEach { st ->
+                    Box(
+                        Modifier
+                            .weight(1f)
+                            .height(if (statuses.size <= 7) 26.dp else 16.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(
+                                when (st) {
+                                    null -> Color.Transparent
+                                    DayStatus.KOSONG -> MaterialTheme.colorScheme.surfaceContainerHighest
+                                    else -> st.color()
+                                },
+                            ),
+                    )
+                }
+                repeat(7 - row.size) { Spacer(Modifier.weight(1f)) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MiniStat(label: String, value: String, sub: String, modifier: Modifier, accent: Color = MaterialTheme.colorScheme.onSurface) {
+    BentoCard(modifier, padding = 12.dp, corner = 20.dp) {
+        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+        Text(value, style = NumberLarge, color = accent, maxLines = 1)
+        Text(sub, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
     }
 }
 
