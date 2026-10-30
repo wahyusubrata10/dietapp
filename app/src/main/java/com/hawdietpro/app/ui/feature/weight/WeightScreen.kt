@@ -34,7 +34,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.core.Format
+import com.hawdietpro.app.data.repository.EnergyRepository
 import com.hawdietpro.app.data.repository.ProfileRepository
+import com.hawdietpro.app.domain.nutrition.AdaptiveTdee
 import com.hawdietpro.app.data.repository.WeightProjectionRepository
 import com.hawdietpro.app.domain.nutrition.WeightProjection
 import com.hawdietpro.app.data.repository.WeightRepository
@@ -59,6 +61,9 @@ data class WeightUi(
     val heightCm: Double? = null,
     val targetKg: Double? = null,
     val projection: WeightProjection? = null,
+    val adaptive: AdaptiveTdee? = null,
+    val adaptiveOn: Boolean = true,
+    val targetCalories: Int? = null,
 )
 
 @HiltViewModel
@@ -66,10 +71,20 @@ class WeightViewModel @Inject constructor(
     private val weights: WeightRepository,
     profiles: ProfileRepository,
     projections: WeightProjectionRepository,
+    private val energy: EnergyRepository,
 ) : ViewModel() {
-    val state: StateFlow<WeightUi> = combine(weights.observeAll(), profiles.observeProfile(), projections.observe()) { w, p, proj ->
-        WeightUi(w, p?.heightCm, p?.targetWeightKg, proj)
+    val state: StateFlow<WeightUi> = combine(
+        weights.observeAll(),
+        profiles.observeProfile(),
+        projections.observe(),
+        combine(energy.observeAdaptive(), energy.adaptiveEnabled, energy.observeTarget()) { a, on, t -> Triple(a, on, t) },
+    ) { w, p, proj, (adaptive, on, target) ->
+        WeightUi(w, p?.heightCm, p?.targetWeightKg, proj, adaptive, on, target?.calories)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), WeightUi())
+
+    fun setAdaptive(on: Boolean) {
+        viewModelScope.launch { energy.setAdaptiveEnabled(on) }
+    }
 
     fun log(kg: Double) {
         viewModelScope.launch { weights.log(LocalDate.now(), kg) }
@@ -124,6 +139,9 @@ fun WeightScreen(onBack: () -> Unit, viewModel: WeightViewModel = hiltViewModel(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+            }
+            state.adaptive?.let { a ->
+                item { AdaptiveSection(a, state.adaptiveOn, state.targetCalories, viewModel::setAdaptive) }
             }
             state.projection?.let { proj ->
                 item { WeightProjectionSection(proj) }

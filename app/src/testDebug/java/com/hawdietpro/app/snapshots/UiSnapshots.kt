@@ -38,14 +38,14 @@ class UiSnapshots {
     val compose = createComposeRule()
 
     private fun snap(name: String, dark: Boolean = true, content: @Composable () -> Unit) {
-        compose.mainClock.autoAdvance = false
         compose.setContent {
             HawDietTheme(darkTheme = dark) {
                 Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) { content() }
             }
         }
-        // Biarkan animasi masuk/angka selesai.
-        repeat(30) { compose.mainClock.advanceTimeBy(100) }
+        // Animasi (masuk, angka, cincin) semuanya terbatas → tunggu sampai diam.
+        compose.mainClock.advanceTimeBy(3_000)
+        compose.waitForIdle()
         val bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
         val dir = File(System.getProperty("snapshotDir") ?: "build/snapshots").apply { mkdirs() }
         File(dir, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
