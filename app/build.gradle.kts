@@ -147,6 +147,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.work.runtime.ktx)
+    // Widget layar utama.
+    implementation(libs.androidx.glance.appwidget)
 
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)

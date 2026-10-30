@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Haw Diet Pro</string>
+    <string name="widget_description">Sisa kalori hari ini + tombol foto makanan</string>
 </resources>

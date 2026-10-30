@@ -37,6 +37,19 @@
             android:name=".data.update.InstallResultReceiver"
             android:exported="false" />
 
+        <!-- Widget layar utama: sisa kalori hari ini + tombol cepat. -->
+        <receiver
+            android:name=".widget.HawWidgetReceiver"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/haw_widget_info" />
+        </receiver>
+
         <!-- WorkManager diinisialisasi manual agar bisa memakai HiltWorkerFactory -->
         <provider
             android:name="androidx.startup.InitializationProvider"

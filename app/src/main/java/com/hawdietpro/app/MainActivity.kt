@@ -9,6 +9,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.hawdietpro.app.core.Notifications
 import com.hawdietpro.app.ui.DeepLink
 import com.hawdietpro.app.ui.HawDietRoot
+import com.hawdietpro.app.widget.QuickLaunch
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -21,7 +22,8 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        handle(intent)
+        // Hanya saat pertama dibuat; setelah rotasi/recreate, deep link yang sama tidak diproses ulang.
+        if (savedInstanceState == null) handle(intent)
         setContent {
             HawDietRoot(deepLinks = deepLinks, onDeepLinkHandled = { deepLinks.value = null })
         }
@@ -35,9 +37,11 @@ class MainActivity : ComponentActivity() {
     private fun handle(intent: Intent?) {
         intent ?: return
         val mealId = intent.getLongExtra(Notifications.EXTRA_OPEN_MEAL, 0L)
+        val quick = QuickLaunch.from(intent)
         when {
             mealId != 0L -> deepLinks.value = DeepLink.Meal(mealId)
             intent.getBooleanExtra(Notifications.EXTRA_OPEN_UPDATE, false) -> deepLinks.value = DeepLink.Update
+            quick != null && quick != QuickLaunch.HOME -> deepLinks.value = DeepLink.Quick(quick)
         }
     }
 }

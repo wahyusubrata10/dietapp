@@ -60,6 +60,7 @@ import com.hawdietpro.app.ui.navigation.QuickAddSheet
 import com.hawdietpro.app.ui.navigation.Routes
 import com.hawdietpro.app.ui.navigation.TopLevelDestination
 import com.hawdietpro.app.ui.theme.HawDietTheme
+import com.hawdietpro.app.widget.QuickLaunch
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -67,6 +68,8 @@ import java.time.LocalDate
 sealed interface DeepLink {
     data class Meal(val id: Long) : DeepLink
     data object Update : DeepLink
+    /** Dari widget / shortcut ikon aplikasi. */
+    data class Quick(val action: QuickLaunch) : DeepLink
 }
 
 @Composable
@@ -108,18 +111,26 @@ private fun MainScaffold(
         currentDestination?.hierarchy?.any { it.route == dest.route } == true
     }
 
+    var showQuickAdd by rememberSaveable { mutableStateOf(false) }
+    var showExercise by rememberSaveable { mutableStateOf(false) }
+
     val deepLink by deepLinks.collectAsStateWithLifecycle()
     LaunchedEffect(deepLink) {
         when (val link = deepLink) {
             is DeepLink.Meal -> navController.navigate(Routes.editMeal(link.id))
             DeepLink.Update -> navController.navigate(Routes.UPDATE)
+            is DeepLink.Quick -> when (link.action) {
+                QuickLaunch.CAMERA -> navController.navigate(Routes.camera())
+                QuickLaunch.BARCODE -> navController.navigate(Routes.BARCODE)
+                QuickLaunch.RELOG -> navController.navigate(Routes.RELOG)
+                QuickLaunch.MANUAL -> navController.navigate(Routes.manualMeal())
+                QuickLaunch.EXERCISE -> showExercise = true
+                QuickLaunch.HOME -> Unit
+            }
             null -> return@LaunchedEffect
         }
         onDeepLinkHandled()
     }
-
-    var showQuickAdd by rememberSaveable { mutableStateOf(false) }
-    var showExercise by rememberSaveable { mutableStateOf(false) }
     if (showExercise) {
         ExerciseSheet(date = LocalDate.now(), onDismiss = { showExercise = false }, onMessage = showMessage)
     }

@@ -7,6 +7,8 @@ import com.hawdietpro.app.core.Notifications
 import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.data.repository.FoodRepository
 import com.hawdietpro.app.di.ApplicationScope
+import com.hawdietpro.app.widget.AppShortcuts
+import com.hawdietpro.app.widget.WidgetUpdater
 import com.hawdietpro.app.work.PendingProcessor
 import com.hawdietpro.app.work.WorkScheduler
 import dagger.hilt.android.HiltAndroidApp
@@ -22,6 +24,7 @@ class HawDietApp : Application(), Configuration.Provider {
     @Inject lateinit var scheduler: WorkScheduler
     @Inject lateinit var remoteConfig: RemoteConfigStore
     @Inject lateinit var pendingProcessor: PendingProcessor
+    @Inject lateinit var widgetUpdater: WidgetUpdater
 
     @Inject
     @field:ApplicationScope
@@ -40,5 +43,7 @@ class HawDietApp : Application(), Configuration.Provider {
         }
         scheduler.schedulePeriodic(remoteConfig.appConfig.value.updateCheckIntervalHours)
         pendingProcessor.start()
+        widgetUpdater.start()
+        AppShortcuts.publish(this)
     }
 }
