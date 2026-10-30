@@ -23,6 +23,10 @@ import com.hawdietpro.app.ui.feature.weight.AdaptiveSection
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.unit.dp
 import com.hawdietpro.app.ui.theme.HawDietTheme
+import com.hawdietpro.app.data.prefs.AccentColor
+import com.hawdietpro.app.data.prefs.Settings
+import com.hawdietpro.app.data.prefs.ThemeMode
+import com.hawdietpro.app.ui.feature.settings.AppearanceCard
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,9 +47,15 @@ class UiSnapshots {
     @get:Rule
     val compose = createAndroidComposeRule<ComponentActivity>()
 
-    private fun snap(name: String, dark: Boolean = true, content: @Composable () -> Unit) {
+    private fun snap(
+        name: String,
+        dark: Boolean = true,
+        accent: AccentColor = AccentColor.EMERALD,
+        amoled: Boolean = false,
+        content: @Composable () -> Unit,
+    ) {
         compose.setContent {
-            HawDietTheme(darkTheme = dark) {
+            HawDietTheme(darkTheme = dark, accent = accent, amoled = amoled) {
                 androidx.compose.material3.Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) { content() }
             }
         }
@@ -102,6 +112,19 @@ class UiSnapshots {
             PillTabs(listOf("Ringkasan", "Nutrisi", "Pola", "Berat"), 3, {})
             val home = SampleData.home()
             AdaptiveSection(home.adaptive!!, enabled = true, targetCalories = home.target?.calories, onToggle = {})
+        }
+    }
+
+    @Test
+    fun home_ocean_amoled() = snap("home_ocean_amoled", accent = AccentColor.OCEAN, amoled = true) { HomeContent(SampleData.home(), HomeActions()) }
+
+    @Test
+    fun home_grape_light() = snap("home_grape_light", dark = false, accent = AccentColor.GRAPE) { HomeContent(SampleData.home(), HomeActions()) }
+
+    @Test
+    fun settings_appearance_dark() = snap("settings_appearance_dark", accent = AccentColor.SUNSET) {
+        androidx.compose.foundation.layout.Box(Modifier.padding(16.dp)) {
+            AppearanceCard(Settings(themeMode = ThemeMode.DARK, accent = AccentColor.SUNSET), {}, {}, {}, {})
         }
     }
 }

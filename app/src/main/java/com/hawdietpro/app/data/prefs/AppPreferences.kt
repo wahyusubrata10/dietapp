@@ -29,6 +29,29 @@ enum class ThemeMode(val label: String) {
     }
 }
 
+/** Warna aksen aplikasi. [light]/[dark] = warna utama (ARGB) untuk tema terang/gelap. */
+enum class AccentColor(val label: String, val light: Long, val dark: Long) {
+    EMERALD("Hijau", 0xFF1A8A5F, 0xFF5FE0A8),
+    OCEAN("Biru", 0xFF1F6FE0, 0xFF8AB8FF),
+    GRAPE("Ungu", 0xFF6E49E0, 0xFFB7A2FF),
+    SUNSET("Oranye", 0xFFDB5A12, 0xFFFFAA72),
+    ROSE("Merah muda", 0xFFD0336C, 0xFFFF92B8);
+
+    companion object {
+        fun parse(value: String?) = entries.firstOrNull { it.name == value } ?: EMERALD
+    }
+}
+
+/** Pengaturan tampilan yang dipakai tema. */
+data class Appearance(
+    val mode: ThemeMode = ThemeMode.SYSTEM,
+    val accent: AccentColor = AccentColor.EMERALD,
+    /** Latar hitam pekat di mode gelap (hemat baterai di layar AMOLED). */
+    val amoled: Boolean = false,
+    /** Warna dari wallpaper (Material You, Android 12+). */
+    val dynamicColor: Boolean = false,
+)
+
 enum class AnalysisMode(val label: String, val description: String) {
     TELITI("Teliti", "Kualitas analisa maksimal (AI berpikir dulu). Sedikit lebih lama."),
     CEPAT("Cepat", "Jawaban lebih cepat, ketelitian bisa sedikit turun pada piring yang rumit.");
@@ -53,7 +76,14 @@ data class Settings(
     val skippedUpdateVersionCode: Int = 0,
     /** true = target & perkiraan berat memakai kebutuhan kalori yang dipelajari dari timbangan. */
     val adaptiveTdee: Boolean = true,
-)
+    val accent: AccentColor = AccentColor.EMERALD,
+    val amoled: Boolean = false,
+    val dynamicColor: Boolean = false,
+    /** Minggu (epochDay hari Senin) terakhir yang rekapnya sudah dilihat. */
+    val lastWrapWeek: Long = 0,
+) {
+    val appearance: Appearance get() = Appearance(themeMode, accent, amoled, dynamicColor)
+}
 
 @Singleton
 class AppPreferences @Inject constructor(@ApplicationContext private val context: Context) {
@@ -72,6 +102,10 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
         val SKIPPED_UPDATE = intPreferencesKey("skipped_update_version")
         val SEEN_ACHIEVEMENTS = stringSetPreferencesKey("seen_achievements")
         val ADAPTIVE_TDEE = booleanPreferencesKey("adaptive_tdee")
+        val ACCENT = stringPreferencesKey("accent_color")
+        val AMOLED = booleanPreferencesKey("amoled")
+        val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
+        val LAST_WRAP_WEEK = longPreferencesKey("last_wrap_week")
     }
 
     val settings: Flow<Settings> = context.dataStore.data.map { p ->
@@ -88,6 +122,10 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
             foodDbVersion = p[Keys.FOOD_DB_VERSION] ?: 0,
             skippedUpdateVersionCode = p[Keys.SKIPPED_UPDATE] ?: 0,
             adaptiveTdee = p[Keys.ADAPTIVE_TDEE] ?: true,
+            accent = AccentColor.parse(p[Keys.ACCENT]),
+            amoled = p[Keys.AMOLED] ?: false,
+            dynamicColor = p[Keys.DYNAMIC_COLOR] ?: false,
+            lastWrapWeek = p[Keys.LAST_WRAP_WEEK] ?: 0,
         )
     }
 
@@ -114,4 +152,8 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
     suspend fun setFoodDbVersion(version: Int) = context.dataStore.edit { it[Keys.FOOD_DB_VERSION] = version }
     suspend fun setSkippedUpdate(versionCode: Int) = context.dataStore.edit { it[Keys.SKIPPED_UPDATE] = versionCode }
     suspend fun setAdaptiveTdee(value: Boolean) = context.dataStore.edit { it[Keys.ADAPTIVE_TDEE] = value }
+    suspend fun setAccent(value: AccentColor) = context.dataStore.edit { it[Keys.ACCENT] = value.name }
+    suspend fun setAmoled(value: Boolean) = context.dataStore.edit { it[Keys.AMOLED] = value }
+    suspend fun setDynamicColor(value: Boolean) = context.dataStore.edit { it[Keys.DYNAMIC_COLOR] = value }
+    suspend fun setLastWrapWeek(value: Long) = context.dataStore.edit { it[Keys.LAST_WRAP_WEEK] = value }
 }

@@ -1,5 +1,35 @@
 package com.hawdietpro.app.ui.feature.settings
 
+import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.hawdietpro.app.data.prefs.AccentColor
+import com.hawdietpro.app.ui.components.BentoCard
+import com.hawdietpro.app.ui.components.IconTile
+import com.hawdietpro.app.ui.components.PillTabs
+import com.hawdietpro.app.ui.components.bouncyClick
+import com.hawdietpro.app.ui.theme.HawTheme
+import com.hawdietpro.app.ui.theme.MacroColors
 import com.hawdietpro.app.ui.components.hawSegmentedColors
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -125,6 +155,15 @@ class SettingsViewModel @Inject constructor(
     fun setTheme(mode: ThemeMode) {
         viewModelScope.launch { prefs.setThemeMode(mode) }
     }
+    fun setAccent(accent: AccentColor) {
+        viewModelScope.launch { prefs.setAccent(accent) }
+    }
+    fun setAmoled(v: Boolean) {
+        viewModelScope.launch { prefs.setAmoled(v) }
+    }
+    fun setDynamicColor(v: Boolean) {
+        viewModelScope.launch { prefs.setDynamicColor(v) }
+    }
     fun setAutoDownload(v: Boolean) {
         viewModelScope.launch { prefs.setAutoDownloadUpdates(v) }
     }
@@ -164,183 +203,258 @@ fun SettingsScreen(
 
     var keyInput by remember { mutableStateOf("") }
     var showKey by remember { mutableStateOf(false) }
+    var showAdvanced by rememberSaveable { mutableStateOf(false) }
     var modelInput by remember(settings.geminiModelOverride) { mutableStateOf(settings.geminiModelOverride.orEmpty()) }
+    val cs = MaterialTheme.colorScheme
 
     HawScaffold(title = "Pengaturan", onBack = onBack) { padding ->
         Column(
-            Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).imePadding().padding(16.dp),
+            Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            SectionHeader("API Key Gemini")
-            HawCard {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (hasKey) Icon(Icons.Filled.CheckCircle, null, tint = MaterialTheme.colorScheme.primary)
-                        if (hasKey) Spacer(Modifier.width(8.dp))
+            GroupTitle(Icons.Filled.Palette, "Tampilan", cs.tertiary)
+            AppearanceCard(
+                settings = settings,
+                onMode = viewModel::setTheme,
+                onAccent = viewModel::setAccent,
+                onAmoled = viewModel::setAmoled,
+                onDynamic = viewModel::setDynamicColor,
+            )
+
+            GroupTitle(Icons.Filled.AutoAwesome, "AI & analisa foto", cs.primary)
+            BentoCard(Modifier.fillMaxWidth()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconTile(if (hasKey) Icons.Filled.CheckCircle else Icons.Filled.Key, if (hasKey) HawTheme.colors.success else cs.error, size = 38.dp)
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(if (hasKey) "API key Gemini tersimpan" else "Belum ada API key", style = MaterialTheme.typography.titleSmall)
                         Text(
-                            if (hasKey) "API key tersimpan (terenkripsi)" else "Belum ada API key",
-                            style = MaterialTheme.typography.titleSmall,
+                            "Gratis dari Google AI Studio. Hanya disimpan terenkripsi di HP ini.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = cs.onSurfaceVariant,
                         )
                     }
-                    Text(
-                        "Gratis dari Google AI Studio. Key hanya disimpan di HP ini dan dikirim langsung ke Google saat analisa.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    OutlinedTextField(
-                        value = keyInput,
-                        onValueChange = { keyInput = it.trim() },
-                        label = { Text(if (hasKey) "Ganti API key" else "Tempel API key") },
-                        singleLine = true,
-                        visualTransformation = if (showKey) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = { showKey = !showKey }) {
-                                Icon(if (showKey) Icons.Filled.VisibilityOff else Icons.Filled.Visibility, contentDescription = "Tampilkan")
+                }
+                Spacer(Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = keyInput,
+                    onValueChange = { keyInput = it.trim() },
+                    label = { Text(if (hasKey) "Ganti API key" else "Tempel API key") },
+                    singleLine = true,
+                    shape = MaterialTheme.shapes.medium,
+                    visualTransformation = if (showKey) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { showKey = !showKey }) {
+                            Icon(if (showKey) Icons.Filled.VisibilityOff else Icons.Filled.Visibility, contentDescription = "Tampilkan")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Button(
+                        onClick = {
+                            viewModel.saveKey(keyInput) { msg ->
+                                showMessage(msg)
+                                if (msg.contains("✅")) keyInput = ""
                             }
                         },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Button(
-                            onClick = {
-                                viewModel.saveKey(keyInput) { msg ->
-                                    showMessage(msg)
-                                    if (msg.contains("✅")) keyInput = ""
-                                }
-                            },
-                            enabled = keyInput.length > 10 && !busy,
-                        ) { Text("Simpan & uji") }
-                        if (busy) CircularProgressIndicator(Modifier.padding(4.dp))
-                        if (hasKey) {
-                            TextButton(onClick = {
-                                viewModel.clearKey()
-                                showMessage("API key dihapus")
-                            }) { Text("Hapus") }
-                        }
-                    }
-                    if (keyInput.length > 10 && !busy) {
+                        enabled = keyInput.length > 10 && !busy,
+                        shape = CircleShape,
+                    ) { Text("Simpan & uji") }
+                    if (busy) CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.5.dp)
+                    if (hasKey) {
                         TextButton(onClick = {
-                            viewModel.saveKeyWithoutCheck(keyInput)
-                            keyInput = ""
-                            showMessage("API key disimpan tanpa uji")
-                        }) { Text("Simpan tanpa uji (offline)") }
-                    }
-                    OutlinedButton(onClick = { uri.openUri("https://aistudio.google.com/apikey") }) {
-                        Icon(Icons.AutoMirrored.Filled.OpenInNew, null)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Ambil API key gratis")
+                            viewModel.clearKey()
+                            showMessage("API key dihapus")
+                        }) { Text("Hapus") }
                     }
                 }
-            }
-
-            SectionHeader("Mode analisa AI")
-            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                AnalysisMode.entries.forEachIndexed { i, mode ->
-                    SegmentedButton(
-                        colors = hawSegmentedColors(),
-                        selected = settings.analysisMode == mode,
-                        onClick = { viewModel.setAnalysisMode(mode) },
-                        shape = SegmentedButtonDefaults.itemShape(i, AnalysisMode.entries.size),
-                    ) { Text(mode.label) }
-                }
-            }
-            Text(
-                settings.analysisMode.description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            HawCard {
-                Column {
-                    ToggleRow(
-                        "Analisa di latar belakang",
-                        "Setelah foto diambil langsung kembali ke Beranda; hasil tercatat otomatis & muncul notifikasi. Matikan bila ingin menunggu & mengedit hasil saat itu juga.",
-                        settings.backgroundAnalysis,
-                        viewModel::setBackgroundAnalysis,
-                    )
-                    TextButton(onClick = onAiLog) { Text("Lihat riwayat analisa AI (diagnosa)") }
-                }
-            }
-
-            SectionHeader("Model AI")
-            HawCard {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = modelInput,
-                        onValueChange = { modelInput = it.trim() },
-                        label = { Text("Nama model (opsional)") },
-                        placeholder = { Text(viewModel.defaultModel) },
-                        supportingText = { Text("Kosongkan untuk memakai default dari remote config: ${viewModel.defaultModel}") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                if (keyInput.length > 10 && !busy) {
                     TextButton(onClick = {
-                        viewModel.setModel(modelInput)
-                        showMessage(if (modelInput.isBlank()) "Memakai model default" else "Model diubah ke $modelInput")
-                    }) { Text("Simpan model") }
+                        viewModel.saveKeyWithoutCheck(keyInput)
+                        keyInput = ""
+                        showMessage("API key disimpan tanpa uji")
+                    }) { Text("Simpan tanpa uji (offline)") }
                 }
-            }
-
-            SectionHeader("Tampilan")
-            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                ThemeMode.entries.forEachIndexed { i, mode ->
-                    SegmentedButton(
-                        colors = hawSegmentedColors(),
-                        selected = settings.themeMode == mode,
-                        onClick = { viewModel.setTheme(mode) },
-                        shape = SegmentedButtonDefaults.itemShape(i, ThemeMode.entries.size),
-                    ) { Text(mode.label) }
+                TextButton(onClick = { uri.openUri("https://aistudio.google.com/apikey") }) {
+                    Icon(Icons.AutoMirrored.Filled.OpenInNew, null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text("Ambil API key gratis")
                 }
-            }
-
-            SectionHeader("Update aplikasi")
-            HawCard {
-                Column {
-                    ToggleRow("Unduh update otomatis", "APK baru diunduh di background, Anda tinggal tap Install", settings.autoDownloadUpdates, viewModel::setAutoDownload)
-                    ToggleRow("Hanya lewat Wi-Fi", "Hemat kuota data", settings.updatesWifiOnly, viewModel::setWifiOnly)
+                HorizontalDivider(Modifier.padding(vertical = 8.dp), color = HawTheme.colors.cardBorder)
+                Text("Mode analisa", style = MaterialTheme.typography.titleSmall)
+                Spacer(Modifier.height(8.dp))
+                PillTabs(
+                    AnalysisMode.entries.map { it.label },
+                    AnalysisMode.entries.indexOf(settings.analysisMode),
+                    { viewModel.setAnalysisMode(AnalysisMode.entries[it]) },
+                    compact = true,
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(settings.analysisMode.description, style = MaterialTheme.typography.bodySmall, color = cs.onSurfaceVariant)
+                ToggleRow(
+                    "Analisa di latar belakang",
+                    "Setelah foto diambil langsung kembali ke Beranda; hasil tercatat otomatis & muncul notifikasi.",
+                    settings.backgroundAnalysis,
+                    viewModel::setBackgroundAnalysis,
+                )
+                LinkRow(Icons.Filled.History, "Riwayat analisa AI", "Diagnosa kecepatan & kegagalan", onAiLog)
+                LinkRow(Icons.Filled.Tune, "Lanjutan: model AI", if (settings.geminiModelOverride.isNullOrBlank()) "Default: ${viewModel.defaultModel}" else "Dipakai: ${settings.geminiModelOverride}") {
+                    showAdvanced = !showAdvanced
                 }
-            }
-            Column(Modifier.fillMaxWidth()) {
-                MenuItem(Icons.Filled.SystemUpdate, "Cek update", "Versi ${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})", onUpdate)
-                MenuItem(Icons.Filled.Backup, "Backup & ekspor", "ZIP & CSV", onBackup)
-            }
-
-            SectionHeader("Data remote (prompt AI, DB makanan, aturan analisa)")
-            HawCard {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    val versions = remember(settings.lastRemoteSync) { viewModel.versions() }
-                    versions.forEach { (name, v) ->
-                        Row {
-                            Text(name, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-                            Text("v$v", style = MaterialTheme.typography.labelLarge)
-                        }
-                    }
-                    Text(
-                        "Sinkron terakhir: " + if (settings.lastRemoteSync > 0) {
-                            val t = Instant.ofEpochMilli(settings.lastRemoteSync).atZone(ZoneId.systemDefault())
-                            "${Format.relativeDay(t.toLocalDate())} ${Format.time(settings.lastRemoteSync)}"
-                        } else "belum pernah",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    OutlinedButton(onClick = { viewModel.syncNow(showMessage) }, enabled = !busy) {
-                        Icon(Icons.Filled.Sync, null)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Sinkron sekarang")
+                AnimatedVisibility(showAdvanced) {
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        OutlinedTextField(
+                            value = modelInput,
+                            onValueChange = { modelInput = it.trim() },
+                            label = { Text("Nama model (opsional)") },
+                            placeholder = { Text(viewModel.defaultModel) },
+                            supportingText = { Text("Kosongkan untuk memakai default: ${viewModel.defaultModel}") },
+                            singleLine = true,
+                            shape = MaterialTheme.shapes.medium,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        TextButton(onClick = {
+                            viewModel.setModel(modelInput)
+                            showMessage(if (modelInput.isBlank()) "Memakai model default" else "Model diubah ke $modelInput")
+                        }) { Text("Simpan model") }
                     }
                 }
             }
-            Spacer(Modifier.padding(8.dp))
+
+            GroupTitle(Icons.Filled.SystemUpdate, "Update aplikasi", MacroColors.Carbs)
+            BentoCard(Modifier.fillMaxWidth()) {
+                ToggleRow("Unduh update otomatis", "APK baru diunduh di latar belakang, kamu tinggal tap Install", settings.autoDownloadUpdates, viewModel::setAutoDownload)
+                ToggleRow("Hanya lewat Wi-Fi", "Hemat kuota data", settings.updatesWifiOnly, viewModel::setWifiOnly)
+                LinkRow(Icons.Filled.SystemUpdate, "Cek update", "Versi ${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})", onUpdate)
+            }
+
+            GroupTitle(Icons.Filled.Storage, "Data", HawTheme.colors.exercise)
+            BentoCard(Modifier.fillMaxWidth()) {
+                LinkRow(Icons.Filled.Backup, "Backup & ekspor", "ZIP (data + foto), CSV untuk Excel", onBackup)
+                HorizontalDivider(Modifier.padding(vertical = 8.dp), color = HawTheme.colors.cardBorder)
+                Text("Data remote (prompt AI, DB makanan, aturan analisa)", style = MaterialTheme.typography.titleSmall)
+                Spacer(Modifier.height(6.dp))
+                val versions = remember(settings.lastRemoteSync) { viewModel.versions() }
+                versions.forEach { (name, v) ->
+                    Row(Modifier.padding(vertical = 2.dp)) {
+                        Text(name, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                        Text("v$v", style = MaterialTheme.typography.labelLarge, color = cs.primary)
+                    }
+                }
+                Text(
+                    "Sinkron terakhir: " + if (settings.lastRemoteSync > 0) {
+                        val t = Instant.ofEpochMilli(settings.lastRemoteSync).atZone(ZoneId.systemDefault())
+                        "${Format.relativeDay(t.toLocalDate())} ${Format.time(settings.lastRemoteSync)}"
+                    } else "belum pernah",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = cs.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(onClick = { viewModel.syncNow(showMessage) }, enabled = !busy, shape = CircleShape) {
+                    Icon(Icons.Filled.Sync, null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Sinkron sekarang")
+                }
+            }
+            Spacer(Modifier.height(16.dp))
         }
+    }
+}
+
+/** Kartu pengaturan tampilan: mode terang/gelap, warna aksen, AMOLED, warna wallpaper. */
+@Composable
+fun AppearanceCard(
+    settings: Settings,
+    onMode: (ThemeMode) -> Unit,
+    onAccent: (AccentColor) -> Unit,
+    onAmoled: (Boolean) -> Unit,
+    onDynamic: (Boolean) -> Unit,
+) {
+    val cs = MaterialTheme.colorScheme
+    val dark = when (settings.themeMode) {
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+    }
+    val supportsDynamic = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    BentoCard(Modifier.fillMaxWidth()) {
+        Text("Mode", style = MaterialTheme.typography.titleSmall)
+        Spacer(Modifier.height(8.dp))
+        PillTabs(listOf("Sistem", "Terang", "Gelap"), ThemeMode.entries.indexOf(settings.themeMode), { onMode(ThemeMode.entries[it]) }, compact = true)
+        Spacer(Modifier.height(16.dp))
+        Text("Warna aksen", style = MaterialTheme.typography.titleSmall)
+        Spacer(Modifier.height(10.dp))
+        val dynamicOn = settings.dynamicColor && supportsDynamic
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            AccentColor.entries.forEach { accent ->
+                val selected = !dynamicOn && settings.accent == accent
+                val color = Color(if (dark) accent.dark else accent.light)
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(58.dp)) {
+                    Box(
+                        Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(color.copy(alpha = if (dynamicOn) 0.35f else 1f))
+                            .border(if (selected) 3.dp else 0.dp, if (selected) cs.onSurface else Color.Transparent, CircleShape)
+                            .bouncyClick {
+                                if (dynamicOn) onDynamic(false)
+                                onAccent(accent)
+                            },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (selected) Icon(Icons.Filled.Check, null, tint = if (dark) Color.Black else Color.White, modifier = Modifier.size(20.dp))
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text(accent.label, style = MaterialTheme.typography.labelSmall, color = cs.onSurfaceVariant, maxLines = 1)
+                }
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        if (supportsDynamic) {
+            ToggleRow("Warna dari wallpaper", "Material You: warna aplikasi mengikuti wallpaper HP", settings.dynamicColor, onDynamic)
+        }
+        ToggleRow("Hitam pekat (AMOLED)", "Latar benar-benar hitam di mode gelap, hemat baterai", settings.amoled, onAmoled)
+    }
+}
+
+@Composable
+private fun GroupTitle(icon: ImageVector, title: String, tint: Color) {
+    Row(Modifier.padding(top = 8.dp, start = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, null, tint = tint, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(title.uppercase(), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun LinkRow(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(MaterialTheme.shapes.medium).clickable(onClick = onClick).padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(22.dp))
+        Spacer(Modifier.width(14.dp))
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
 @Composable
 private fun ToggleRow(title: String, subtitle: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        Modifier.fillMaxWidth().clip(MaterialTheme.shapes.medium).clickable { onChange(!checked) }.padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.bodyLarge)
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
+        Spacer(Modifier.width(12.dp))
         Switch(checked = checked, onCheckedChange = onChange)
     }
 }

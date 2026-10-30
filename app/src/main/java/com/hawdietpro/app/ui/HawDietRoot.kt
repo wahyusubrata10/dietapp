@@ -75,13 +75,13 @@ fun HawDietRoot(
     onDeepLinkHandled: () -> Unit,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
-    val theme by viewModel.themeMode.collectAsStateWithLifecycle()
-    val dark = when (theme) {
+    val appearance by viewModel.appearance.collectAsStateWithLifecycle()
+    val dark = when (appearance.mode) {
         ThemeMode.SYSTEM -> null
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
     }
-    HawDietTheme(darkTheme = dark) {
+    HawDietTheme(darkTheme = dark, accent = appearance.accent, amoled = appearance.amoled, dynamicColor = appearance.dynamicColor) {
         val start by viewModel.startState.collectAsStateWithLifecycle()
         when (start) {
             StartState.Loading -> LoadingBox()

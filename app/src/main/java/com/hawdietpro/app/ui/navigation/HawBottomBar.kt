@@ -85,7 +85,7 @@ fun HawBottomBar(currentRoute: (String) -> Boolean, onNavigate: (String) -> Unit
                         Modifier
                             .size(52.dp)
                             .clip(CircleShape)
-                            .background(Brush.linearGradient(listOf(cs.primary, Teal500)))
+                            .background(Brush.linearGradient(listOf(cs.primary, hc.accentEnd)))
                             .bouncyClick(onClick = onAdd),
                         contentAlignment = Alignment.Center,
                     ) {

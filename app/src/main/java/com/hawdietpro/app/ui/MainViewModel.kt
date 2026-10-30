@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.BuildConfig
 import com.hawdietpro.app.data.prefs.AppPreferences
-import com.hawdietpro.app.data.prefs.ThemeMode
+import com.hawdietpro.app.data.prefs.Appearance
 import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.data.remote.RemoteConfigSync
 import com.hawdietpro.app.data.repository.ProfileRepository
@@ -44,8 +44,8 @@ class MainViewModel @Inject constructor(
         .map { if (it == null) StartState.NeedsOnboarding else StartState.Ready }
         .stateIn(viewModelScope, SharingStarted.Eagerly, StartState.Loading)
 
-    val themeMode: StateFlow<ThemeMode> = prefs.settings.map { it.themeMode }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ThemeMode.SYSTEM)
+    val appearance: StateFlow<Appearance> = prefs.settings.map { it.appearance }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, Appearance())
 
     val updateState: StateFlow<UpdateState> = updates.state
 

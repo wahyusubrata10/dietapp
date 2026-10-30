@@ -1,6 +1,13 @@
 package com.hawdietpro.app.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalContext
+import com.hawdietpro.app.data.prefs.AccentColor
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
@@ -112,6 +119,8 @@ data class HawExtendedColors(
     /** Aksen olahraga & makanan. */
     val exercise: Color = Color(0xFF7C8CFF),
     val food: Color = Color(0xFFFF8A4C),
+    /** Warna akhir gradasi aksen (tombol +). */
+    val accentEnd: Color = Teal500,
 )
 
 private val LightExtended = HawExtendedColors(
@@ -161,16 +170,77 @@ private val HawShapes = Shapes(
     extraLarge = RoundedCornerShape(32.dp),
 )
 
-/** [darkTheme] null = ikuti sistem. */
+/** Warna akhir gradasi aksen (tombol +, ujung busur), diturunkan dari warna utama. */
+private fun accentEnd(primary: Color, emerald: Boolean): Color = if (emerald) Teal500 else lerp(primary, Color.White, 0.22f)
+
+/** Ganti keluarga warna utama skema dengan aksen pilihan. */
+private fun ColorScheme.withPrimary(primary: Color, dark: Boolean): ColorScheme = copy(
+    primary = primary,
+    onPrimary = if (dark) lerp(primary, Color.Black, 0.82f) else Color.White,
+    primaryContainer = if (dark) lerp(primary, Color.Black, 0.65f) else lerp(primary, Color.White, 0.85f),
+    onPrimaryContainer = if (dark) lerp(primary, Color.White, 0.8f) else lerp(primary, Color.Black, 0.6f),
+    inversePrimary = if (dark) lerp(primary, Color.Black, 0.3f) else lerp(primary, Color.White, 0.4f),
+    surfaceTint = primary,
+)
+
+/** Latar hitam pekat (AMOLED). */
+private fun ColorScheme.amoled(): ColorScheme = copy(
+    background = Color.Black,
+    surface = Color.Black,
+    surfaceDim = Color.Black,
+    surfaceContainerLowest = Color.Black,
+    surfaceContainerLow = Color(0xFF0B0B0B),
+    surfaceContainer = Color(0xFF101010),
+    surfaceContainerHigh = Color(0xFF161616),
+    surfaceContainerHighest = Color(0xFF1D1D1D),
+    surfaceVariant = Color(0xFF161616),
+)
+
+/** Token tambahan yang mengikuti warna utama (untuk aksen selain hijau & warna wallpaper). */
+private fun extendedFor(scheme: ColorScheme, dark: Boolean, base: HawExtendedColors, emerald: Boolean, amoled: Boolean): HawExtendedColors {
+    val p = scheme.primary
+    var ext = if (emerald) base else base.copy(
+        heroGradient = if (dark) {
+            Brush.linearGradient(listOf(lerp(p, Color.Black, 0.86f), lerp(p, Color.Black, 0.72f), lerp(p, Color.Black, 0.58f)))
+        } else {
+            Brush.linearGradient(listOf(lerp(p, Color.Black, 0.18f), p, lerp(p, Color.White, 0.18f)))
+        },
+        glow = p.copy(alpha = if (dark) 0.2f else 0.26f),
+    )
+    ext = ext.copy(accentEnd = accentEnd(p, emerald))
+    if (dark && amoled) {
+        ext = ext.copy(card = Color(0xFF0B0B0B), cardRaised = Color(0xFF141414), cardBorder = Color(0xFF1E1E1E))
+    }
+    return ext
+}
+
+/**
+ * Tema aplikasi. [darkTheme] null = ikuti sistem. [accent] = warna utama pilihan,
+ * [dynamicColor] = warna dari wallpaper (Android 12+), [amoled] = latar hitam pekat di mode gelap.
+ */
 @Composable
 fun HawDietTheme(
     darkTheme: Boolean? = null,
+    accent: AccentColor = AccentColor.EMERALD,
+    amoled: Boolean = false,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val useDark = darkTheme ?: isSystemInDarkTheme()
-    CompositionLocalProvider(LocalHawColors provides if (useDark) DarkExtended else LightExtended) {
+    val context = LocalContext.current
+    val useDynamic = dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val emerald = !useDynamic && accent == AccentColor.EMERALD
+    var scheme = when {
+        useDynamic && useDark -> dynamicDarkColorScheme(context)
+        useDynamic -> dynamicLightColorScheme(context)
+        emerald -> if (useDark) DarkColors else LightColors
+        else -> (if (useDark) DarkColors else LightColors).withPrimary(Color(if (useDark) accent.dark else accent.light), useDark)
+    }
+    if (useDark && amoled) scheme = scheme.amoled()
+    val extended = extendedFor(scheme, useDark, if (useDark) DarkExtended else LightExtended, emerald, amoled)
+    CompositionLocalProvider(LocalHawColors provides extended) {
         MaterialTheme(
-            colorScheme = if (useDark) DarkColors else LightColors,
+            colorScheme = scheme,
             typography = HawTypography,
             shapes = HawShapes,
             content = content,
