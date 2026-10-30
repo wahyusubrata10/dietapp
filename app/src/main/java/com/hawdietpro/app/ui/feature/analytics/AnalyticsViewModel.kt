@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.data.gemini.GeminiError
 import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.data.repository.CachedReview
+import com.hawdietpro.app.data.repository.EnergyRepository
 import com.hawdietpro.app.data.repository.ExerciseRepository
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.PeriodReviewRepository
@@ -18,7 +19,6 @@ import com.hawdietpro.app.domain.insight.PeriodStats
 import com.hawdietpro.app.domain.insight.PeriodStatsCalculator
 import com.hawdietpro.app.domain.model.UserProfile
 import com.hawdietpro.app.domain.nutrition.DailyTarget
-import com.hawdietpro.app.domain.nutrition.TdeeCalculator
 import com.hawdietpro.app.domain.nutrition.WeightProjection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,6 +68,7 @@ class AnalyticsViewModel @Inject constructor(
     private val reviews: PeriodReviewRepository,
     private val store: RemoteConfigStore,
     exercises: ExerciseRepository,
+    energy: EnergyRepository,
 ) : ViewModel() {
 
     private data class Range(val period: Period, val offset: Int, val start: LocalDate, val end: LocalDate, val prevStart: LocalDate, val prevEnd: LocalDate)
@@ -83,14 +84,13 @@ class AnalyticsViewModel @Inject constructor(
     val state: StateFlow<AnalyticsUi> = range.flatMapLatest { r ->
         combine(
             combine(meals.observeRange(r.prevStart, r.end), exercises.observeRange(r.prevStart, r.end)) { m, e -> m to e },
-            profiles.observeProfile(),
+            combine(profiles.observeProfile(), energy.observeTarget()) { p, t -> p to t },
             weights.observeAll(),
             projections.observe(),
             store.insightRules,
-        ) { (list, exerciseList), profile, w, projection, rules ->
+        ) { (list, exerciseList), (profile, target), w, projection, rules ->
             val burned = ExerciseRepository.dailyTotals(exerciseList)
             val today = LocalDate.now()
-            val target = profile?.let(TdeeCalculator::calculate)
             val calc = PeriodStatsCalculator(rules)
             val effectiveEnd = if (r.end.isAfter(today)) today else r.end
             val stats = calc.compute(list, r.start, effectiveEnd, target?.calories, w, burned)

@@ -1,0 +1,62 @@
+name: UI snapshots
+
+# Merender layar Compose ke PNG (Robolectric, tanpa emulator) untuk ditinjau sebelum rilis.
+# Hasil dipublikasikan ke branch "ui-snapshots" (hanya berisi gambar & laporan test).
+on:
+  push:
+    branches: ['claude/**']
+    paths-ignore:
+      - 'remote/**'
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ui-snapshots
+  cancel-in-progress: true
+
+jobs:
+  snapshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Render snapshot
+        id: render
+        continue-on-error: true
+        run: ./gradlew :app:testDebugUnitTest --tests "com.hawdietpro.app.snapshots.*" --stacktrace
+
+      - name: Publikasikan ke branch ui-snapshots
+        if: always()
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          OUT="$RUNNER_TEMP/snap"
+          mkdir -p "$OUT/reports"
+          cp app/build/snapshots/*.png "$OUT/" 2>/dev/null || true
+          cp app/build/test-results/testDebugUnitTest/*.xml "$OUT/reports/" 2>/dev/null || true
+          {
+            echo "commit: $GITHUB_SHA"
+            echo "render: ${{ steps.render.outcome }}"
+            ls "$OUT"
+          } > "$OUT/STATUS.txt"
+          cd "$OUT"
+          git init -q
+          git checkout -q -b ui-snapshots
+          git add -A
+          git -c user.name="ci" -c user.email="ci@users.noreply.github.com" commit -qm "snapshots $GITHUB_SHA"
+          git push -fq "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" ui-snapshots
+
+      - name: Gagal render
+        if: steps.render.outcome != 'success'
+        run: exit 1

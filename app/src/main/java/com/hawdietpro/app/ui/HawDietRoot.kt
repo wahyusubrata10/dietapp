@@ -185,6 +185,7 @@ private fun MainScaffold(
                         onOpenWeight = { navController.navigate(Routes.WEIGHT) },
                         onOpenProfile = { navController.navigateTopLevel(Routes.PROFILE) },
                         onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
+                        onOpenBarcode = { navController.navigate(Routes.BARCODE) },
                         showMessage = showMessage,
                     )
                 }

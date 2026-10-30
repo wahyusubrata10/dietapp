@@ -4,8 +4,6 @@ import com.hawdietpro.app.data.local.dao.UserProfileDao
 import com.hawdietpro.app.data.local.toDomain
 import com.hawdietpro.app.data.local.toEntity
 import com.hawdietpro.app.domain.model.UserProfile
-import com.hawdietpro.app.domain.nutrition.DailyTarget
-import com.hawdietpro.app.domain.nutrition.TdeeCalculator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
@@ -19,11 +17,7 @@ class ProfileRepository @Inject constructor(
 ) {
     fun observeProfile(): Flow<UserProfile?> = dao.observe().map { it?.toDomain() }
 
-    fun observeTarget(): Flow<DailyTarget?> = observeProfile().map { p -> p?.let(TdeeCalculator::calculate) }
-
     suspend fun getProfile(): UserProfile? = dao.get()?.toDomain()
-
-    suspend fun getTarget(): DailyTarget? = getProfile()?.let(TdeeCalculator::calculate)
 
     /** Simpan profil; bila berat berubah, otomatis tercatat di log berat hari ini. */
     suspend fun save(profile: UserProfile) {

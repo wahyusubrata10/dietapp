@@ -31,7 +31,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -77,10 +81,22 @@ fun HawCard(
     contentPadding: Dp = 16.dp,
     content: @Composable () -> Unit,
 ) {
-    val bg = color ?: HawTheme.colors.card
-    val border = if (color == null) BorderStroke(1.dp, HawTheme.colors.cardBorder) else null
+    val hc = HawTheme.colors
+    val bg = color ?: hc.card
+    // Sorotan tipis di tepi atas (mode gelap) memberi kesan kartu "kaca" yang sedikit terangkat.
+    val border = if (color == null) {
+        BorderStroke(1.dp, Brush.verticalGradient(listOf(lerp(hc.cardBorder, Color.White, if (hc.cardHighlight.alpha > 0f) 0.06f else 0f), hc.cardBorder)))
+    } else null
     if (onClick != null) {
-        Surface(onClick = onClick, modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, color = bg, border = border) {
+        val interaction = remember { MutableInteractionSource() }
+        Surface(
+            onClick = onClick,
+            modifier = modifier.fillMaxWidth().pressScale(interaction, 0.98f),
+            shape = MaterialTheme.shapes.large,
+            color = bg,
+            border = border,
+            interactionSource = interaction,
+        ) {
             Box(Modifier.padding(contentPadding)) { content() }
         }
     } else {

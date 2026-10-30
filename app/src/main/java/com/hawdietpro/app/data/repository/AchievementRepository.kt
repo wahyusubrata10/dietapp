@@ -4,7 +4,6 @@ import com.hawdietpro.app.data.prefs.AppPreferences
 import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.domain.achievement.Achievement
 import com.hawdietpro.app.domain.achievement.AchievementCalculator
-import com.hawdietpro.app.domain.nutrition.TdeeCalculator
 import com.hawdietpro.app.domain.scoring.FoodClassifier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -20,18 +19,19 @@ class AchievementRepository @Inject constructor(
     private val store: RemoteConfigStore,
     private val prefs: AppPreferences,
     private val exercises: ExerciseRepository,
+    private val energy: EnergyRepository,
 ) {
     fun observe(): Flow<List<Achievement>> = combine(
         meals.observeAll(),
         weights.observeAll(),
-        profiles.observeProfile(),
+        combine(profiles.observeProfile(), energy.observeTarget()) { p, t -> p to t },
         store.insightRules,
         exercises.observeAll(),
-    ) { mealList, weightList, profile, rules, exerciseList ->
+    ) { mealList, weightList, (profile, target), rules, exerciseList ->
         AchievementCalculator(
             isVegetable = FoodClassifier(rules)::isVegetable,
             targetTolerancePct = rules.targetTolerancePct,
-        ).compute(mealList, weightList, profile?.let(TdeeCalculator::calculate), profile?.goal, exerciseList)
+        ).compute(mealList, weightList, target, profile?.goal, exerciseList)
     }
 
     /** Badge yang sudah terbuka tetapi belum pernah dilihat. */

@@ -51,6 +51,8 @@ data class Settings(
     val lastRemoteSync: Long = 0,
     val foodDbVersion: Int = 0,
     val skippedUpdateVersionCode: Int = 0,
+    /** true = target & perkiraan berat memakai kebutuhan kalori yang dipelajari dari timbangan. */
+    val adaptiveTdee: Boolean = true,
 )
 
 @Singleton
@@ -69,6 +71,7 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
         val FOOD_DB_VERSION = intPreferencesKey("food_db_version")
         val SKIPPED_UPDATE = intPreferencesKey("skipped_update_version")
         val SEEN_ACHIEVEMENTS = stringSetPreferencesKey("seen_achievements")
+        val ADAPTIVE_TDEE = booleanPreferencesKey("adaptive_tdee")
     }
 
     val settings: Flow<Settings> = context.dataStore.data.map { p ->
@@ -84,6 +87,7 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
             lastRemoteSync = p[Keys.LAST_REMOTE_SYNC] ?: 0,
             foodDbVersion = p[Keys.FOOD_DB_VERSION] ?: 0,
             skippedUpdateVersionCode = p[Keys.SKIPPED_UPDATE] ?: 0,
+            adaptiveTdee = p[Keys.ADAPTIVE_TDEE] ?: true,
         )
     }
 
@@ -109,4 +113,5 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
     suspend fun setLastRemoteSync(time: Long) = context.dataStore.edit { it[Keys.LAST_REMOTE_SYNC] = time }
     suspend fun setFoodDbVersion(version: Int) = context.dataStore.edit { it[Keys.FOOD_DB_VERSION] = version }
     suspend fun setSkippedUpdate(versionCode: Int) = context.dataStore.edit { it[Keys.SKIPPED_UPDATE] = versionCode }
+    suspend fun setAdaptiveTdee(value: Boolean) = context.dataStore.edit { it[Keys.ADAPTIVE_TDEE] = value }
 }

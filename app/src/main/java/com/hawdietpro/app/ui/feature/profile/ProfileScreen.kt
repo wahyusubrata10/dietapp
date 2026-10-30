@@ -53,13 +53,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.BuildConfig
 import com.hawdietpro.app.core.Format
+import com.hawdietpro.app.data.repository.EnergyRepository
 import com.hawdietpro.app.data.repository.PendingRepository
 import com.hawdietpro.app.data.repository.ProfileRepository
 import com.hawdietpro.app.data.update.UpdateRepository
 import com.hawdietpro.app.data.update.UpdateState
 import com.hawdietpro.app.domain.model.UserProfile
 import com.hawdietpro.app.domain.nutrition.DailyTarget
-import com.hawdietpro.app.domain.nutrition.TdeeCalculator
 import com.hawdietpro.app.ui.components.HawCard
 import com.hawdietpro.app.ui.components.HawScaffold
 import com.hawdietpro.app.ui.components.StatTile
@@ -80,13 +80,14 @@ data class ProfileUi(
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     profiles: ProfileRepository,
+    energy: EnergyRepository,
     pending: PendingRepository,
     updates: UpdateRepository,
 ) : ViewModel() {
-    val state: StateFlow<ProfileUi> = combine(profiles.observeProfile(), pending.observe(), updates.state) { p, q, u ->
+    val state: StateFlow<ProfileUi> = combine(profiles.observeProfile(), energy.observeTarget(), pending.observe(), updates.state) { p, target, q, u ->
         ProfileUi(
             profile = p,
-            target = p?.let(TdeeCalculator::calculate),
+            target = target,
             pendingCount = q.size,
             updateAvailable = u is UpdateState.Available || u is UpdateState.ReadyToInstall || u is UpdateState.Downloading,
         )

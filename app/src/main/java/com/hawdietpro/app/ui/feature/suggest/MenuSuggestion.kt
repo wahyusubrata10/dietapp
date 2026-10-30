@@ -42,11 +42,11 @@ import com.hawdietpro.app.data.gemini.GeminiError
 import com.hawdietpro.app.data.gemini.GeminiSuggestion
 import com.hawdietpro.app.data.repository.ExerciseRepository
 import com.hawdietpro.app.data.repository.MealRepository
+import com.hawdietpro.app.data.repository.EnergyRepository
 import com.hawdietpro.app.data.repository.ProfileRepository
 import com.hawdietpro.app.domain.model.MealType
 import com.hawdietpro.app.domain.model.sum
 import com.hawdietpro.app.domain.nutrition.NutritionLimits
-import com.hawdietpro.app.domain.nutrition.TdeeCalculator
 import com.hawdietpro.app.ui.components.HawCard
 import com.hawdietpro.app.ui.components.Pill
 import com.hawdietpro.app.ui.theme.HawTheme
@@ -84,6 +84,7 @@ class MenuSuggestionViewModel @Inject constructor(
     private val gemini: GeminiClient,
     private val meals: MealRepository,
     private val profiles: ProfileRepository,
+    private val energy: EnergyRepository,
     private val exercises: ExerciseRepository,
 ) : ViewModel() {
 
@@ -94,7 +95,7 @@ class MenuSuggestionViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val target = profiles.getTarget()
+            val target = energy.getTarget()
             val today = meals.observeDay(LocalDate.now()).first()
             val total = today.map { it.total }.sum()
             val burned = exercises.observeDay(LocalDate.now()).first().sumOf { it.calories }
@@ -111,7 +112,7 @@ class MenuSuggestionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val profile = profiles.getProfile()
-                val target = profile?.let(TdeeCalculator::calculate)
+                val target = energy.getTarget()
                 val today = meals.observeDay(LocalDate.now()).first()
                 val total = today.map { it.total }.sum()
                 val favorites = meals.observeFavorites().first().take(8)

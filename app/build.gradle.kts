@@ -77,6 +77,12 @@ android {
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+        // Snapshot UI (Robolectric) butuh resource Android (font, tema).
+        unitTests.isIncludeAndroidResources = true
+        unitTests.all { test ->
+            test.systemProperty("snapshotDir", layout.buildDirectory.dir("snapshots").get().asFile.absolutePath)
+            test.maxHeapSize = "3g"
+        }
     }
 }
 
@@ -164,4 +170,10 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+
+    // Snapshot tampilan (hanya varian debug): render Compose ke PNG tanpa emulator.
+    testDebugImplementation(libs.robolectric)
+    testDebugImplementation(platform(libs.androidx.compose.bom))
+    testDebugImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

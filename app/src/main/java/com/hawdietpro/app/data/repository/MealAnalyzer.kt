@@ -24,9 +24,9 @@ import javax.inject.Singleton
 @Singleton
 class MealEvaluator @Inject constructor(
     private val store: RemoteConfigStore,
-    private val profiles: ProfileRepository,
+    private val energy: EnergyRepository,
 ) {
-    suspend fun evaluate(meal: Meal): Meal = evaluate(meal, profiles.getTarget()?.calories)
+    suspend fun evaluate(meal: Meal): Meal = evaluate(meal, energy.getTarget()?.calories)
 
     fun evaluate(meal: Meal, targetCalories: Int?): Meal {
         if (meal.items.isEmpty()) return meal.copy(grade = null, assessments = emptyList(), suggestions = emptyList())

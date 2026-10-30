@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.data.prefs.SecureStorage
 import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.data.repository.AchievementRepository
+import com.hawdietpro.app.data.repository.EnergyRepository
 import com.hawdietpro.app.data.repository.ExerciseRepository
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.PendingRepository
@@ -21,8 +22,8 @@ import com.hawdietpro.app.domain.model.Meal
 import com.hawdietpro.app.domain.model.MealType
 import com.hawdietpro.app.domain.model.Nutrients
 import com.hawdietpro.app.domain.model.sum
+import com.hawdietpro.app.domain.nutrition.AdaptiveTdee
 import com.hawdietpro.app.domain.nutrition.DailyTarget
-import com.hawdietpro.app.domain.nutrition.TdeeCalculator
 import com.hawdietpro.app.domain.nutrition.WeightProjection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -66,6 +67,10 @@ data class HomeState(
     val newAchievements: List<Achievement> = emptyList(),
     /** Olahraga pada tanggal yang dipilih. */
     val exercises: List<Exercise> = emptyList(),
+    /** Kebutuhan kalori yang dipelajari dari data. */
+    val adaptive: AdaptiveTdee? = null,
+    /** Hari berturut-turut dengan catatan makan (sampai hari ini/kemarin). */
+    val streak: Int = 0,
 ) {
     val exerciseKcal: Double get() = exercises.sumOf { it.calories }
     /** Jatah kalori hari itu = target + kalori olahraga. */
@@ -85,6 +90,7 @@ class HomeViewModel @Inject constructor(
     projections: WeightProjectionRepository,
     achievements: AchievementRepository,
     exercises: ExerciseRepository,
+    energy: EnergyRepository,
 ) : ViewModel() {
 
     private val today = MutableStateFlow(LocalDate.now())
@@ -106,12 +112,11 @@ class HomeViewModel @Inject constructor(
 
     private val base = combine(
         selected.flatMapLatest { d -> combine(meals.observeDay(d), exercises.observeDay(d)) { m, e -> Triple(d, m, e) } },
-        profiles.observeProfile(),
+        combine(profiles.observeProfile(), energy.observeTarget()) { p, t -> p to t },
         pending.observe(),
         secure.hasApiKey,
         store.insightRules,
-    ) { (date, list, exerciseList), profile, queue, hasKey, rules ->
-        val target = profile?.let(TdeeCalculator::calculate)
+    ) { (date, list, exerciseList), (profile, target), queue, hasKey, rules ->
         val burned = ExerciseRepository.dailyTotals(exerciseList)
         val stats = PeriodStatsCalculator(rules).compute(list, date, date, target?.calories, exerciseByDay = burned)
         val tips = store.appConfig.value.tips
@@ -136,8 +141,14 @@ class HomeViewModel @Inject constructor(
     private val previousDay = selected.flatMapLatest { d -> meals.observeDay(d.minusDays(1)) }
         .map { list -> list.sortedBy { it.eatenAt }.groupBy { it.mealType } }
 
-    val state: StateFlow<HomeState> = combine(base, projections.observe(), strip, previousDay, achievements.observeNew()) { home, proj, days, prev, fresh ->
-        home.copy(projection = proj, days = days, previousDayByType = prev, newAchievements = fresh)
+    val state: StateFlow<HomeState> = combine(
+        base,
+        combine(projections.observe(), energy.observeAdaptive(), energy.observeDailyIntake()) { p, a, intake -> Triple(p, a, streakOf(intake.keys)) },
+        strip,
+        previousDay,
+        achievements.observeNew(),
+    ) { home, (proj, adaptive, streak), days, prev, fresh ->
+        home.copy(projection = proj, adaptive = adaptive, streak = streak, days = days, previousDayByType = prev, newAchievements = fresh)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState())
 
     /** Salin semua makan [type] dari hari sebelumnya ke hari yang sedang dilihat (jam sama). */
@@ -167,7 +178,18 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val STRIP_DAYS = 14
+    companion object {
+        private const val STRIP_DAYS = 14
+
+        /** Jumlah hari berturut-turut yang punya catatan, dihitung mundur dari hari ini (atau kemarin bila hari ini belum). */
+        fun streakOf(days: Set<LocalDate>, today: LocalDate = LocalDate.now()): Int {
+            var d = if (today in days) today else today.minusDays(1)
+            var n = 0
+            while (d in days) {
+                n++
+                d = d.minusDays(1)
+            }
+            return n
+        }
     }
 }

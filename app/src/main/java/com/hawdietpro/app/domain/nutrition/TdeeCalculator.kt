@@ -25,6 +25,8 @@ data class DailyTarget(
     /** Perkiraan minggu menuju berat target, null bila tidak relevan. */
     val weeksToTarget: Int?,
     val warnings: List<String>,
+    /** true = TDEE berasal dari data timbangan & catatan makan (adaptif), bukan rumus saja. */
+    val adaptive: Boolean = false,
 )
 
 /**
@@ -67,10 +69,13 @@ object TdeeCalculator {
 
     fun minimumCalories(sex: Sex): Int = if (sex == Sex.PRIA) MIN_CALORIES_MALE else MIN_CALORIES_FEMALE
 
-    fun calculate(profile: UserProfile): DailyTarget {
+    fun calculate(profile: UserProfile): DailyTarget = calculate(profile, null)
+
+    /** [measuredTdee] = TDEE adaptif dari data (lihat [AdaptiveTdeeEstimator]); null = pakai rumus. */
+    fun calculate(profile: UserProfile, measuredTdee: Int?): DailyTarget {
         val warnings = mutableListOf<String>()
         val bmr = bmr(profile.sex, profile.weightKg, profile.heightCm, profile.age)
-        val tdee = bmr * profile.activityLevel.factor
+        val tdee = measuredTdee?.toDouble() ?: (bmr * profile.activityLevel.factor)
         val bmi = bmi(profile.weightKg, profile.heightCm)
         val floor = minimumCalories(profile.sex).toDouble()
 
@@ -144,6 +149,7 @@ object TdeeCalculator {
             weeklyChangeKg = (weeklyChange * 100).roundToInt() / 100.0,
             weeksToTarget = weeksToTarget,
             warnings = warnings,
+            adaptive = measuredTdee != null,
         )
     }
 

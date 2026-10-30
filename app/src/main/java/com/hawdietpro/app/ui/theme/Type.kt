@@ -42,3 +42,31 @@ val HawTypography = Typography(
     labelMedium = style(12, 16, FontWeight.SemiBold),
     labelSmall = style(11, 15, FontWeight.Medium, 0.2),
 )
+
+/** Angka besar dengan digit lebar seragam (tabular) agar tidak "bergoyang" saat beranimasi. */
+val NumberDisplay = TextStyle(
+    fontFamily = JakartaSans,
+    fontSize = 56.sp,
+    lineHeight = 60.sp,
+    fontWeight = FontWeight.ExtraBold,
+    letterSpacing = (-1.5).sp,
+    fontFeatureSettings = "tnum",
+)
+
+val NumberLarge = TextStyle(
+    fontFamily = JakartaSans,
+    fontSize = 26.sp,
+    lineHeight = 30.sp,
+    fontWeight = FontWeight.ExtraBold,
+    letterSpacing = (-0.5).sp,
+    fontFeatureSettings = "tnum",
+)
+
+val NumberMedium = TextStyle(
+    fontFamily = JakartaSans,
+    fontSize = 18.sp,
+    lineHeight = 22.sp,
+    fontWeight = FontWeight.Bold,
+    letterSpacing = (-0.2).sp,
+    fontFeatureSettings = "tnum",
+)

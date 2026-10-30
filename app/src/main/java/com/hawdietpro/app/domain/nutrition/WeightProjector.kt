@@ -69,6 +69,8 @@ object WeightProjector {
         dailyIntake: Map<LocalDate, Double>,
         weights: List<WeightEntry>,
         dailyExercise: Map<LocalDate, Double> = emptyMap(),
+        /** Koreksi TDEE dari data (lihat [AdaptiveTdeeEstimator]); 1.0 = rumus murni. */
+        tdeeMultiplier: Double = 1.0,
     ): WeightProjection {
         val days = ArrayList<DayBalance>()
         var weight = startWeight
@@ -77,7 +79,7 @@ object WeightProjector {
         // Hari ini belum selesai → hanya hari-hari sebelum hari ini yang dihitung.
         while (date.isBefore(today)) {
             val bmr = TdeeCalculator.bmr(profile.sex, weight, profile.heightCm, profile.age)
-            val tdee = bmr * profile.activityLevel.factor
+            val tdee = bmr * profile.activityLevel.factor * tdeeMultiplier
             val intake = dailyIntake[date]
             val exercise = dailyExercise[date] ?: 0.0
             // Hari tanpa catatan makan tetap netral walau ada olahraga: asupan hari itu tidak diketahui.

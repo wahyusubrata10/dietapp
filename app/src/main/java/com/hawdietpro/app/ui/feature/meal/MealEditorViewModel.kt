@@ -11,7 +11,7 @@ import com.hawdietpro.app.data.repository.MealAnalyzer
 import com.hawdietpro.app.data.repository.MealEvaluator
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.PendingRepository
-import com.hawdietpro.app.data.repository.ProfileRepository
+import com.hawdietpro.app.data.repository.EnergyRepository
 import com.hawdietpro.app.domain.model.FoodItem
 import com.hawdietpro.app.domain.model.FoodReference
 import com.hawdietpro.app.domain.model.Meal
@@ -62,7 +62,7 @@ class MealEditorViewModel @Inject constructor(
     private val evaluator: MealEvaluator,
     private val meals: MealRepository,
     private val foods: FoodRepository,
-    private val profiles: ProfileRepository,
+    private val energy: EnergyRepository,
     private val pending: PendingRepository,
     private val network: NetworkMonitor,
     store: RemoteConfigStore,
@@ -85,7 +85,7 @@ class MealEditorViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val target = profiles.getTarget()?.calories
+            val target = energy.getTarget()?.calories
             foods.seedIfNeeded()
             when {
                 mealId != 0L -> {

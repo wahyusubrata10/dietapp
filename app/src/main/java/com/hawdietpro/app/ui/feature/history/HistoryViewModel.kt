@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.data.repository.ExerciseRepository
 import com.hawdietpro.app.data.repository.MealRepository
-import com.hawdietpro.app.data.repository.ProfileRepository
+import com.hawdietpro.app.data.repository.EnergyRepository
 import com.hawdietpro.app.domain.model.Grade
 import com.hawdietpro.app.domain.model.Meal
 import com.hawdietpro.app.domain.model.MealType
@@ -65,7 +65,7 @@ data class HistoryUi(
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val meals: MealRepository,
-    profiles: ProfileRepository,
+    energy: EnergyRepository,
     exercises: ExerciseRepository,
 ) : ViewModel() {
 
@@ -97,7 +97,7 @@ class HistoryViewModel @Inject constructor(
         combine(mode, filters, windowDays, month, selected) { a, b, c, d, e -> Params(a, b, c, d, e) },
         timeline,
         monthData,
-        profiles.observeTarget(),
+        energy.observeTarget(),
         exercises.observeDailyTotals(),
     ) { p, groups, monthMeals, target, burned ->
         val filteredMonth = p.filters.apply(monthMeals)

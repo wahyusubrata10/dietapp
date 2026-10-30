@@ -103,28 +103,47 @@ data class HawExtendedColors(
     val cardBorder: Color,
     val success: Color,
     val warning: Color,
+    /** Kilau lembut di belakang hero & bagian atas layar. */
+    val glow: Color = Color.Transparent,
+    /** Sorotan tipis di tepi atas kartu (efek kaca halus). */
+    val cardHighlight: Color = Color.Transparent,
+    /** Kartu sedikit lebih terang (bento tile sekunder). */
+    val cardRaised: Color = card,
+    /** Aksen olahraga & makanan. */
+    val exercise: Color = Color(0xFF7C8CFF),
+    val food: Color = Color(0xFFFF8A4C),
 )
 
 private val LightExtended = HawExtendedColors(
-    heroGradient = Brush.linearGradient(listOf(Emerald700, Emerald600, Mint400)),
+    heroGradient = Brush.linearGradient(listOf(Color(0xFF0B7A55), Emerald600, Teal500)),
     heroContent = White,
-    heroContentSub = White.copy(alpha = 0.78f),
+    heroContentSub = White.copy(alpha = 0.80f),
     heroTrack = White.copy(alpha = 0.22f),
     card = White,
     cardBorder = Line,
     success = Color(0xFF16A34A),
     warning = Color(0xFFEA8A0C),
+    glow = Emerald300.copy(alpha = 0.28f),
+    cardHighlight = Color.Transparent,
+    cardRaised = Color(0xFFF7FAF8),
+    exercise = Indigo600,
+    food = Orange500,
 )
 
 private val DarkExtended = HawExtendedColors(
-    heroGradient = Brush.linearGradient(listOf(Emerald900, Emerald800, Color(0xFF0F6E55))),
+    heroGradient = Brush.linearGradient(listOf(Color(0xFF07291F), Color(0xFF0B4A37), Color(0xFF0E6B57))),
     heroContent = Color(0xFFF1FBF6),
-    heroContentSub = Color(0xFFF1FBF6).copy(alpha = 0.72f),
-    heroTrack = White.copy(alpha = 0.14f),
+    heroContentSub = Color(0xFFF1FBF6).copy(alpha = 0.70f),
+    heroTrack = White.copy(alpha = 0.12f),
     card = NightCard,
     cardBorder = NightLine,
     success = Color(0xFF4ADE80),
     warning = Color(0xFFFBBF24),
+    glow = Color(0xFF1DB386).copy(alpha = 0.22f),
+    cardHighlight = White.copy(alpha = 0.05f),
+    cardRaised = NightCardHigh,
+    exercise = Color(0xFF8E9BFF),
+    food = Color(0xFFFF9A62),
 )
 
 val LocalHawColors = staticCompositionLocalOf { LightExtended }
@@ -138,8 +157,8 @@ private val HawShapes = Shapes(
     extraSmall = RoundedCornerShape(8.dp),
     small = RoundedCornerShape(12.dp),
     medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(22.dp),
-    extraLarge = RoundedCornerShape(30.dp),
+    large = RoundedCornerShape(24.dp),
+    extraLarge = RoundedCornerShape(32.dp),
 )
 
 /** [darkTheme] null = ikuti sistem. */
