@@ -1,5 +1,15 @@
 package com.hawdietpro.app.ui.feature.meal
 
+import com.hawdietpro.app.ui.components.AnimatedCount
+import com.hawdietpro.app.ui.components.BentoCard
+import com.hawdietpro.app.ui.components.PillTabs
+import com.hawdietpro.app.ui.components.SegmentDonut
+import com.hawdietpro.app.ui.theme.NumberLarge
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -263,21 +273,29 @@ fun MealEditorScreen(
 
 @Composable
 private fun SaveBar(state: EditorState, onSave: () -> Unit) {
-    Surface(tonalElevation = 3.dp, shadowElevation = 8.dp) {
+    val cs = MaterialTheme.colorScheme
+    Surface(color = cs.surface, shadowElevation = 16.dp) {
         Row(
             Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {
-                Text("Total", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(Format.kcal(state.meal.total.calories), style = MaterialTheme.typography.titleLarge)
+                Text("Total", style = MaterialTheme.typography.labelMedium, color = cs.onSurfaceVariant)
+                Row(verticalAlignment = Alignment.Bottom) {
+                    AnimatedCount(state.meal.total.calories.roundToInt(), NumberLarge, cs.onSurface)
+                    Spacer(Modifier.width(4.dp))
+                    Text("kkal", style = MaterialTheme.typography.labelMedium, color = cs.onSurfaceVariant, modifier = Modifier.padding(bottom = 3.dp))
+                }
             }
             Button(
                 onClick = onSave,
                 enabled = state.meal.items.isNotEmpty() && state.phase == EditorPhase.Ready,
-                shape = MaterialTheme.shapes.large,
-                modifier = Modifier.height(52.dp),
+                shape = CircleShape,
+                contentPadding = PaddingValues(horizontal = 24.dp),
+                modifier = Modifier.height(54.dp),
             ) {
+                Icon(Icons.Filled.Check, null, Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
                 Text(if (state.mode == EditorMode.EDIT) "Simpan perubahan" else "Simpan", style = MaterialTheme.typography.titleSmall)
             }
         }
@@ -296,10 +314,18 @@ private fun PhotoHeader(path: String?, modifier: Modifier = Modifier) {
     }
 }
 
+private val ANALYZE_STEPS = listOf(
+    "Mengenali menu di foto",
+    "Memecah tiap elemen di piring",
+    "Mencocokkan dengan database gizi",
+    "Menghitung skor gizi",
+)
+
 @Composable
 private fun AnalyzingView(photoPath: String?, onBackground: (() -> Unit)?) {
-    val transition = rememberInfiniteTransition(label = "pulse")
-    val scale by transition.animateFloat(0.96f, 1.02f, infiniteRepeatable(tween(900), RepeatMode.Reverse), label = "scale")
+    val cs = MaterialTheme.colorScheme
+    val transition = rememberInfiniteTransition(label = "scan")
+    val scan by transition.animateFloat(0f, 1f, infiniteRepeatable(tween(1600), RepeatMode.Reverse), label = "scanY")
     var seconds by remember { mutableStateOf(0) }
     LaunchedEffect(Unit) {
         while (true) {
@@ -307,33 +333,77 @@ private fun AnalyzingView(photoPath: String?, onBackground: (() -> Unit)?) {
             seconds++
         }
     }
+    val active = (seconds / 4).coerceAtMost(ANALYZE_STEPS.lastIndex)
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(Modifier.scale(scale)) { PhotoHeader(photoPath) }
-        Spacer(Modifier.height(24.dp))
-        Icon(Icons.Filled.AutoAwesome, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(36.dp))
-        Spacer(Modifier.height(8.dp))
-        Text("Menganalisa makanan… ${seconds}s", style = MaterialTheme.typography.titleLarge)
+        // Foto dengan garis "pemindai" yang bergerak naik-turun.
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(28.dp))
+                .drawWithContent {
+                    drawContent()
+                    val y = size.height * scan
+                    drawRect(
+                        Brush.verticalGradient(
+                            listOf(Color.Transparent, cs.primary.copy(alpha = 0.35f), Color.Transparent),
+                            startY = y - 60f,
+                            endY = y + 60f,
+                        ),
+                    )
+                    drawLine(cs.primary, Offset(0f, y), Offset(size.width, y), strokeWidth = 3.dp.toPx())
+                },
+        ) {
+            if (photoPath != null && File(photoPath).exists()) {
+                PhotoHeader(photoPath)
+            } else {
+                Box(Modifier.fillMaxWidth().aspectRatio(4f / 3f).background(cs.surfaceContainerHigh))
+            }
+        }
+        Spacer(Modifier.height(22.dp))
+        Text("Menganalisa makanan…", style = MaterialTheme.typography.headlineSmall)
+        Text("${seconds} detik", style = MaterialTheme.typography.labelLarge, color = cs.primary)
+        Spacer(Modifier.height(16.dp))
+        BentoCard(Modifier.fillMaxWidth(), padding = 16.dp) {
+            ANALYZE_STEPS.forEachIndexed { i, step ->
+                Row(Modifier.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(26.dp), contentAlignment = Alignment.Center) {
+                        when {
+                            i < active -> Box(Modifier.size(22.dp).clip(CircleShape).background(cs.primary), contentAlignment = Alignment.Center) {
+                                Icon(Icons.Filled.Check, null, tint = cs.onPrimary, modifier = Modifier.size(14.dp))
+                            }
+                            i == active -> CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.5.dp)
+                            else -> Box(Modifier.size(10.dp).clip(CircleShape).background(cs.outlineVariant))
+                        }
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        step,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (i <= active) cs.onSurface else cs.onSurfaceVariant,
+                        fontWeight = if (i == active) FontWeight.SemiBold else FontWeight.Normal,
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(12.dp))
         Text(
             when {
-                seconds < 8 -> "AI sedang mengenali menu & memecah setiap elemen di piring"
-                seconds < 20 -> "Masih memproses… server Gemini gratis kadang sedang ramai"
-                else -> "Server sedang lambat. Anda bisa lanjut di background dan dapat notifikasi saat selesai."
+                seconds < 20 -> "AI mengenali menu & memecah setiap elemen di piring."
+                else -> "Server Gemini gratis sedang ramai. Kamu bisa lanjut di latar belakang dan dapat notifikasi saat selesai."
             },
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = cs.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(16.dp))
-        LinearProgressIndicator(Modifier.fillMaxWidth(0.6f))
         if (onBackground != null) {
-            Spacer(Modifier.height(24.dp))
-            OutlinedButton(onClick = onBackground, shape = MaterialTheme.shapes.large) {
+            Spacer(Modifier.height(20.dp))
+            OutlinedButton(onClick = onBackground, shape = CircleShape) {
                 Icon(Icons.Filled.CloudQueue, null)
                 Spacer(Modifier.width(8.dp))
-                Text("Lanjutkan di background")
+                Text("Lanjutkan di latar belakang")
             }
         }
     }
@@ -562,26 +632,38 @@ private fun PhotoHero(meal: Meal) {
 @Composable
 private fun NutritionCard(meal: Meal) {
     val t = meal.total
-    HawCard {
-        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(Format.kcalNumber(t.calories), style = MaterialTheme.typography.displaySmall)
-                Spacer(Modifier.width(6.dp))
-                Text("kkal", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 6.dp))
+    val split = t.macroEnergy
+    val cs = MaterialTheme.colorScheme
+    BentoCard(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            SegmentDonut(
+                listOf(
+                    split.proteinPct.toFloat() to MacroColors.Protein,
+                    split.carbsPct.toFloat() to MacroColors.Carbs,
+                    split.fatPct.toFloat() to MacroColors.Fat,
+                ),
+                size = 128.dp,
+                stroke = 14.dp,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    AnimatedCount(t.calories.roundToInt(), NumberLarge, cs.onSurface)
+                    Text("kkal", style = MaterialTheme.typography.labelMedium, color = cs.onSurfaceVariant)
+                }
             }
-            SegmentedMacroBar(t, height = 12.dp)
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                val split = t.macroEnergy
+            Spacer(Modifier.width(18.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 MacroValue("Protein", t.protein, split.proteinPct, MacroColors.Protein)
                 MacroValue("Karbo", t.carbs, split.carbsPct, MacroColors.Carbs)
                 MacroValue("Lemak", t.fat, split.fatPct, MacroColors.Fat)
                 MacroValue("Serat", t.fiber, null, MacroColors.Fiber)
             }
-            HorizontalDivider(color = HawTheme.colors.cardBorder)
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                LimitValue("🍬 Gula", "${Format.oneDecimal(t.sugar)} g", t.sugar / NutritionLimits.SUGAR_G, Modifier.weight(1f))
-                LimitValue("🧂 Natrium", "${Format.grouped(t.sodium.roundToInt())} mg", t.sodium / NutritionLimits.SODIUM_MG, Modifier.weight(1f))
-            }
+        }
+        Spacer(Modifier.height(14.dp))
+        HorizontalDivider(color = HawTheme.colors.cardBorder)
+        Spacer(Modifier.height(14.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            LimitValue("🍬 Gula", "${Format.oneDecimal(t.sugar)} g", t.sugar / NutritionLimits.SUGAR_G, Modifier.weight(1f))
+            LimitValue("🧂 Natrium", "${Format.grouped(t.sodium.roundToInt())} mg", t.sodium / NutritionLimits.SODIUM_MG, Modifier.weight(1f))
         }
     }
 }
@@ -613,51 +695,40 @@ private val PORTIONS = listOf(0.5 to "½", 0.75 to "¾", 1.0 to "1", 1.5 to "1½
 /** Porsi cepat untuk seluruh piring. */
 @Composable
 private fun PortionSelector(current: Double, onSelect: (Double) -> Unit) {
-    HawCard(contentPadding = 14.dp) {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Porsi yang dimakan", style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-                Text(
-                    if (current == 1.0) "sesuai foto" else "× ${Format.oneDecimal(current)}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PORTIONS.forEach { (value, label) ->
-                    val selected = current == value
-                    Surface(
-                        onClick = { onSelect(value) },
-                        shape = MaterialTheme.shapes.medium,
-                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer,
-                        contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f).height(44.dp),
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(label, style = MaterialTheme.typography.titleMedium)
-                        }
-                    }
-                }
-            }
+    BentoCard(Modifier.fillMaxWidth(), padding = 14.dp) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Porsi yang dimakan", style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
             Text(
-                "Mis. hanya habis setengah piring → pilih ½. Semua elemen ikut disesuaikan.",
-                style = MaterialTheme.typography.bodySmall,
+                if (current == 1.0) "sesuai foto" else "× ${Format.oneDecimal(current)}",
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+        Spacer(Modifier.height(10.dp))
+        PillTabs(PORTIONS.map { it.second }, PORTIONS.indexOfFirst { it.first == current }, { onSelect(PORTIONS[it].first) })
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Mis. hanya habis setengah piring → pilih ½. Semua elemen ikut disesuaikan.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
 @Composable
 private fun MacroValue(label: String, grams: Double, pct: Double?, color: Color) {
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(8.dp).clip(CircleShape).background(color))
-            Spacer(Modifier.width(6.dp))
-            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Text("${Format.oneDecimal(grams)} g", style = MaterialTheme.typography.titleMedium)
-        pct?.let { Text("${it.roundToInt()}% energi", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(10.dp).clip(CircleShape).background(color))
+        Spacer(Modifier.width(8.dp))
+        Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+        Text("${Format.oneDecimal(grams)} g", style = MaterialTheme.typography.titleSmall)
+        Text(
+            pct?.let { "  ${it.roundToInt()}%" } ?: "",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.width(36.dp),
+            textAlign = TextAlign.End,
+        )
     }
 }
 

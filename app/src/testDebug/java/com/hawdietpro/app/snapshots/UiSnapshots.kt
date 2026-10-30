@@ -18,6 +18,10 @@ import com.hawdietpro.app.ui.feature.home.HomeActions
 import com.hawdietpro.app.ui.feature.home.HomeContent
 import com.hawdietpro.app.ui.navigation.HawBottomBar
 import com.hawdietpro.app.ui.navigation.QuickAddContent
+import com.hawdietpro.app.ui.components.PillTabs
+import com.hawdietpro.app.ui.feature.weight.AdaptiveSection
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import com.hawdietpro.app.ui.theme.HawDietTheme
 import org.junit.Rule
 import org.junit.Test
@@ -42,7 +46,7 @@ class UiSnapshots {
     private fun snap(name: String, dark: Boolean = true, content: @Composable () -> Unit) {
         compose.setContent {
             HawDietTheme(darkTheme = dark) {
-                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) { content() }
+                androidx.compose.material3.Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) { content() }
             }
         }
         // Animasi (masuk, angka, cincin) semuanya terbatas → tunggu sampai diam.
@@ -88,4 +92,16 @@ class UiSnapshots {
 
     @Test
     fun quick_add_dark() = snap("quick_add_dark") { QuickAddContent(onAction = {}) }
+
+    @Test
+    fun weight_adaptive_dark() = snap("weight_adaptive_dark") {
+        androidx.compose.foundation.layout.Column(
+            Modifier.padding(16.dp),
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp),
+        ) {
+            PillTabs(listOf("Ringkasan", "Nutrisi", "Pola", "Berat"), 3, {})
+            val home = SampleData.home()
+            AdaptiveSection(home.adaptive!!, enabled = true, targetCalories = home.target?.calories, onToggle = {})
+        }
+    }
 }

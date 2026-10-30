@@ -117,15 +117,19 @@ fun BentoCard(
     val border = if (color == null) {
         BorderStroke(1.dp, Brush.verticalGradient(listOf(hc.cardHighlight.compositeOver(hc.cardBorder), hc.cardBorder)))
     } else null
-    Column(
-        modifier
-            .then(if (onClick != null) Modifier.bouncyClick(onClick = onClick) else Modifier)
-            .clip(shape)
-            .background(bg)
-            .then(if (border != null) Modifier.border(border, shape) else Modifier)
-            .padding(padding),
-        content = content,
-    )
+    // Warna teks default mengikuti kartu (bukan induknya) agar selalu kontras.
+    val contentColor = if (color == null) MaterialTheme.colorScheme.onSurface else androidx.compose.material3.LocalContentColor.current
+    androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalContentColor provides contentColor) {
+        Column(
+            modifier
+                .then(if (onClick != null) Modifier.bouncyClick(onClick = onClick) else Modifier)
+                .clip(shape)
+                .background(bg)
+                .then(if (border != null) Modifier.border(border, shape) else Modifier)
+                .padding(padding),
+            content = content,
+        )
+    }
 }
 
 private fun Color.compositeOver(other: Color): Color {
@@ -370,14 +374,16 @@ fun PillTabs(options: List<String>, selected: Int, onSelect: (Int) -> Unit, modi
             label = "pill",
         )
         val height = if (compact) 34.dp else 40.dp
-        Box(
-            Modifier
-                .padding(start = offset)
-                .width(itemWidth)
-                .height(height)
-                .clip(CircleShape)
-                .background(cs.primary),
-        )
+        if (selected in options.indices) {
+            Box(
+                Modifier
+                    .padding(start = offset)
+                    .width(itemWidth)
+                    .height(height)
+                    .clip(CircleShape)
+                    .background(cs.primary),
+            )
+        }
         Row(Modifier.fillMaxWidth()) {
             options.forEachIndexed { i, label ->
                 val active = i == selected
@@ -401,5 +407,38 @@ fun PillTabs(options: List<String>, selected: Int, onSelect: (Int) -> Unit, modi
                 }
             }
         }
+    }
+}
+
+/** Donat proporsi (mis. energi protein/karbo/lemak) dengan celah antar segmen dan isi di tengah. */
+@Composable
+fun SegmentDonut(
+    segments: List<Pair<Float, Color>>,
+    modifier: Modifier = Modifier,
+    size: Dp = 124.dp,
+    stroke: Dp = 14.dp,
+    track: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    content: @Composable () -> Unit = {},
+) {
+    val total = segments.sumOf { it.first.toDouble() }.toFloat()
+    val progress = remember { Animatable(0f) }
+    LaunchedEffect(total) { progress.snapTo(0f); progress.animateTo(1f, tween(900, easing = FastOutSlowInEasing)) }
+    Box(modifier.size(size), contentAlignment = Alignment.Center) {
+        Canvas(Modifier.size(size)) {
+            val sw = stroke.toPx()
+            val arc = Size(this.size.width - sw, this.size.height - sw)
+            val tl = Offset(sw / 2, sw / 2)
+            drawArc(track, 0f, 360f, false, tl, arc, style = Stroke(sw))
+            if (total > 0f) {
+                val gap = if (segments.count { it.first > 0f } > 1) 6f else 0f
+                var start = -90f
+                segments.filter { it.first > 0f }.forEach { (v, c) ->
+                    val sweep = 360f * v / total
+                    drawArc(c, start + gap / 2, ((sweep - gap) * progress.value).coerceAtLeast(0.1f), false, tl, arc, style = Stroke(sw, cap = StrokeCap.Butt))
+                    start += sweep
+                }
+            }
+        }
+        content()
     }
 }
