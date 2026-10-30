@@ -68,6 +68,7 @@ import com.hawdietpro.app.ui.components.GradeBadge
 import com.hawdietpro.app.ui.components.HawCard
 import com.hawdietpro.app.ui.components.HawScaffold
 import com.hawdietpro.app.ui.components.LoadingBox
+import com.hawdietpro.app.ui.components.PillTabs
 import com.hawdietpro.app.ui.components.StackedBarChart
 import com.hawdietpro.app.ui.components.StatTile
 import com.hawdietpro.app.ui.components.gradeColor
@@ -96,17 +97,7 @@ fun AnalyticsScreen(onOpenWeight: () -> Unit, viewModel: AnalyticsViewModel = hi
             return@HawScaffold
         }
         Column(Modifier.padding(padding).fillMaxSize()) {
-            PrimaryTabRow(selectedTabIndex = tab, containerColor = MaterialTheme.colorScheme.background) {
-                TABS.forEachIndexed { i, title ->
-                    Tab(
-                        selected = tab == i,
-                        onClick = { viewModel.setTab(i) },
-                        text = { Text(title, fontWeight = if (tab == i) FontWeight.Bold else FontWeight.Medium) },
-                        selectedContentColor = MaterialTheme.colorScheme.primary,
-                        unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+            PillTabs(TABS, tab, viewModel::setTab, Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
             LazyColumn(
                 Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
@@ -128,16 +119,13 @@ fun AnalyticsScreen(onOpenWeight: () -> Unit, viewModel: AnalyticsViewModel = hi
 
 private fun LazyListScope.periodHeader(state: AnalyticsUi, viewModel: AnalyticsViewModel) {
     item {
-        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-            listOf(Period.WEEK to "Mingguan", Period.MONTH to "Bulanan").forEachIndexed { i, (p, label) ->
-                SegmentedButton(
-                    colors = hawSegmentedColors(),
-                    selected = state.period == p,
-                    onClick = { viewModel.setPeriod(p) },
-                    shape = SegmentedButtonDefaults.itemShape(i, 2),
-                ) { Text(label) }
-            }
-        }
+        val periods = listOf(Period.WEEK to "Mingguan", Period.MONTH to "Bulanan")
+        PillTabs(
+            periods.map { it.second },
+            periods.indexOfFirst { it.first == state.period }.coerceAtLeast(0),
+            { viewModel.setPeriod(periods[it].first) },
+            compact = true,
+        )
     }
     item {
         Row(verticalAlignment = Alignment.CenterVertically) {

@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.activity.ComponentActivity
+import android.graphics.Canvas
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onRoot
 import com.hawdietpro.app.ui.feature.home.HomeActions
 import com.hawdietpro.app.ui.feature.home.HomeContent
@@ -35,7 +37,7 @@ import java.io.File
 class UiSnapshots {
 
     @get:Rule
-    val compose = createComposeRule()
+    val compose = createAndroidComposeRule<ComponentActivity>()
 
     private fun snap(name: String, dark: Boolean = true, content: @Composable () -> Unit) {
         compose.setContent {
@@ -46,7 +48,15 @@ class UiSnapshots {
         // Animasi (masuk, angka, cincin) semuanya terbatas → tunggu sampai diam.
         compose.mainClock.advanceTimeBy(3_000)
         compose.waitForIdle()
-        val bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
+        // Gambar langsung dari view (stabil di Robolectric); PixelCopy hanya cadangan.
+        val bitmap = runCatching {
+            var out: Bitmap? = null
+            compose.runOnIdle {
+                val view = compose.activity.window.decorView
+                out = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888).also { view.draw(Canvas(it)) }
+            }
+            out!!
+        }.getOrElse { compose.onRoot().captureToImage().asAndroidBitmap() }
         val dir = File(System.getProperty("snapshotDir") ?: "build/snapshots").apply { mkdirs() }
         File(dir, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }

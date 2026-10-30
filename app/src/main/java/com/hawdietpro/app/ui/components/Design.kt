@@ -345,3 +345,61 @@ fun LabeledValue(label: String, value: String, modifier: Modifier = Modifier, va
         Text(value, style = valueStyle, color = valueColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
+
+/**
+ * Tab berbentuk pil di dalam wadah membulat; pil aktif bergeser dengan animasi.
+ * Dipakai untuk tab layar (Analisa) maupun pilihan periode.
+ */
+@Composable
+fun PillTabs(options: List<String>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier, compact: Boolean = false) {
+    val cs = MaterialTheme.colorScheme
+    val hc = HawTheme.colors
+    androidx.compose.foundation.layout.BoxWithConstraints(
+        modifier
+            .fillMaxWidth()
+            .clip(CircleShape)
+            .background(hc.card)
+            .border(1.dp, hc.cardBorder, CircleShape)
+            .padding(4.dp),
+    ) {
+        val count = options.size.coerceAtLeast(1)
+        val itemWidth = maxWidth / count
+        val offset by androidx.compose.animation.core.animateDpAsState(
+            itemWidth * selected,
+            spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessMediumLow),
+            label = "pill",
+        )
+        val height = if (compact) 34.dp else 40.dp
+        Box(
+            Modifier
+                .padding(start = offset)
+                .width(itemWidth)
+                .height(height)
+                .clip(CircleShape)
+                .background(cs.primary),
+        )
+        Row(Modifier.fillMaxWidth()) {
+            options.forEachIndexed { i, label ->
+                val active = i == selected
+                val color by androidx.compose.animation.animateColorAsState(if (active) cs.onPrimary else cs.onSurfaceVariant, label = "pillText")
+                Box(
+                    Modifier
+                        .width(itemWidth)
+                        .height(height)
+                        .clip(CircleShape)
+                        .clickable { onSelect(i) },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        label,
+                        style = if (compact) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelLarge,
+                        fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                        color = color,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+        }
+    }
+}

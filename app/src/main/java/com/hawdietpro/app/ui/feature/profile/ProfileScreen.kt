@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import com.hawdietpro.app.ui.components.IconBadge
+import com.hawdietpro.app.ui.components.IconTile
 import com.hawdietpro.app.ui.components.Pill
 import com.hawdietpro.app.ui.theme.HawTheme
+import com.hawdietpro.app.ui.theme.MacroColors
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -128,28 +130,30 @@ fun ProfileScreen(
             item {
                 MenuGroup("Data & kebiasaan") {
                     MenuItem(Icons.Filled.Edit, "Data diri & target", "Umur, tinggi, berat, aktivitas, tujuan", onEditProfile)
-                    MenuItem(Icons.Filled.MonitorWeight, "Log berat badan", "Catat & lihat tren berat", onWeight)
-                    MenuItem(Icons.Filled.EmojiEvents, "Pencapaian", "Badge kebiasaan & rekor streak", onAchievements)
-                    MenuItem(Icons.Filled.Replay, "Makan lagi & favorit", "Catat ulang menu yang sering dimakan", onRelog)
+                    MenuItem(Icons.Filled.MonitorWeight, "Berat & kebutuhan kalori", "Tren berat, kebutuhan kalori dari datamu", onWeight, tint = MacroColors.Protein)
+                    MenuItem(Icons.Filled.EmojiEvents, "Pencapaian", "Badge kebiasaan & rekor streak", onAchievements, tint = HawTheme.colors.warning)
+                    MenuItem(Icons.Filled.Replay, "Makan lagi & favorit", "Catat ulang menu yang sering dimakan", onRelog, tint = HawTheme.colors.food)
                     MenuItem(
                         Icons.Filled.CloudQueue,
                         "Antrian analisa",
                         if (state.pendingCount > 0) "${state.pendingCount} foto menunggu" else "Tidak ada antrian",
                         onQueue,
                         badge = state.pendingCount.takeIf { it > 0 }?.toString(),
+                        tint = MaterialTheme.colorScheme.tertiary,
                     )
                 }
             }
             item {
                 MenuGroup("Aplikasi") {
-                    MenuItem(Icons.Filled.Settings, "Pengaturan", "API key Gemini, model AI, tema", onSettings)
-                    MenuItem(Icons.Filled.Backup, "Backup & ekspor", "ZIP (data + foto), CSV untuk Excel", onBackup)
+                    MenuItem(Icons.Filled.Settings, "Pengaturan", "API key Gemini, model AI, tema", onSettings, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    MenuItem(Icons.Filled.Backup, "Backup & ekspor", "ZIP (data + foto), CSV untuk Excel", onBackup, tint = HawTheme.colors.exercise)
                     MenuItem(
                         Icons.Filled.SystemUpdate,
                         "Update aplikasi",
                         "Versi ${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})",
                         onUpdate,
                         badge = if (state.updateAvailable) "Baru" else null,
+                        tint = MacroColors.Carbs,
                     )
                 }
             }
@@ -166,11 +170,11 @@ fun ProfileScreen(
 }
 
 @Composable
-fun MenuItem(icon: ImageVector, title: String, subtitle: String?, onClick: () -> Unit, badge: String? = null) {
+fun MenuItem(icon: ImageVector, title: String, subtitle: String?, onClick: () -> Unit, badge: String? = null, tint: Color? = null) {
     ListItem(
         headlineContent = { Text(title) },
         supportingContent = subtitle?.let { s -> @Composable { Text(s) } },
-        leadingContent = { IconBadge(icon, MaterialTheme.colorScheme.primary, size = 38.dp) },
+        leadingContent = { IconTile(icon, tint ?: MaterialTheme.colorScheme.primary, size = 40.dp) },
         trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 badge?.let {

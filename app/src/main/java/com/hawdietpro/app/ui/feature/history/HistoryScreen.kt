@@ -59,6 +59,7 @@ import com.hawdietpro.app.ui.components.EmptyState
 import com.hawdietpro.app.ui.components.HawCard
 import com.hawdietpro.app.ui.components.HawScaffold
 import com.hawdietpro.app.ui.components.LoadingBox
+import com.hawdietpro.app.ui.components.PillTabs
 import com.hawdietpro.app.ui.components.MealRow
 import com.hawdietpro.app.ui.components.Pill
 import com.hawdietpro.app.ui.components.SoftProgress
@@ -87,22 +88,11 @@ fun HistoryScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             item {
-                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                    SegmentedButton(
-                        colors = hawSegmentedColors(),
-                        selected = state.mode == HistoryMode.TIMELINE,
-                        onClick = { viewModel.setMode(HistoryMode.TIMELINE) },
-                        shape = SegmentedButtonDefaults.itemShape(0, 2),
-                        icon = { Icon(Icons.AutoMirrored.Filled.ViewList, null, Modifier.size(18.dp)) },
-                    ) { Text("Timeline") }
-                    SegmentedButton(
-                        colors = hawSegmentedColors(),
-                        selected = state.mode == HistoryMode.CALENDAR,
-                        onClick = { viewModel.setMode(HistoryMode.CALENDAR) },
-                        shape = SegmentedButtonDefaults.itemShape(1, 2),
-                        icon = { Icon(Icons.Filled.CalendarMonth, null, Modifier.size(18.dp)) },
-                    ) { Text("Kalender") }
-                }
+                PillTabs(
+                    listOf("Timeline", "Kalender"),
+                    if (state.mode == HistoryMode.TIMELINE) 0 else 1,
+                    { viewModel.setMode(if (it == 0) HistoryMode.TIMELINE else HistoryMode.CALENDAR) },
+                )
             }
             item { Filters(state, viewModel) }
 

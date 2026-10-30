@@ -82,6 +82,7 @@ android {
         unitTests.all { test ->
             test.systemProperty("snapshotDir", layout.buildDirectory.dir("snapshots").get().asFile.absolutePath)
             test.maxHeapSize = "3g"
+            test.systemProperty("robolectric.pixelCopyRenderMode", "hardware")
         }
     }
 }
