@@ -243,12 +243,13 @@ fun StatTile(
     color: Color? = null,
     accent: Color? = null,
 ) {
-    val bg = color ?: HawTheme.colors.card
+    val hc = HawTheme.colors
+    val bg = color ?: hc.card
     Surface(
         modifier.fillMaxHeight(),
-        shape = MaterialTheme.shapes.medium,
+        shape = RoundedCornerShape(20.dp),
         color = bg,
-        border = if (color == null) BorderStroke(1.dp, HawTheme.colors.cardBorder) else null,
+        border = if (color == null) BorderStroke(1.dp, Brush.verticalGradient(listOf(lerp(hc.cardBorder, Color.White, if (hc.cardHighlight.alpha > 0f) 0.06f else 0f), hc.cardBorder))) else null,
     ) {
         Column(Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

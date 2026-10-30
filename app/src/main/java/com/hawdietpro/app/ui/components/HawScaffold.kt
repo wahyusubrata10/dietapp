@@ -43,7 +43,7 @@ fun HawScaffold(
                 title = {
                     Text(
                         title,
-                        style = if (topLevel) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleLarge,
+                        style = if (topLevel) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.titleLarge,
                     )
                 },
                 navigationIcon = {

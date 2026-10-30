@@ -61,6 +61,7 @@ object AdaptiveTdeeEstimator {
     private const val FULL_WEIGH_INS = 4.0
     private const val MIN_COVERAGE = 0.5
     private const val FULL_COVERAGE = 0.85
+    private const val WATER_PHASE_DAYS = 7
 
     fun estimate(
         profile: UserProfile,
@@ -90,11 +91,14 @@ object AdaptiveTdeeEstimator {
 
         val windowStart = today.minusDays(WINDOW_DAYS)
         // Satu timbangan per hari (yang terakhir dicatat), hanya di jendela hitung & bukan masa depan.
-        val points = weights
+        val allPoints = weights
             .filter { it.epochDay in windowStart.toEpochDay()..today.toEpochDay() }
             .groupBy { it.epochDay }
             .map { (day, list) -> day to list.last().weightKg }
             .sortedBy { it.first }
+        // Minggu pertama diet: turunnya sebagian besar air & glikogen. Abaikan bila data sesudahnya sudah cukup.
+        val settled = firstLogDate?.let { f -> allPoints.filter { it.first >= f.toEpochDay() + WATER_PHASE_DAYS } }
+        val points = if (settled != null && settled.size >= 2 && settled.last().first - settled.first().first >= MIN_SPAN_DAYS) settled else allPoints
         if (points.size < 2) {
             return insufficient("Timbang badan minimal 2 kali dengan jarak ±1 minggu (idealnya 2–3x seminggu, pagi hari).", count = points.size)
         }
@@ -130,7 +134,7 @@ object AdaptiveTdeeEstimator {
             min(1.0, (points.size - 1) / (FULL_WEIGH_INS - 1)) *
             min(1.0, coverage / FULL_COVERAGE)
         // Minggu-minggu awal diet: penurunan cepat sebagian besar air & glikogen, bukan lemak.
-        val earlyPhase = firstLogDate != null && first - firstLogDate.toEpochDay() < 10
+        val earlyPhase = firstLogDate != null && first - firstLogDate.toEpochDay() < WATER_PHASE_DAYS
         if (earlyPhase) confidence *= 0.6
         confidence = confidence.coerceIn(0.0, 1.0)
 

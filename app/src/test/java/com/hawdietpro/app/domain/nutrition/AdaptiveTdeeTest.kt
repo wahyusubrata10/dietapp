@@ -102,6 +102,15 @@ class AdaptiveTdeeTest {
     }
 
     @Test
+    fun `turun cepat minggu pertama (air) diabaikan bila data sesudahnya cukup`() {
+        // Hari 1–6: turun 2 kg (air). Sesudahnya stabil dengan asupan 2400 → kebutuhan ±2400, bukan jauh lebih tinggi.
+        val first = day(30)
+        val weights = listOf(w(30, 82.0), w(25, 80.0), w(20, 80.0), w(14, 80.0), w(7, 80.0), w(1, 80.0))
+        val r = AdaptiveTdeeEstimator.estimate(profile, today, intake(2400.0, 30), weights, firstLogDate = first)
+        assertEquals(2400.0, r.observedTdee!!.toDouble(), 40.0)
+    }
+
+    @Test
     fun `regresi linear`() {
         val slope = AdaptiveTdeeEstimator.slopePerDay(listOf(0L to 80.0, 7L to 79.3, 14L to 78.6))
         assertEquals(-0.1, slope, 1e-9)
