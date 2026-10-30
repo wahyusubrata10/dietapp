@@ -231,6 +231,17 @@ private fun range(w: WeeklyWrap) = "${Format.dayMonth(w.weekStart)} – ${Format
 fun WrapSlide(w: WeeklyWrap, page: Int) {
     SlideFrame(page) {
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            WrapPageContent(w, page)
+            // Tanda kecil agar gambar yang dibagikan tetap menyebut aplikasinya.
+            Text("— Haw Diet Pro", style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.55f))
+        }
+    }
+}
+
+@Composable
+private fun WrapPageContent(w: WeeklyWrap, page: Int) {
+    run {
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
             when (page) {
                 0 -> {
                     Kicker("Rekap minggu · ${range(w)}")
@@ -256,6 +267,11 @@ fun WrapSlide(w: WeeklyWrap, page: Int) {
                     Caption("≈ ${if (deficit) "−" else "+"}${Format.oneDecimal(abs(w.estimatedKg))} kg (perkiraan dari kalori)")
                     Spacer(Modifier.height(6.dp))
                     StatusWeek(w)
+                    Text(
+                        "▢ putih = sesuai · pudar = kurang · merah = lebih · gelap = tidak dicatat",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White.copy(alpha = 0.7f),
+                    )
                     Caption("${w.daysOnTarget} hari sesuai jatah kalori (±10%).")
                 }
                 2 -> {

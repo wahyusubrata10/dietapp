@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -314,6 +315,15 @@ internal fun SummaryTiles(stats: PeriodStats, prev: PeriodStats?, target: Int?) 
             Text("Konsistensi", style = MaterialTheme.typography.labelLarge, color = cs.onSurfaceVariant)
             Spacer(Modifier.height(6.dp))
             ConsistencyGrid(statuses)
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                listOf(DayStatus.SESUAI, DayStatus.KURANG, DayStatus.LEBIH, DayStatus.KOSONG).forEach { st ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(8.dp).clip(RoundedCornerShape(2.dp)).background(st.color()))
+                        Text(" " + if (st == DayStatus.KOSONG) "Kosong" else st.label, style = MaterialTheme.typography.labelSmall, color = cs.onSurfaceVariant)
+                    }
+                }
+            }
         }
         Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             MiniStat("Tercatat", "${stats.daysLogged}/${statuses.count { it != null }}", "hari", Modifier.weight(1f).fillMaxHeight())
