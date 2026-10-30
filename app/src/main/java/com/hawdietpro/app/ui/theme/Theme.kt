@@ -228,11 +228,12 @@ fun HawDietTheme(
 ) {
     val useDark = darkTheme ?: isSystemInDarkTheme()
     val context = LocalContext.current
-    val useDynamic = dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-    val emerald = !useDynamic && accent == AccentColor.EMERALD
+    val dynamicScheme: ColorScheme? = if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (useDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    } else null
+    val emerald = dynamicScheme == null && accent == AccentColor.EMERALD
     var scheme = when {
-        useDynamic && useDark -> dynamicDarkColorScheme(context)
-        useDynamic -> dynamicLightColorScheme(context)
+        dynamicScheme != null -> dynamicScheme
         emerald -> if (useDark) DarkColors else LightColors
         else -> (if (useDark) DarkColors else LightColors).withPrimary(Color(if (useDark) accent.dark else accent.light), useDark)
     }

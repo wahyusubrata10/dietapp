@@ -64,3 +64,26 @@ jobs:
       - name: Gagal render
         if: steps.render.outcome != 'success'
         run: exit 1
+
+  # Pastikan build rilis (unit test + R8 + lint vital) juga lolos sebelum digabung ke main.
+  verify-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Unit test + build rilis (tanpa tanda tangan)
+        run: |
+          set -o pipefail
+          ./gradlew testReleaseUnitTest assembleRelease 2>&1 | tee "$RUNNER_TEMP/release.log"
+
+      - name: Ringkasan error
+        if: failure()
+        run: grep -E "^e: |Error:|FAILED|What went wrong|Lint found" "$RUNNER_TEMP/release.log" | head -80
