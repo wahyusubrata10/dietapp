@@ -66,6 +66,7 @@ import com.hawdietpro.app.ui.components.EmptyState
 import com.hawdietpro.app.ui.components.HawCard
 import com.hawdietpro.app.ui.components.HawScaffold
 import com.hawdietpro.app.ui.components.LoadingBox
+import com.hawdietpro.app.ui.components.SkeletonScreen
 import com.hawdietpro.app.ui.components.PillTabs
 import com.hawdietpro.app.ui.components.MealRow
 import com.hawdietpro.app.ui.components.Pill
@@ -86,7 +87,7 @@ fun HistoryScreen(
 
     HawScaffold(title = "Riwayat", topLevel = true) { padding ->
         if (state.loading) {
-            LoadingBox(Modifier.padding(padding))
+            SkeletonScreen(Modifier.padding(padding), statusBarInset = false)
             return@HawScaffold
         }
         LazyColumn(

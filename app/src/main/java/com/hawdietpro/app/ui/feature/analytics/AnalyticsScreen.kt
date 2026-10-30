@@ -81,6 +81,7 @@ import com.hawdietpro.app.ui.components.GradeBadge
 import com.hawdietpro.app.ui.components.HawCard
 import com.hawdietpro.app.ui.components.HawScaffold
 import com.hawdietpro.app.ui.components.LoadingBox
+import com.hawdietpro.app.ui.components.SkeletonScreen
 import com.hawdietpro.app.ui.components.PillTabs
 import com.hawdietpro.app.ui.components.StackedBarChart
 import com.hawdietpro.app.ui.components.StatTile
@@ -106,7 +107,7 @@ fun AnalyticsScreen(onOpenWeight: () -> Unit, onOpenWrap: () -> Unit = {}, viewM
     HawScaffold(title = "Analisa", topLevel = true) { padding ->
         val stats = state.stats
         if (state.loading || stats == null) {
-            LoadingBox(Modifier.padding(padding))
+            SkeletonScreen(Modifier.padding(padding), statusBarInset = false)
             return@HawScaffold
         }
         Column(Modifier.padding(padding).fillMaxSize()) {

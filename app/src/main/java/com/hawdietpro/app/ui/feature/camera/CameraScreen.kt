@@ -1,5 +1,31 @@
 package com.hawdietpro.app.ui.feature.camera
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import com.hawdietpro.app.ui.components.bouncyClick
+import com.hawdietpro.app.ui.theme.HawTheme
+import kotlinx.coroutines.launch
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -168,85 +194,136 @@ private fun CaptureStep(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val haptic = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
     val controller = remember {
         LifecycleCameraController(context).apply { setEnabledUseCases(CameraController.IMAGE_CAPTURE) }
     }
     var flashOn by remember { mutableStateOf(false) }
+    val flash = remember { Animatable(0f) }
     DisposableEffect(lifecycleOwner) {
         controller.bindToLifecycle(lifecycleOwner)
         onDispose { controller.unbind() }
     }
+    // Bingkai bantu "bernapas" pelan agar terasa hidup.
+    val breathe by rememberInfiniteTransition(label = "frame").animateFloat(
+        0.55f, 0.95f, infiniteRepeatable(tween(1400), RepeatMode.Reverse), label = "frameAlpha",
+    )
 
-    Column(Modifier.fillMaxSize()) {
-        Box(Modifier.weight(1f).fillMaxWidth()) {
-            AndroidView(
-                factory = { ctx ->
-                    PreviewView(ctx).apply {
-                        scaleType = PreviewView.ScaleType.FILL_CENTER
-                        this.controller = controller
-                    }
-                },
-                modifier = Modifier.fillMaxSize(),
-            )
-            // Bingkai bantu agar piring berada di tengah.
-            Box(
-                Modifier.align(Alignment.Center).fillMaxWidth(0.82f).aspectRatio(1f)
-                    .border(2.dp, Color.White.copy(alpha = 0.6f), CircleShape),
-            )
-            IconButton(
-                onClick = {
-                    flashOn = !flashOn
-                    controller.imageCaptureFlashMode = if (flashOn) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
-                },
-                modifier = Modifier.statusBarsPadding().padding(8.dp).align(Alignment.TopEnd),
-                colors = IconButtonDefaults.iconButtonColors(containerColor = Color.Black.copy(alpha = 0.4f), contentColor = Color.White),
-            ) { Icon(if (flashOn) Icons.Filled.FlashOn else Icons.Filled.FlashOff, contentDescription = "Flash") }
+    fun shoot() {
+        if (busy) return
+        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        scope.launch {
+            flash.snapTo(0.85f)
+            flash.animateTo(0f, tween(320))
+        }
+        val file = File(captureDir, "raw_${System.currentTimeMillis()}.jpg")
+        controller.takePicture(
+            ImageCapture.OutputFileOptions.Builder(file).build(),
+            ContextCompat.getMainExecutor(context),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) = onCaptured(file)
+                override fun onError(exception: ImageCaptureException) = onCaptureError(exception.message ?: "Gagal mengambil foto")
+            },
+        )
+    }
+
+    Box(Modifier.fillMaxSize()) {
+        // Pratinjau kamera layar penuh (ketuk untuk fokus ditangani PreviewView).
+        AndroidView(
+            factory = { ctx ->
+                PreviewView(ctx).apply {
+                    scaleType = PreviewView.ScaleType.FILL_CENTER
+                    this.controller = controller
+                }
+            },
+            modifier = Modifier.fillMaxSize(),
+        )
+        // Bingkai sudut di tengah: posisikan piring di dalamnya.
+        Canvas(Modifier.align(Alignment.Center).padding(bottom = 120.dp).fillMaxWidth(0.82f).aspectRatio(1f)) {
+            val len = size.minDimension * 0.16f
+            val sw = 4.dp.toPx()
+            val c = Color.White.copy(alpha = breathe)
+            val r = 24.dp.toPx()
+            // Empat sudut berbentuk "L" membulat.
+            listOf(
+                Offset(0f, 0f) to (1f to 1f),
+                Offset(size.width, 0f) to (-1f to 1f),
+                Offset(0f, size.height) to (1f to -1f),
+                Offset(size.width, size.height) to (-1f to -1f),
+            ).forEach { (o, d) ->
+                val (dx, dy) = d
+                val path = Path().apply {
+                    moveTo(o.x, o.y + dy * (len + r))
+                    lineTo(o.x, o.y + dy * r)
+                    quadraticTo(o.x, o.y, o.x + dx * r, o.y)
+                    lineTo(o.x + dx * (len + r), o.y)
+                }
+                drawPath(path, c, style = Stroke(sw, cap = StrokeCap.Round))
+            }
+        }
+        // Gradasi atas & bawah agar kontrol terbaca.
+        Box(Modifier.fillMaxWidth().height(140.dp).background(Brush.verticalGradient(listOf(Color.Black.copy(alpha = 0.6f), Color.Transparent))))
+        Box(
+            Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(300.dp)
+                .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.85f)))),
+        )
+        Row(
+            Modifier.statusBarsPadding().padding(top = 10.dp).align(Alignment.TopCenter),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Text(
-                "Foto dari atas, seluruh piring terlihat",
+                "Foto dari atas · seluruh piring terlihat",
                 color = Color.White,
                 style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.align(Alignment.BottomCenter).padding(12.dp)
-                    .background(Color.Black.copy(alpha = 0.45f), MaterialTheme.shapes.small)
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                modifier = Modifier.clip(CircleShape).background(Color.Black.copy(alpha = 0.45f)).padding(horizontal = 14.dp, vertical = 7.dp),
             )
         }
+        IconButton(
+            onClick = {
+                flashOn = !flashOn
+                controller.imageCaptureFlashMode = if (flashOn) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
+            },
+            modifier = Modifier.statusBarsPadding().padding(8.dp).align(Alignment.TopEnd),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = Color.Black.copy(alpha = 0.4f), contentColor = if (flashOn) Color(0xFFFFD27A) else Color.White),
+        ) { Icon(if (flashOn) Icons.Filled.FlashOn else Icons.Filled.FlashOff, contentDescription = "Flash") }
+
         Column(
-            Modifier.fillMaxWidth().background(Color.Black).navigationBarsPadding().padding(vertical = 12.dp),
+            Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding().padding(bottom = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             MealTypeChips(mealType, onTypeChange, dark = true)
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(18.dp))
             Row(
-                Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+                Modifier.fillMaxWidth().padding(horizontal = 36.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RoundAction(Icons.Filled.PhotoLibrary, "Galeri", onGallery)
-                Box(
-                    Modifier.size(78.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.25f)).padding(6.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Surface(
-                        onClick = onClick@{
-                            if (busy) return@onClick
-                            val file = File(captureDir, "raw_${System.currentTimeMillis()}.jpg")
-                            controller.takePicture(
-                                ImageCapture.OutputFileOptions.Builder(file).build(),
-                                ContextCompat.getMainExecutor(context),
-                                object : ImageCapture.OnImageSavedCallback {
-                                    override fun onImageSaved(output: ImageCapture.OutputFileResults) = onCaptured(file)
-                                    override fun onError(exception: ImageCaptureException) = onCaptureError(exception.message ?: "Gagal mengambil foto")
-                                },
-                            )
-                        },
-                        shape = CircleShape,
-                        color = Color.White,
-                        modifier = Modifier.fillMaxSize(),
-                    ) {}
-                }
+                ShutterButton(enabled = !busy, onClick = ::shoot)
                 RoundAction(Icons.Filled.EditNote, "Manual", onManual)
             }
         }
+        // Kilat putih singkat saat memotret.
+        if (flash.value > 0f) Box(Modifier.fillMaxSize().background(Color.White.copy(alpha = flash.value)))
+    }
+}
+
+/** Tombol rana: cincin putih + lingkaran dalam yang mengecil saat ditekan. */
+@Composable
+private fun ShutterButton(enabled: Boolean, onClick: () -> Unit) {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val inner by animateFloatAsState(if (pressed) 0.78f else 1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy), label = "shutter")
+    Box(
+        Modifier
+            .size(82.dp)
+            .border(4.dp, Color.White, CircleShape)
+            .padding(8.dp)
+            .clickable(interactionSource = interaction, indication = null, enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(Modifier.fillMaxSize().graphicsLayer { scaleX = inner; scaleY = inner }.clip(CircleShape).background(if (enabled) Color.White else Color.White.copy(alpha = 0.5f)))
     }
 }
 
@@ -255,25 +332,45 @@ private fun RoundAction(icon: androidx.compose.ui.graphics.vector.ImageVector, l
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         IconButton(
             onClick = onClick,
-            colors = IconButtonDefaults.iconButtonColors(containerColor = Color.White.copy(alpha = 0.15f), contentColor = Color.White),
-            modifier = Modifier.size(52.dp),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = Color.White.copy(alpha = 0.16f), contentColor = Color.White),
+            modifier = Modifier.size(54.dp),
         ) { Icon(icon, contentDescription = label) }
+        Spacer(Modifier.height(4.dp))
         Text(label, color = Color.White, style = MaterialTheme.typography.labelSmall)
     }
 }
 
 @Composable
 fun MealTypeChips(selected: MealType, onSelect: (MealType) -> Unit, dark: Boolean = false, modifier: Modifier = Modifier) {
+    val cs = MaterialTheme.colorScheme
     Row(
         modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         MealType.entries.forEach { type ->
-            FilterChip(
-                selected = type == selected,
-                onClick = { onSelect(type) },
-                label = { Text("${type.emoji} ${type.label}", color = if (dark && type != selected) Color.White else androidx.compose.ui.graphics.Color.Unspecified) },
-            )
+            val active = type == selected
+            val bg = when {
+                active -> cs.primary
+                dark -> Color.White.copy(alpha = 0.16f)
+                else -> cs.surfaceContainerHigh
+            }
+            val fg = when {
+                active -> cs.onPrimary
+                dark -> Color.White
+                else -> cs.onSurface
+            }
+            Row(
+                Modifier
+                    .clip(CircleShape)
+                    .background(bg)
+                    .bouncyClick { onSelect(type) }
+                    .padding(horizontal = 14.dp, vertical = 9.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(type.emoji, style = MaterialTheme.typography.labelLarge)
+                Spacer(Modifier.width(6.dp))
+                Text(type.label, style = MaterialTheme.typography.labelLarge, color = fg)
+            }
         }
     }
 }
@@ -287,18 +384,25 @@ private fun ReviewStep(
     onRetake: () -> Unit,
     onAnalyze: () -> Unit,
 ) {
-    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        Column(
-            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding(),
-        ) {
-            AsyncImage(
-                model = File(photoPath),
-                contentDescription = "Foto makanan",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-            )
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Waktu makan", style = MaterialTheme.typography.titleMedium)
+    val cs = MaterialTheme.colorScheme
+    Box(Modifier.fillMaxSize().background(cs.background)) {
+        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().imePadding()) {
+            Box {
+                AsyncImage(
+                    model = File(photoPath),
+                    contentDescription = "Foto makanan",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxWidth().aspectRatio(0.95f),
+                )
+                Box(
+                    Modifier.matchParentSize().background(
+                        Brush.verticalGradient(0.6f to Color.Transparent, 1f to cs.background),
+                    ),
+                )
+            }
+            Column(Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Text("Siap dianalisa?", style = MaterialTheme.typography.headlineSmall)
+                Text("Pilih waktu makan", style = MaterialTheme.typography.labelLarge, color = cs.onSurfaceVariant)
                 MealTypeChips(state.mealType, onTypeChange, modifier = Modifier.padding(horizontal = 0.dp))
                 OutlinedTextField(
                     value = state.hint,
@@ -306,14 +410,25 @@ private fun ReviewStep(
                     label = { Text("Catatan untuk AI (opsional)") },
                     placeholder = { Text("mis. nasi setengah porsi, ayam tanpa kulit") },
                     modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.large,
                     maxLines = 3,
                 )
-                Button(onClick = onAnalyze, modifier = Modifier.fillMaxWidth().height(56.dp), shape = MaterialTheme.shapes.large) {
-                    Icon(Icons.Filled.AutoAwesome, null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Analisa dengan AI", style = MaterialTheme.typography.titleMedium)
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(58.dp)
+                        .clip(CircleShape)
+                        .background(Brush.linearGradient(listOf(cs.primary, HawTheme.colors.accentEnd)))
+                        .bouncyClick(onClick = onAnalyze),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.AutoAwesome, null, tint = cs.onPrimary)
+                        Spacer(Modifier.width(10.dp))
+                        Text("Analisa dengan AI", style = MaterialTheme.typography.titleMedium, color = cs.onPrimary)
+                    }
                 }
-                OutlinedButton(onClick = onRetake, modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large) {
+                OutlinedButton(onClick = onRetake, modifier = Modifier.fillMaxWidth().height(50.dp), shape = CircleShape) {
                     Icon(Icons.Filled.Replay, null)
                     Spacer(Modifier.width(8.dp))
                     Text("Foto ulang")

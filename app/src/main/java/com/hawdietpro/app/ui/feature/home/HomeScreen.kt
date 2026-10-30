@@ -104,7 +104,8 @@ import com.hawdietpro.app.ui.components.ArcGauge
 import com.hawdietpro.app.ui.components.BentoCard
 import com.hawdietpro.app.ui.components.GradeBadge
 import com.hawdietpro.app.ui.components.IconTile
-import com.hawdietpro.app.ui.components.LoadingBox
+import com.hawdietpro.app.ui.components.ConfettiBurst
+import com.hawdietpro.app.ui.components.SkeletonScreen
 import com.hawdietpro.app.ui.components.MealPhoto
 import com.hawdietpro.app.ui.components.MiniRing
 import com.hawdietpro.app.ui.components.NoticeCard
@@ -206,7 +207,7 @@ fun HomeScreen(
     }
 
     if (state.loading) {
-        LoadingBox()
+        SkeletonScreen()
         return
     }
 
@@ -315,6 +316,12 @@ fun HomeContent(
             state.tip?.let { tip ->
                 item(key = "tip") { NoticeCard("Tips hari ini", tip, Icons.Filled.TipsAndUpdates, MacroColors.Carbs) }
             }
+        }
+        // Confetti sekali untuk badge yang baru terbuka.
+        val badgeKey = state.newAchievements.joinToString(",") { it.id }
+        var celebrated by rememberSaveable { mutableStateOf("") }
+        if (badgeKey.isNotEmpty() && badgeKey != celebrated) {
+            ConfettiBurst(badgeKey, onFinished = { celebrated = badgeKey })
         }
     }
 }

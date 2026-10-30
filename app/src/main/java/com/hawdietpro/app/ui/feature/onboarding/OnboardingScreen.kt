@@ -1,5 +1,19 @@
 package com.hawdietpro.app.ui.feature.onboarding
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Brush
+import com.hawdietpro.app.ui.components.AnimatedCount
+import com.hawdietpro.app.ui.components.BentoCard
+import com.hawdietpro.app.ui.components.IconTile
+import com.hawdietpro.app.ui.components.bouncyClick
+import com.hawdietpro.app.ui.theme.NumberMedium
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.asStateFlow
@@ -105,15 +119,15 @@ fun OnboardingScreen(
     }
 
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding().navigationBarsPadding().imePadding()) {
-        if (step > 0) {
-            LinearProgressIndicator(
-                progress = { step / (STEPS - 1).toFloat() },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp),
-            )
-        }
+        if (step > 0) StepProgress(step, onBack = { step-- })
         AnimatedContent(
             targetState = step,
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            transitionSpec = {
+                // Geser ke kiri saat maju, ke kanan saat mundur.
+                val dir = if (targetState > initialState) 1 else -1
+                (slideInHorizontally(tween(320)) { it / 3 * dir } + fadeIn(tween(320))) togetherWith
+                    (slideOutHorizontally(tween(280)) { -it / 3 * dir } + fadeOut(tween(200)))
+            },
             modifier = Modifier.weight(1f),
             label = "step",
         ) { s ->
@@ -132,7 +146,7 @@ fun OnboardingScreen(
                         PersonalFields(form, viewModel::update)
                     }
                     2 -> StepPage("Tinggi & berat badan", null) { BodyFields(form, viewModel::update) }
-                    3 -> StepPage("Seberapa aktif Anda?", "Pilih yang paling mendekati keseharian Anda.") { ActivityPicker(form, viewModel::update) }
+                    3 -> StepPage("Seberapa aktif keseharianmu?", "Pilih aktivitas harian di luar olahraga. Olahraga dicatat terpisah dan menambah jatah makan di hari itu.") { ActivityPicker(form, viewModel::update) }
                     4 -> StepPage("Apa tujuan Anda?", null) { GoalPicker(form, viewModel::update) }
                     5 -> StepPage("Target harian Anda", "Dihitung dengan batas aman — tidak pernah ekstrem.") {
                         form.preview?.let { TargetSummary(it, form, viewModel::update) }
@@ -141,24 +155,49 @@ fun OnboardingScreen(
                 }
             }
         }
+        // Pratinjau target yang langsung berubah saat aktivitas/tujuan dipilih.
+        val preview = form.preview
+        AnimatedVisibility(step in 3..4 && preview != null) {
+            preview?.let {
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 20.dp).clip(RoundedCornerShape(18.dp))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)).padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("🎯", style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.width(10.dp))
+                    Text("Perkiraan target harian", style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
+                    AnimatedCount(it.calories, NumberMedium, MaterialTheme.colorScheme.primary, suffix = " kkal")
+                }
+            }
+        }
         Row(
             Modifier.fillMaxWidth().padding(20.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (step > 0) {
-                OutlinedButton(onClick = { step-- }, modifier = Modifier.weight(1f).height(52.dp)) { Text("Kembali") }
-            }
-            Button(
-                onClick = { if (step < STEPS - 1) step++ else viewModel.save() },
-                enabled = canNext && !form.saving,
-                modifier = Modifier.weight(if (step > 0) 1.5f else 1f).height(52.dp),
+            val enabled = canNext && !form.saving
+            val cs = MaterialTheme.colorScheme
+            Box(
+                Modifier
+                    .weight(1f)
+                    .height(56.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (enabled) Brush.linearGradient(listOf(cs.primary, HawTheme.colors.accentEnd))
+                        else Brush.linearGradient(listOf(cs.surfaceContainerHighest, cs.surfaceContainerHighest)),
+                    )
+                    .then(if (enabled) Modifier.bouncyClick { if (step < STEPS - 1) step++ else viewModel.save() } else Modifier),
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     when (step) {
-                        0 -> "Mulai"
+                        0 -> "Mulai sekarang"
                         STEPS - 1 -> if (form.apiKey.isBlank()) "Lewati & selesai" else "Selesai"
                         else -> "Lanjut"
                     },
+                    style = MaterialTheme.typography.titleMedium,
+                    color = if (enabled) cs.onPrimary else cs.onSurfaceVariant,
                 )
             }
         }
@@ -193,21 +232,46 @@ private fun Welcome() {
                 )
             }
         }
-        Feature(Icons.Filled.CameraAlt, MaterialTheme.colorScheme.primary, "Foto → menu dikenali", "Nasi, lauk, sayur & sambal dihitung per elemen")
-        Feature(Icons.Filled.AutoAwesome, MaterialTheme.colorScheme.tertiary, "Skor gizi A–E", "Lengkap dengan saran yang realistis")
-        Feature(Icons.Filled.BarChart, MaterialTheme.colorScheme.secondary, "Analisa & perkiraan berat", "Harian, mingguan, bulanan + grafik")
-        Feature(Icons.Filled.Lock, MacroColors.Fat, "Gratis & privat", "Tanpa akun, semua data tersimpan di HP")
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Feature(Icons.Filled.CameraAlt, MaterialTheme.colorScheme.primary, "Foto → gizi", "Nasi, lauk, sayur & sambal dihitung per elemen", Modifier.weight(1f))
+            Feature(Icons.Filled.AutoAwesome, MaterialTheme.colorScheme.tertiary, "Skor gizi A–E", "Lengkap dengan saran realistis", Modifier.weight(1f))
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Feature(Icons.Filled.BarChart, MaterialTheme.colorScheme.secondary, "Kalori adaptif", "Belajar dari timbanganmu", Modifier.weight(1f))
+            Feature(Icons.Filled.Lock, MacroColors.Fat, "Gratis & privat", "Tanpa akun, data hanya di HP", Modifier.weight(1f))
+        }
     }
 }
 
 @Composable
-private fun Feature(icon: ImageVector, tint: Color, title: String, subtitle: String) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        IconBadge(icon, tint, size = 44.dp)
-        Spacer(Modifier.width(14.dp))
-        Column {
-            Text(title, style = MaterialTheme.typography.titleSmall)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+private fun Feature(icon: ImageVector, tint: Color, title: String, subtitle: String, modifier: Modifier = Modifier) {
+    BentoCard(modifier, padding = 14.dp, corner = 22.dp) {
+        IconTile(icon, tint, size = 40.dp)
+        Spacer(Modifier.height(10.dp))
+        Text(title, style = MaterialTheme.typography.titleSmall)
+        Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 2)
+    }
+}
+
+/** Progres bersegmen + tombol kembali + "Langkah x dari y". */
+@Composable
+private fun StepProgress(step: Int, onBack: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Column(Modifier.fillMaxWidth().padding(start = 8.dp, end = 20.dp, top = 4.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali") }
+            Text("Langkah $step dari ${STEPS - 1}", style = MaterialTheme.typography.labelLarge, color = cs.onSurfaceVariant)
+        }
+        Row(Modifier.fillMaxWidth().padding(start = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            repeat(STEPS - 1) { i ->
+                val active = i < step
+                val alpha by animateFloatAsState(if (active) 1f else 0f, tween(300), label = "seg")
+                Box(
+                    Modifier.weight(1f).height(6.dp).clip(CircleShape).background(cs.surfaceContainerHighest),
+                ) {
+                    Box(Modifier.fillMaxWidth(alpha).height(6.dp).clip(CircleShape).background(cs.primary))
+                }
+            }
         }
     }
 }

@@ -133,7 +133,7 @@ object SampleData {
 
     /** Statistik mingguan contoh untuk ringkasan Analisa. */
     fun weekStats(): com.hawdietpro.app.domain.insight.PeriodStats {
-        val calc = com.hawdietpro.app.domain.insight.PeriodStatsCalculator(com.hawdietpro.app.domain.config.InsightRulesFile(version = 1), zone)
+        val calc = com.hawdietpro.app.domain.insight.PeriodStatsCalculator(com.hawdietpro.app.domain.config.InsightRulesFile(version = 1, mealScoring = com.hawdietpro.app.domain.config.MealScoringConfig(rules = emptyList(), grades = emptyList())), zone)
         val start = today.minusDays(6)
         val list = (0 until 7).filter { it != 2 }.map { i ->
             val d = start.plusDays(i.toLong())

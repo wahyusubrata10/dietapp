@@ -36,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.hawdietpro.app.data.prefs.ThemeMode
 import com.hawdietpro.app.ui.components.LoadingBox
+import com.hawdietpro.app.ui.components.SuccessCheck
 import com.hawdietpro.app.ui.feature.analytics.AnalyticsScreen
 import com.hawdietpro.app.ui.feature.backup.BackupScreen
 import com.hawdietpro.app.ui.feature.barcode.BarcodeScreen
@@ -105,6 +106,11 @@ private fun MainScaffold(
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val showMessage: (String) -> Unit = { msg -> scope.launch { snackbar.showSnackbar(msg) } }
+    // Animasi centang untuk aksi simpan yang berhasil; pesan lain tetap lewat snackbar.
+    var success by remember { mutableStateOf<Pair<Long, String>?>(null) }
+    val showResult: (String) -> Unit = { msg ->
+        if (isSuccessMessage(msg)) success = System.currentTimeMillis() to msg else showMessage(msg)
+    }
 
     val backStack by navController.currentBackStackEntryAsState()
     val currentDestination = backStack?.destination
@@ -259,7 +265,7 @@ private fun MainScaffold(
                     MealEditorScreen(
                         onClose = { message ->
                             navController.popBackStack()
-                            message?.let(showMessage)
+                            message?.let(showResult)
                         },
                         onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                     )
@@ -296,7 +302,7 @@ private fun MainScaffold(
                         onBack = { navController.popBackStack() },
                         onDone = { message ->
                             navController.popBackStack()
-                            showMessage(message)
+                            showResult(message)
                         },
                     )
                 }
@@ -306,9 +312,16 @@ private fun MainScaffold(
                 ) { WrapScreen(onClose = { navController.popBackStack() }) }
                 composable(Routes.BACKUP) { BackupScreen(onBack = { navController.popBackStack() }, showMessage = showMessage) }
             }
+            success?.let { (key, msg) ->
+                SuccessCheck(key, msg, onFinished = { if (success?.first == key) success = null })
+            }
         }
     }
 }
+
+/** Pesan hasil simpan yang ditampilkan dengan animasi centang. */
+private fun isSuccessMessage(msg: String) =
+    msg.startsWith("Tersimpan") || msg.startsWith("Perubahan disimpan") || msg.startsWith("Dicatat lagi") || msg.contains(" tercatat: ")
 
 private fun NavHostController.navigateTopLevel(route: String) {
     navigate(route) {
