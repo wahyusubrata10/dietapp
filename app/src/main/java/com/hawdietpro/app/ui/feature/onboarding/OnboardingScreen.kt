@@ -52,7 +52,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
-import com.hawdietpro.app.ui.components.IconBadge
 import com.hawdietpro.app.ui.theme.HawTheme
 import com.hawdietpro.app.ui.theme.MacroColors
 import androidx.compose.foundation.verticalScroll

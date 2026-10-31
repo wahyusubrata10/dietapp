@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
-import com.hawdietpro.app.ui.components.IconBadge
 import com.hawdietpro.app.ui.components.IconTile
 import com.hawdietpro.app.ui.components.Pill
 import com.hawdietpro.app.ui.theme.HawTheme

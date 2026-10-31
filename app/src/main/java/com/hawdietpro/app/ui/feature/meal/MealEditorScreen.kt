@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import com.hawdietpro.app.domain.model.NutritionSource
 import com.hawdietpro.app.ui.components.Pill
 import com.hawdietpro.app.ui.components.SectionHeader
-import com.hawdietpro.app.ui.components.SegmentedMacroBar
 import com.hawdietpro.app.ui.components.SoftProgress
 import com.hawdietpro.app.domain.nutrition.NutritionLimits
 import com.hawdietpro.app.ui.theme.HawTheme
