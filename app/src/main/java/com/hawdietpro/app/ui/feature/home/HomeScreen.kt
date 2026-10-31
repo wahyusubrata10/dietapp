@@ -89,6 +89,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -740,12 +741,16 @@ private fun QuickTile(icon: ImageVector, label: String, tint: Color, modifier: M
             Spacer(Modifier.height(6.dp))
             // Label mengecil otomatis bila tidak muat (layar 360dp + huruf besar) alih-alih terpotong.
             val labelStyle = MaterialTheme.typography.labelMedium
-            BasicText(
-                label,
-                style = labelStyle.copy(color = if (primary) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface),
-                maxLines = 1,
-                autoSize = TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = labelStyle.fontSize),
-            )
+            // Tinggi baris tetap agar keempat petak sama tinggi meski ukuran label berbeda.
+            val lineHeight = with(LocalDensity.current) { labelStyle.lineHeight.toDp() }
+            Box(Modifier.height(lineHeight), contentAlignment = Alignment.Center) {
+                BasicText(
+                    label,
+                    style = labelStyle.copy(color = if (primary) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface),
+                    maxLines = 1,
+                    autoSize = TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = labelStyle.fontSize),
+                )
+            }
         }
     }
 }
