@@ -81,6 +81,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -549,6 +550,8 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit, modifier: Modifier
     }
     Box(
         modifier
+            // Lapisan sendiri: saat scroll cukup digeser, tidak digambar ulang (gradasi + busur cukup berat).
+            .graphicsLayer()
             .fillMaxWidth()
             .clip(RoundedCornerShape(32.dp))
             .background(hc.heroGradient)
