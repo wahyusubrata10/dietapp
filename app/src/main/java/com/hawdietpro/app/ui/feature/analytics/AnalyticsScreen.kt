@@ -2,6 +2,7 @@ package com.hawdietpro.app.ui.feature.analytics
 
 import com.hawdietpro.app.domain.nutrition.DayStatus
 import com.hawdietpro.app.ui.components.AnimatedCount
+import com.hawdietpro.app.ui.components.EmptyState
 import com.hawdietpro.app.ui.components.BentoCard
 import com.hawdietpro.app.ui.components.IconTile
 import com.hawdietpro.app.ui.components.NoticeCard
@@ -14,7 +15,6 @@ import com.hawdietpro.app.ui.theme.NumberMedium
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.material.icons.filled.Restaurant
 import com.hawdietpro.app.ui.components.StatRow
-import com.hawdietpro.app.ui.components.hawSegmentedColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,11 +46,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -58,7 +53,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -81,7 +75,6 @@ import com.hawdietpro.app.ui.components.DonutSlice
 import com.hawdietpro.app.ui.components.GradeBadge
 import com.hawdietpro.app.ui.components.HawCard
 import com.hawdietpro.app.ui.components.HawScaffold
-import com.hawdietpro.app.ui.components.LoadingBox
 import com.hawdietpro.app.ui.components.SkeletonScreen
 import com.hawdietpro.app.ui.components.PillTabs
 import com.hawdietpro.app.ui.components.tabTransition
@@ -89,6 +82,7 @@ import androidx.compose.animation.AnimatedContent
 import com.hawdietpro.app.ui.components.StackedBarChart
 import com.hawdietpro.app.ui.components.StatTile
 import com.hawdietpro.app.ui.components.gradeColor
+import com.hawdietpro.app.ui.components.mealTypeColor
 import com.hawdietpro.app.ui.feature.home.InsightCard
 import com.hawdietpro.app.ui.feature.weight.WeightProjectionSection
 import com.hawdietpro.app.ui.theme.MacroColors
@@ -487,7 +481,7 @@ private fun BulletSection(title: String, items: List<String>) {
 
 private fun LazyListScope.nutritionTab(stats: PeriodStats, target: DailyTarget?) {
     if (stats.daysLogged == 0) {
-        item { Text("Belum ada catatan di periode ini.", color = Color.Gray) }
+        item { EmptyState(Icons.Filled.Restaurant, "Belum ada catatan", "Catat makananmu di periode ini untuk melihat analisanya di sini.") }
         return
     }
     val avg = stats.averagePerDay
@@ -617,7 +611,7 @@ private fun GradeCard(stats: PeriodStats) {
 
 private fun LazyListScope.patternTab(stats: PeriodStats, period: Period) {
     if (stats.daysLogged == 0) {
-        item { Text("Belum ada catatan di periode ini.", color = Color.Gray) }
+        item { EmptyState(Icons.Filled.Restaurant, "Belum ada catatan", "Catat makananmu di periode ini untuk melihat analisanya di sini.") }
         return
     }
     item {
@@ -628,12 +622,11 @@ private fun LazyListScope.patternTab(stats: PeriodStats, period: Period) {
         }
     }
     item {
-        val colors = listOf(Color(0xFFF2A93B), Color(0xFF2E7D5B), Color(0xFF4F5BB8), Color(0xFFE5635A))
         HawCard {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text("Kalori per waktu makan", style = MaterialTheme.typography.titleMedium)
                 DonutChart(
-                    slices = MealType.entries.mapIndexed { i, t -> DonutSlice(t.label, stats.mealTypeCalories[t] ?: 0.0, colors[i]) },
+                    slices = MealType.entries.map { t -> DonutSlice(t.label, stats.mealTypeCalories[t] ?: 0.0, mealTypeColor(t)) },
                     centerTitle = Format.grouped(stats.totalCalories.roundToInt()),
                     centerSubtitle = "kkal total",
                     legendValue = { s, pct -> "${pct.roundToInt()}% · ${Format.grouped((s.value / stats.daysLogged).roundToInt())}/hr" },

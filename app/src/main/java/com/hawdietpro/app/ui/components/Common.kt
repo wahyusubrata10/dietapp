@@ -49,9 +49,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.hawdietpro.app.core.Format
 import com.hawdietpro.app.domain.model.Meal
 import com.hawdietpro.app.domain.model.MealType
-import com.hawdietpro.app.domain.model.Nutrients
 import com.hawdietpro.app.ui.theme.HawTheme
-import com.hawdietpro.app.ui.theme.MacroColors
 import com.hawdietpro.app.ui.theme.MealTypeColors
 import java.io.File
 
@@ -105,27 +103,6 @@ fun HawCard(
         Surface(modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, color = bg, border = border) {
             Box(Modifier.padding(contentPadding)) { content() }
         }
-    }
-}
-
-/** Lingkaran ikon berwarna lembut (dipakai di header kartu, menu, dsb.). */
-@Composable
-fun IconBadge(icon: ImageVector, tint: Color, modifier: Modifier = Modifier, size: Dp = 40.dp) {
-    Box(
-        modifier.size(size).clip(RoundedCornerShape(size * 0.32f)).background(tint.copy(alpha = 0.14f)),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(icon, null, tint = tint, modifier = Modifier.size(size * 0.52f))
-    }
-}
-
-@Composable
-fun EmojiBadge(emoji: String, tint: Color, modifier: Modifier = Modifier, size: Dp = 40.dp) {
-    Box(
-        modifier.size(size).clip(RoundedCornerShape(size * 0.32f)).background(tint.copy(alpha = 0.16f)),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(emoji, style = MaterialTheme.typography.titleMedium)
     }
 }
 
@@ -214,25 +191,6 @@ fun MealRow(meal: Meal, onClick: () -> Unit, modifier: Modifier = Modifier, show
         Column(horizontalAlignment = Alignment.End) {
             Text(Format.kcalNumber(meal.total.calories), style = MaterialTheme.typography.titleMedium)
             Text("kkal", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-}
-
-/** Batang proporsi energi protein/karbo/lemak dalam satu baris. */
-@Composable
-fun SegmentedMacroBar(n: Nutrients, modifier: Modifier = Modifier, height: Dp = 10.dp) {
-    val p = (n.protein * 4).toFloat()
-    val c = (n.carbs * 4).toFloat()
-    val f = (n.fat * 9).toFloat()
-    val total = p + c + f
-    Row(
-        modifier.fillMaxWidth().height(height).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerHighest),
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-        if (total > 0f) {
-            listOf(p to MacroColors.Protein, c to MacroColors.Carbs, f to MacroColors.Fat).forEach { (v, color) ->
-                if (v > 0f) Box(Modifier.weight(v).fillMaxSize().background(color))
-            }
         }
     }
 }

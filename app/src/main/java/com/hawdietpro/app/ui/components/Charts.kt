@@ -632,21 +632,6 @@ private fun ChartPlaceholder(text: String, modifier: Modifier, height: Dp) {
     }
 }
 
-// Kompatibilitas: dipakai layar lama.
-
-@Composable
-fun CalorieTrendChart(values: List<Double>, labels: List<String>, target: Int?, modifier: Modifier = Modifier, height: Dp = 220.dp) {
-    BarChart(
-        values = values,
-        labels = labels,
-        modifier = modifier,
-        height = height,
-        target = target?.toDouble(),
-        targetLabel = target?.let { "Target" },
-        emptyText = "Belum ada data kalori di periode ini",
-    )
-}
-
 @Composable
 fun LineTrendChart(values: List<Double>, labels: List<String>, modifier: Modifier = Modifier, height: Dp = 200.dp, emptyText: String = "Belum ada data") {
     LineChart(

@@ -6,19 +6,11 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.TrendingDown
-import androidx.compose.material.icons.automirrored.filled.TrendingFlat
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,9 +19,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.hawdietpro.app.core.Format
 import com.hawdietpro.app.domain.nutrition.WeightProjection
@@ -44,38 +34,6 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 private fun signed(v: Double, unit: String) = (if (v > 0) "+" else if (v < 0) "−" else "") + Format.oneDecimal(abs(v)) + unit
-
-/** Kartu ringkas untuk Beranda. */
-@Composable
-fun WeightEstimateCompact(p: WeightProjection, onClick: () -> Unit) {
-    HawCard(onClick = onClick) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            val icon = when {
-                p.estimatedChange < -0.05 -> Icons.AutoMirrored.Filled.TrendingDown
-                p.estimatedChange > 0.05 -> Icons.AutoMirrored.Filled.TrendingUp
-                else -> Icons.AutoMirrored.Filled.TrendingFlat
-            }
-            Icon(icon, null, tint = MaterialTheme.colorScheme.primary)
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text("Perkiraan berat hari ini", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(
-                    "${Format.kg(p.estimatedToday)}  (${signed(p.estimatedChange, " kg")} sejak ${Format.dayMonth(p.startDate)})",
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                p.latestActual?.let {
-                    Text(
-                        "Timbangan terakhir ${Format.kg(it.weightKg)} · ${Format.relativeDay(LocalDate.ofEpochDay(it.epochDay))}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-    }
-}
 
 /** Bagian lengkap: ringkasan, grafik perkiraan vs aktual vs target + proyeksi, dan surplus/defisit harian. */
 @Composable

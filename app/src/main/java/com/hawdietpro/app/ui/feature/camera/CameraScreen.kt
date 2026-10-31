@@ -34,6 +34,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import com.hawdietpro.app.ui.components.bouncyClick
 import com.hawdietpro.app.ui.theme.HawTheme
+import com.hawdietpro.app.ui.theme.Highlight
 import kotlinx.coroutines.launch
 import android.Manifest
 import android.content.pm.PackageManager
@@ -75,7 +76,6 @@ import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -328,7 +328,7 @@ private fun CaptureStep(
                 controller.imageCaptureFlashMode = if (flashOn) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
             },
             modifier = Modifier.statusBarsPadding().padding(8.dp).align(Alignment.TopEnd),
-            colors = IconButtonDefaults.iconButtonColors(containerColor = Color.Black.copy(alpha = 0.4f), contentColor = if (flashOn) Color(0xFFFFD27A) else Color.White),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = Color.Black.copy(alpha = 0.4f), contentColor = if (flashOn) Highlight else Color.White),
         ) { Icon(if (flashOn) Icons.Filled.FlashOn else Icons.Filled.FlashOff, contentDescription = "Flash") }
 
         Column(

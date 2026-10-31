@@ -78,6 +78,22 @@ object GradeColors {
     val E = Color(0xFFDC4A2F)
 }
 
+// ── Rekap mingguan (Wrapped): gradasi tetap per slide, teks selalu putih ──
+object WrapColors {
+    val Slides = listOf(
+        listOf(Color(0xFF0B4A37), Color(0xFF13896A), Color(0xFF2CC598)),
+        listOf(Color(0xFF1B1F6B), Color(0xFF3F3FC2), Color(0xFF7A6CF0)),
+        listOf(Color(0xFF7A2E0B), Color(0xFFD25B17), Color(0xFFFF9E4F)),
+        listOf(Color(0xFF6B0F3A), Color(0xFFC0306E), Color(0xFFFF7BA9)),
+        listOf(Color(0xFF07343F), Color(0xFF0E7490), Color(0xFF22C3D6)),
+    )
+    /** Kartu ajakan di Beranda: perpaduan warna slide. */
+    val Teaser = listOf(Color(0xFF3F3FC2), Color(0xFFC0306E), Color(0xFFFF9E4F))
+}
+
+/** Sorotan hangat di atas latar gelap/foto (lampu kilat aktif, hari "lebih" di rekap). */
+val Highlight = Color(0xFFFFD27A)
+
 // ── Waktu makan ────────────────────────────────────────────────────────────
 object MealTypeColors {
     val Sarapan = Color(0xFFC0801A)

@@ -12,7 +12,6 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
-import com.hawdietpro.app.ui.components.hawSegmentedColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,9 +36,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
@@ -49,9 +46,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -70,7 +64,6 @@ import com.hawdietpro.app.domain.model.MealType
 import com.hawdietpro.app.ui.components.EmptyState
 import com.hawdietpro.app.ui.components.HawCard
 import com.hawdietpro.app.ui.components.HawScaffold
-import com.hawdietpro.app.ui.components.LoadingBox
 import com.hawdietpro.app.ui.components.SkeletonScreen
 import com.hawdietpro.app.ui.components.PillTabs
 import com.hawdietpro.app.ui.components.tabTransition

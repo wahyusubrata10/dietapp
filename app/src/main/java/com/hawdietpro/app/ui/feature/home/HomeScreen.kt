@@ -53,7 +53,6 @@ import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Restaurant
@@ -132,6 +131,7 @@ import com.hawdietpro.app.ui.theme.MacroColors
 import com.hawdietpro.app.ui.theme.NumberDisplay
 import com.hawdietpro.app.ui.theme.NumberLarge
 import com.hawdietpro.app.ui.theme.NumberMedium
+import com.hawdietpro.app.ui.theme.WrapColors
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -518,7 +518,7 @@ private fun WrapTeaser(week: LocalDate, onClick: () -> Unit) {
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(22.dp))
-            .background(Brush.linearGradient(listOf(Color(0xFF3F3FC2), Color(0xFFC0306E), Color(0xFFFF9E4F))))
+            .background(Brush.linearGradient(WrapColors.Teaser))
             .bouncyClick(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,

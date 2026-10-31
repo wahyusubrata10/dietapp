@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,7 +43,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.hawdietpro.app.ui.theme.HawTheme
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -184,10 +182,3 @@ fun SkeletonScreen(modifier: Modifier = Modifier, statusBarInset: Boolean = true
     }
 }
 
-/** Titik-titik kecil berkedip, dipakai di indikator "sedang dianalisa". */
-@Composable
-fun PulseDot(color: Color = HawTheme.colors.success, modifier: Modifier = Modifier) {
-    val transition = rememberInfiniteTransition(label = "pulse")
-    val a by transition.animateFloat(0.3f, 1f, infiniteRepeatable(tween(700), RepeatMode.Reverse), label = "pulseA")
-    Box(modifier.size(8.dp).clip(CircleShape).background(color.copy(alpha = a)))
-}

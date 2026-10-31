@@ -1,33 +1,23 @@
 package com.hawdietpro.app.ui.components
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -37,107 +27,6 @@ import com.hawdietpro.app.domain.model.NutritionSource
 import com.hawdietpro.app.domain.model.Nutrients
 import com.hawdietpro.app.ui.theme.GradeColors
 import com.hawdietpro.app.ui.theme.MacroColors
-import kotlin.math.roundToInt
-
-/**
- * Ring progres kalori: terisi sesuai kalori masuk / target, berubah merah bila melebihi.
- * Warna bisa diatur agar cocok di atas latar gradasi (hero).
- */
-@Composable
-fun CalorieRing(
-    consumed: Double,
-    target: Int,
-    modifier: Modifier = Modifier,
-    size: Dp = 180.dp,
-    stroke: Dp = 16.dp,
-    trackColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
-    progressColor: Color = MaterialTheme.colorScheme.primary,
-    overColor: Color = MaterialTheme.colorScheme.error,
-    textColor: Color = MaterialTheme.colorScheme.onSurface,
-    subTextColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-) {
-    val progress = if (target > 0) (consumed / target).toFloat() else 0f
-    val animated by animateFloatAsState(progress.coerceIn(0f, 1f), tween(800), label = "ring")
-    val over = consumed > target && target > 0
-    val color = if (over) overColor else progressColor
-    val remaining = target - consumed.roundToInt()
-
-    Box(modifier.size(size), contentAlignment = Alignment.Center) {
-        Canvas(Modifier.size(size)) {
-            val s = Stroke(width = stroke.toPx(), cap = StrokeCap.Round)
-            val inset = stroke.toPx() / 2
-            val arcSize = androidx.compose.ui.geometry.Size(this.size.width - inset * 2, this.size.height - inset * 2)
-            val topLeft = androidx.compose.ui.geometry.Offset(inset, inset)
-            drawArc(trackColor, -90f, 360f, false, topLeft, arcSize, style = s)
-            if (animated > 0f) drawArc(color, -90f, 360f * animated, false, topLeft, arcSize, style = s)
-        }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                Format.grouped(if (remaining >= 0) remaining else -remaining),
-                style = MaterialTheme.typography.headlineLarge,
-                color = if (over) overColor else textColor,
-            )
-            Text(
-                if (remaining >= 0) "kkal tersisa" else "kkal berlebih",
-                style = MaterialTheme.typography.labelMedium,
-                color = subTextColor,
-            )
-        }
-    }
-}
-
-/** Progress makro ringkas untuk di atas latar gradasi. */
-@Composable
-fun HeroMacro(label: String, value: Double, target: Int, color: Color, textColor: Color, subColor: Color, trackColor: Color, modifier: Modifier = Modifier) {
-    val progress = if (target > 0) (value / target).toFloat().coerceIn(0f, 1f) else 0f
-    val animated by animateFloatAsState(progress, tween(700), label = "heroMacro")
-    Column(modifier) {
-        Text(label, style = MaterialTheme.typography.labelMedium, color = subColor)
-        Text(
-            "${value.roundToInt()}/${target}g",
-            style = MaterialTheme.typography.titleSmall,
-            color = textColor,
-        )
-        Spacer(Modifier.height(6.dp))
-        Box(Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)).background(trackColor)) {
-            Box(Modifier.fillMaxWidth(animated).height(6.dp).clip(RoundedCornerShape(3.dp)).background(color))
-        }
-    }
-}
-
-data class MacroSpec(val label: String, val value: Double, val target: Int, val color: Color)
-
-fun macroSpecs(n: Nutrients, proteinT: Int, carbsT: Int, fatT: Int, fiberT: Int) = listOf(
-    MacroSpec("Protein", n.protein, proteinT, MacroColors.Protein),
-    MacroSpec("Karbo", n.carbs, carbsT, MacroColors.Carbs),
-    MacroSpec("Lemak", n.fat, fatT, MacroColors.Fat),
-    MacroSpec("Serat", n.fiber, fiberT, MacroColors.Fiber),
-)
-
-@Composable
-fun MacroProgress(spec: MacroSpec, modifier: Modifier = Modifier) {
-    val progress = if (spec.target > 0) (spec.value / spec.target).toFloat().coerceIn(0f, 1f) else 0f
-    val animated by animateFloatAsState(progress, tween(600), label = "macro")
-    Column(modifier) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(spec.label, style = MaterialTheme.typography.labelLarge)
-            Text(
-                "${spec.value.roundToInt()} / ${spec.target} g",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        Spacer(Modifier.height(4.dp))
-        LinearProgressIndicator(
-            progress = { animated },
-            modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
-            color = spec.color,
-            trackColor = spec.color.copy(alpha = 0.18f),
-            drawStopIndicator = {},
-            gapSize = 0.dp,
-        )
-    }
-}
 
 /** Ringkasan makro kecil dalam satu baris: P 20g · K 50g · L 10g. */
 @Composable

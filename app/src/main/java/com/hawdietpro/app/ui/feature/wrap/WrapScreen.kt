@@ -65,7 +65,9 @@ import com.hawdietpro.app.domain.nutrition.DayStatus
 import com.hawdietpro.app.ui.components.AnimatedCount
 import com.hawdietpro.app.ui.components.LoadingBox
 import com.hawdietpro.app.ui.components.MiniRing
+import com.hawdietpro.app.ui.theme.Highlight
 import com.hawdietpro.app.ui.theme.NumberDisplay
+import com.hawdietpro.app.ui.theme.WrapColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -189,13 +191,7 @@ fun WrapContent(w: WeeklyWrap, onClose: () -> Unit, initialPage: Int = 0) {
 
 private const val WRAP_PAGES = 5
 
-private val SlideGradients = listOf(
-    listOf(Color(0xFF0B4A37), Color(0xFF13896A), Color(0xFF2CC598)),
-    listOf(Color(0xFF1B1F6B), Color(0xFF3F3FC2), Color(0xFF7A6CF0)),
-    listOf(Color(0xFF7A2E0B), Color(0xFFD25B17), Color(0xFFFF9E4F)),
-    listOf(Color(0xFF6B0F3A), Color(0xFFC0306E), Color(0xFFFF7BA9)),
-    listOf(Color(0xFF07343F), Color(0xFF0E7490), Color(0xFF22C3D6)),
-)
+private val SlideGradients = WrapColors.Slides
 
 @Composable
 private fun SlideFrame(index: Int, content: @Composable () -> Unit) {
@@ -337,7 +333,7 @@ private fun StatusWeek(w: WeeklyWrap) {
                             when (st) {
                                 DayStatus.SESUAI -> Color.White
                                 DayStatus.KURANG -> Color.White.copy(alpha = 0.55f)
-                                DayStatus.LEBIH -> Color(0xFFFFB4A6)
+                                DayStatus.LEBIH -> Highlight
                                 DayStatus.KOSONG -> Color.White.copy(alpha = 0.12f)
                             },
                         ),

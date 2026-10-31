@@ -14,7 +14,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -345,15 +344,6 @@ fun IconTile(icon: ImageVector, tint: Color, modifier: Modifier = Modifier, size
         contentAlignment = Alignment.Center,
     ) {
         Icon(icon, null, tint = if (filled) Color.White else tint, modifier = Modifier.size(size * 0.5f))
-    }
-}
-
-/** Dua nilai label-angka bertumpuk (dipakai di hero & bento). */
-@Composable
-fun LabeledValue(label: String, value: String, modifier: Modifier = Modifier, valueColor: Color = MaterialTheme.colorScheme.onSurface, labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant, valueStyle: TextStyle = MaterialTheme.typography.titleMedium) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(1.dp)) {
-        Text(label, style = MaterialTheme.typography.labelMedium, color = labelColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(value, style = valueStyle, color = valueColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
