@@ -671,7 +671,7 @@ private fun NutritionCard(meal: Meal) {
 @Composable
 private fun LimitValue(label: String, value: String, fractionOfDaily: Double, modifier: Modifier = Modifier) {
     val color = when {
-        fractionOfDaily >= 0.5 -> MaterialTheme.colorScheme.error
+        fractionOfDaily >= 0.5 -> HawTheme.colors.warning
         fractionOfDaily >= 0.3 -> HawTheme.colors.warning
         else -> HawTheme.colors.success
     }

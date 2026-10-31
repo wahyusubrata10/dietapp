@@ -45,14 +45,14 @@ private val LightColors = lightColorScheme(
     onBackground = Ink900,
     surface = Paper,
     onSurface = Ink900,
-    surfaceVariant = Color(0xFFE9EEEB),
+    surfaceVariant = Neutral.N100,
     onSurfaceVariant = Ink500,
     surfaceTint = Emerald600,
     surfaceContainerLowest = White,
     surfaceContainerLow = White,
-    surfaceContainer = Color(0xFFF0F3F1),
-    surfaceContainerHigh = Color(0xFFEAEFEC),
-    surfaceContainerHighest = Color(0xFFE3E9E5),
+    surfaceContainer = Neutral.N100,
+    surfaceContainerHigh = Color(0xFFE9EDE9),
+    surfaceContainerHighest = Neutral.N200,
     surfaceBright = White,
     surfaceDim = Color(0xFFDCE2DE),
     outline = Ink300,
@@ -69,7 +69,7 @@ private val DarkColors = darkColorScheme(
     onPrimaryContainer = Emerald100,
     inversePrimary = Emerald600,
     secondary = Orange300,
-    onSecondary = Orange900,
+    onSecondary = Color(0xFF4A1B02),
     secondaryContainer = Color(0xFF5A2D06),
     onSecondaryContainer = Orange100,
     tertiary = Indigo300,
@@ -87,12 +87,12 @@ private val DarkColors = darkColorScheme(
     surfaceVariant = NightCardHigh,
     onSurfaceVariant = NightInkSub,
     surfaceTint = Emerald300,
-    surfaceContainerLowest = Color(0xFF090C0B),
+    surfaceContainerLowest = Color(0xFF0A0D0C),
     surfaceContainerLow = NightCard,
-    surfaceContainer = Color(0xFF19201D),
+    surfaceContainer = Color(0xFF1A201D),
     surfaceContainerHigh = NightCardHigh,
-    surfaceContainerHighest = Color(0xFF262E2B),
-    surfaceBright = Color(0xFF2C3431),
+    surfaceContainerHighest = Color(0xFF27302C),
+    surfaceBright = Color(0xFF2C3531),
     surfaceDim = NightBg,
     outline = Color(0xFF5E6863),
     outlineVariant = NightLine,
@@ -123,38 +123,54 @@ data class HawExtendedColors(
     val food: Color = Color(0xFFFF8A4C),
     /** Warna akhir gradasi aksen (tombol +). */
     val accentEnd: Color = Teal500,
+    /** Latar lembut untuk status peringatan / "sedikit di atas jatah" (bukan merah agar tidak menghakimi). */
+    val warningContainer: Color = Color.Transparent,
+    /** Teks di atas warna [warning] penuh. */
+    val onWarning: Color = Color.White,
+    /** Warna di atas gradasi hero (cincin makro, jatah olahraga, lebih). */
+    val heroProtein: Color = Color(0xFFFF9C8F),
+    val heroCarbs: Color = Color(0xFFFFD27A),
+    val heroFat: Color = Color(0xFFA9C4FF),
+    val heroFiber: Color = Color(0xFFB9F6CA),
+    val heroBonus: Color = Color(0xFFB9C2FF),
+    val heroOver: Color = Color(0xFFFFD59A),
 )
 
 private val LightExtended = HawExtendedColors(
-    heroGradient = Brush.linearGradient(listOf(Color(0xFF0B7A55), Emerald600, Teal500)),
+    // Gradasi cukup gelap agar teks putih ≥ 4,8:1 di seluruh area.
+    heroGradient = Brush.linearGradient(listOf(Color(0xFF0A5A3D), Emerald700, Color(0xFF11714F))),
     heroContent = White,
-    heroContentSub = White.copy(alpha = 0.80f),
+    heroContentSub = White.copy(alpha = 0.85f),
     heroTrack = White.copy(alpha = 0.22f),
     card = White,
     cardBorder = Line,
-    success = Color(0xFF16A34A),
-    warning = Color(0xFFEA8A0C),
-    glow = Emerald300.copy(alpha = 0.28f),
+    success = Color(0xFF1C7C44),
+    warning = Color(0xFF9A5B07),
+    glow = Emerald300.copy(alpha = 0.26f),
     cardHighlight = Color.Transparent,
-    cardRaised = Color(0xFFF7FAF8),
+    cardRaised = Neutral.N50,
     exercise = Indigo600,
     food = Orange500,
+    warningContainer = Color(0xFFFFF1DC),
+    onWarning = White,
 )
 
 private val DarkExtended = HawExtendedColors(
-    heroGradient = Brush.linearGradient(listOf(Color(0xFF07291F), Color(0xFF0B4A37), Color(0xFF0E6B57))),
+    heroGradient = Brush.linearGradient(listOf(Color(0xFF0A2C20), Color(0xFF0F4231), Color(0xFF145740))),
     heroContent = Color(0xFFF1FBF6),
-    heroContentSub = Color(0xFFF1FBF6).copy(alpha = 0.70f),
+    heroContentSub = Color(0xFFF1FBF6).copy(alpha = 0.80f),
     heroTrack = White.copy(alpha = 0.12f),
     card = NightCard,
     cardBorder = NightLine,
-    success = Color(0xFF4ADE80),
-    warning = Color(0xFFFBBF24),
+    success = Color(0xFF5BD68C),
+    warning = Color(0xFFF2B14C),
     glow = Color(0xFF1DB386).copy(alpha = 0.22f),
     cardHighlight = White.copy(alpha = 0.05f),
     cardRaised = NightCardHigh,
     exercise = Color(0xFF8E9BFF),
     food = Color(0xFFFF9A62),
+    warningContainer = Color(0xFF3A2A10),
+    onWarning = Color(0xFF2A1C02),
 )
 
 val LocalHawColors = staticCompositionLocalOf { LightExtended }
@@ -205,7 +221,7 @@ private fun extendedFor(scheme: ColorScheme, dark: Boolean, base: HawExtendedCol
         heroGradient = if (dark) {
             Brush.linearGradient(listOf(lerp(p, Color.Black, 0.86f), lerp(p, Color.Black, 0.72f), lerp(p, Color.Black, 0.58f)))
         } else {
-            Brush.linearGradient(listOf(lerp(p, Color.Black, 0.18f), p, lerp(p, Color.White, 0.18f)))
+            Brush.linearGradient(listOf(lerp(p, Color.Black, 0.32f), lerp(p, Color.Black, 0.2f), lerp(p, Color.Black, 0.1f)))
         },
         glow = p.copy(alpha = if (dark) 0.2f else 0.26f),
     )

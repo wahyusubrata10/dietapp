@@ -317,7 +317,7 @@ internal fun SummaryTiles(stats: PeriodStats, prev: PeriodStats?, target: Int?) 
             }
             if (target != null && target > 0) {
                 Spacer(Modifier.height(10.dp))
-                ProgressBar((avg / target).toFloat(), if (avg > target * 1.1) cs.error else cs.primary, height = 8.dp)
+                ProgressBar((avg / target).toFloat(), if (avg > target * 1.1) HawTheme.colors.warning else cs.primary, height = 8.dp)
             }
             Spacer(Modifier.height(14.dp))
             Text("Konsistensi", style = MaterialTheme.typography.labelLarge, color = cs.onSurfaceVariant)

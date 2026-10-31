@@ -1,5 +1,6 @@
 package com.hawdietpro.app.ui.components
 
+import com.hawdietpro.app.ui.theme.HawTheme
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -234,7 +235,7 @@ fun BarChart(
     target: Double? = null,
     targetLabel: String? = null,
     barColor: Color = MaterialTheme.colorScheme.primary,
-    overColor: Color? = MaterialTheme.colorScheme.error,
+    overColor: Color? = HawTheme.colors.warning,
     overFactor: Double = 1.1,
     tooltipLabels: List<String> = labels,
     valueFormat: (Double) -> String = ::defaultFormat,
@@ -491,7 +492,7 @@ fun DivergingBarChart(
     labels: List<String>,
     modifier: Modifier = Modifier,
     height: Dp = 200.dp,
-    positiveColor: Color = MaterialTheme.colorScheme.error,
+    positiveColor: Color = HawTheme.colors.warning,
     negativeColor: Color = MaterialTheme.colorScheme.primary,
     tooltipLabels: List<String> = labels,
     valueFormat: (Double) -> String = { (if (it > 0) "+" else "") + defaultFormat(it) },

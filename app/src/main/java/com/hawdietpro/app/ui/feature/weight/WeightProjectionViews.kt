@@ -1,5 +1,6 @@
 package com.hawdietpro.app.ui.feature.weight
 
+import com.hawdietpro.app.ui.theme.HawTheme
 import com.hawdietpro.app.ui.components.StatRow
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -190,7 +191,7 @@ fun WeightProjectionSection(p: WeightProjection) {
                                 style = MaterialTheme.typography.bodySmall,
                                 color = when {
                                     !d.counted -> cs.onSurfaceVariant
-                                    d.balance > 0 -> cs.error
+                                    d.balance > 0 -> HawTheme.colors.warning
                                     else -> cs.primary
                                 },
                             )

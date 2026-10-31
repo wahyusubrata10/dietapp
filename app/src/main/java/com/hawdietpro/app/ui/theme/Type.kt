@@ -17,22 +17,27 @@ val JakartaSans = FontFamily(
     Font(R.font.plus_jakarta_sans_extrabold, FontWeight.ExtraBold),
 )
 
+/**
+ * Semua gaya memakai angka tabular ("tnum", didukung Plus Jakarta Sans) agar kalori, gram & tanggal
+ * tidak "bergoyang" lebarnya saat angka berubah/beranimasi.
+ */
 private fun style(size: Int, line: Int, weight: FontWeight, spacing: Double = 0.0) = TextStyle(
     fontFamily = JakartaSans,
     fontSize = size.sp,
     lineHeight = line.sp,
     fontWeight = weight,
     letterSpacing = spacing.sp,
+    fontFeatureSettings = "tnum",
 )
 
 val HawTypography = Typography(
-    displayLarge = style(52, 60, FontWeight.ExtraBold, -1.0),
+    displayLarge = style(52, 56, FontWeight.ExtraBold, -1.0),
     displayMedium = style(42, 50, FontWeight.ExtraBold, -0.8),
     displaySmall = style(34, 42, FontWeight.ExtraBold, -0.5),
     headlineLarge = style(30, 38, FontWeight.ExtraBold, -0.4),
-    headlineMedium = style(26, 34, FontWeight.Bold, -0.3),
+    headlineMedium = style(28, 34, FontWeight.Bold, -0.3),
     headlineSmall = style(22, 30, FontWeight.Bold, -0.2),
-    titleLarge = style(20, 28, FontWeight.Bold, -0.1),
+    titleLarge = style(20, 26, FontWeight.Bold, -0.1),
     titleMedium = style(16, 24, FontWeight.Bold),
     titleSmall = style(14, 20, FontWeight.SemiBold),
     bodyLarge = style(16, 24, FontWeight.Normal),
@@ -40,7 +45,7 @@ val HawTypography = Typography(
     bodySmall = style(12, 17, FontWeight.Normal),
     labelLarge = style(14, 20, FontWeight.SemiBold),
     labelMedium = style(12, 16, FontWeight.SemiBold),
-    labelSmall = style(11, 15, FontWeight.Medium, 0.2),
+    labelSmall = style(11, 14, FontWeight.SemiBold, 0.4),
 )
 
 /** Angka besar dengan digit lebar seragam (tabular) agar tidak "bergoyang" saat beranimasi. */

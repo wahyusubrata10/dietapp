@@ -59,6 +59,7 @@ import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.TipsAndUpdates
 import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -403,7 +404,7 @@ private fun DayPill(day: DayChip, selected: Boolean, target: Int?, onClick: () -
     val ratio = if (budget != null && budget > 0) (day.calories / budget).toFloat() else if (day.calories > 0) 1f else 0f
     val ring = when {
         selected -> cs.onPrimary
-        ratio > 1.1f -> cs.error
+        ratio > 1.1f -> HawTheme.colors.warning
         else -> cs.primary
     }
     val track = if (selected) cs.onPrimary.copy(alpha = 0.22f) else cs.surfaceContainerHighest
@@ -545,7 +546,7 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit, modifier: Modifier
     val target = state.target
     val statusText = when {
         eaten <= 0.0 -> "Mulai catat"
-        over -> "Melebihi jatah"
+        over -> "Sedikit di atas jatah"
         else -> "${(eaten / budget * 100).roundToInt()}% terpakai"
     }
     Box(
@@ -558,7 +559,7 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit, modifier: Modifier
             .drawBehind {
                 // Gelembung cahaya agar gradasi terasa "hidup".
                 drawRect(Brush.radialGradient(listOf(Color.White.copy(alpha = 0.16f), Color.Transparent), center = Offset(size.width * 0.15f, size.height * 0.1f), radius = size.width * 0.6f))
-                drawRect(Brush.radialGradient(listOf(Color(0xFF7CF5C9).copy(alpha = 0.18f), Color.Transparent), center = Offset(size.width, size.height * 0.85f), radius = size.width * 0.7f))
+                drawRect(Brush.radialGradient(listOf(hc.heroFiber.copy(alpha = 0.16f), Color.Transparent), center = Offset(size.width, size.height * 0.85f), radius = size.width * 0.7f))
             }
             .padding(horizontal = 20.dp, vertical = 18.dp),
     ) {
@@ -570,7 +571,7 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit, modifier: Modifier
                     color = hc.heroContent,
                     modifier = Modifier.weight(1f),
                 )
-                StatusChip(statusText, Color.White, onColor = true, icon = if (over) Icons.Filled.LocalFireDepartment else Icons.Outlined.Flag)
+                StatusChip(statusText, Color.White, onColor = true, icon = if (over) Icons.Outlined.Info else Icons.Outlined.Flag)
             }
             ArcGauge(
                 progress = (eaten / budget).toFloat(),
@@ -579,13 +580,13 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit, modifier: Modifier
                 stroke = 18.dp,
                 track = hc.heroTrack,
                 fill = Brush.linearGradient(listOf(lerp(MaterialTheme.colorScheme.primary, Color.White, 0.7f), Color.White)),
-                bonusColor = Color(0xFFB9C2FF),
-                overColor = Color(0xFFFFB4A6),
+                bonusColor = hc.heroBonus,
+                overColor = hc.heroOver,
                 modifier = Modifier.padding(top = 4.dp),
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    AnimatedCount(abs(remaining), NumberDisplay, if (over) Color(0xFFFFD2C9) else hc.heroContent)
-                    Text(if (over) "kkal berlebih" else "kkal tersisa", style = MaterialTheme.typography.labelLarge, color = hc.heroContentSub)
+                    AnimatedCount(abs(remaining), NumberDisplay, if (over) hc.heroOver else hc.heroContent)
+                    Text(if (over) "kkal di atas jatah" else "kkal tersisa", style = MaterialTheme.typography.labelLarge, color = hc.heroContentSub)
                 }
             }
             Row(Modifier.fillMaxWidth().offset(y = (-26).dp), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -595,10 +596,10 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit, modifier: Modifier
             }
             if (target != null) {
                 Row(Modifier.fillMaxWidth().offset(y = (-10).dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                    HeroMacroRing("Protein", state.total.protein, target.proteinG, Color(0xFFFF9C8F))
-                    HeroMacroRing("Karbo", state.total.carbs, target.carbsG, Color(0xFFFFD27A))
-                    HeroMacroRing("Lemak", state.total.fat, target.fatG, Color(0xFFA9C4FF))
-                    HeroMacroRing("Serat", state.total.fiber, target.fiberG, Color(0xFFB9F6CA))
+                    HeroMacroRing("Protein", state.total.protein, target.proteinG, hc.heroProtein)
+                    HeroMacroRing("Karbo", state.total.carbs, target.carbsG, hc.heroCarbs)
+                    HeroMacroRing("Lemak", state.total.fat, target.fatG, hc.heroFat)
+                    HeroMacroRing("Serat", state.total.fiber, target.fiberG, hc.heroFiber)
                 }
             }
             if (state.isToday && state.hasApiKey) {
@@ -753,7 +754,7 @@ private fun MealTimelineRow(
                                 else -> "Belum dicatat"
                             },
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (done) color else MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = if (done) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Box(
@@ -975,7 +976,7 @@ private fun LimitsCard(sugar: Double, sodium: Double, modifier: Modifier = Modif
 private fun LimitBar(label: String, value: Double, limit: Double, unit: String, modifier: Modifier) {
     val ratio = (value / limit).toFloat()
     val color = when {
-        ratio > 1f -> MaterialTheme.colorScheme.error
+        ratio > 1f -> HawTheme.colors.warning
         ratio > 0.75f -> HawTheme.colors.warning
         else -> HawTheme.colors.success
     }

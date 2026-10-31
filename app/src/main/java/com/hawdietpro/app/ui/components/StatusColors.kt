@@ -4,6 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.hawdietpro.app.domain.nutrition.DayStatus
+import com.hawdietpro.app.ui.theme.HawTheme
 
 /** Warna konsisten untuk status hari (kalender heatmap, rekap, legenda). */
 @Composable
@@ -11,7 +12,8 @@ fun DayStatus.color(): Color = when (this) {
     DayStatus.KOSONG -> MaterialTheme.colorScheme.surfaceContainerHighest
     DayStatus.KURANG -> MaterialTheme.colorScheme.tertiary
     DayStatus.SESUAI -> MaterialTheme.colorScheme.primary
-    DayStatus.LEBIH -> MaterialTheme.colorScheme.error
+    // "Lebih" memakai amber tenang (bukan merah) agar tidak terasa menghakimi; selalu disertai ikon/teks.
+    DayStatus.LEBIH -> HawTheme.colors.warning
 }
 
 /** Warna teks di atas sel berwarna status. */
@@ -20,5 +22,13 @@ fun DayStatus.onColor(): Color = when (this) {
     DayStatus.KOSONG -> MaterialTheme.colorScheme.onSurface
     DayStatus.KURANG -> MaterialTheme.colorScheme.onTertiary
     DayStatus.SESUAI -> MaterialTheme.colorScheme.onPrimary
-    DayStatus.LEBIH -> MaterialTheme.colorScheme.onError
+    DayStatus.LEBIH -> HawTheme.colors.onWarning
+}
+
+/** Ikon pendamping status agar makna tidak hanya dari warna (aksesibilitas buta warna). */
+fun DayStatus.symbol(): String = when (this) {
+    DayStatus.KOSONG -> ""
+    DayStatus.KURANG -> "↓"
+    DayStatus.SESUAI -> "✓"
+    DayStatus.LEBIH -> "△"
 }

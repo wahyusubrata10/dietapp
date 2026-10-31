@@ -204,7 +204,7 @@ private fun Filters(state: HistoryUi, viewModel: HistoryViewModel) {
 @Composable
 private fun DayCard(group: DayGroup, target: Int?, onOpenMeal: (Long) -> Unit, modifier: Modifier = Modifier) {
     val over = target != null && group.calories > target * 1.1
-    val color = if (over) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+    val color = if (over) HawTheme.colors.warning else MaterialTheme.colorScheme.primary
     HawCard(modifier, contentPadding = 14.dp) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
