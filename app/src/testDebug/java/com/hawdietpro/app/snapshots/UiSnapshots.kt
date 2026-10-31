@@ -52,11 +52,17 @@ class UiSnapshots {
         dark: Boolean = true,
         accent: AccentColor = AccentColor.EMERALD,
         amoled: Boolean = false,
+        fontScale: Float = 1f,
         content: @Composable () -> Unit,
     ) {
         compose.setContent {
-            HawDietTheme(darkTheme = dark, accent = accent, amoled = amoled) {
-                androidx.compose.material3.Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) { content() }
+            val density = androidx.compose.ui.platform.LocalDensity.current
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(density.density, fontScale),
+            ) {
+                HawDietTheme(darkTheme = dark, accent = accent, amoled = amoled) {
+                    androidx.compose.material3.Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) { content() }
+                }
             }
         }
         // Animasi (masuk, angka, cincin) semuanya terbatas → tunggu sampai diam.
@@ -91,6 +97,31 @@ class UiSnapshots {
 
     @Test
     fun home_empty_dark() = snap("home_empty_dark") { HomeContent(SampleData.homeEmpty(), HomeActions()) }
+
+    @Test
+    fun home_empty_light() = snap("home_empty_light", dark = false) { HomeContent(SampleData.homeEmpty(), HomeActions()) }
+
+    /** Layar kecil 360dp + ukuran huruf sistem 130%. */
+    @Test
+    @Config(qualifiers = "w360dp-h2200dp-xxhdpi")
+    fun home_light_360_font130() = snap("home_light_360_font130", dark = false, fontScale = 1.3f) { HomeContent(SampleData.home(), HomeActions()) }
+
+    @Test
+    @Config(qualifiers = "w360dp-h2200dp-xxhdpi")
+    fun home_dark_360_font130() = snap("home_dark_360_font130", fontScale = 1.3f) { HomeContent(SampleData.home(), HomeActions()) }
+
+    /** Banyak catatan + nama panjang. */
+    @Test
+    @Config(qualifiers = "w360dp-h3200dp-xxhdpi")
+    fun home_busy_long_names() = snap("home_busy_long_names", dark = false) { HomeContent(SampleData.homeBusyLongNames(), HomeActions()) }
+
+    @Test
+    @Config(qualifiers = "w360dp-h900dp-xxhdpi")
+    fun analytics_summary_light_font130() = snap("analytics_summary_light_font130", dark = false, fontScale = 1.3f) {
+        androidx.compose.foundation.layout.Column(Modifier.padding(16.dp)) {
+            com.hawdietpro.app.ui.feature.analytics.SummaryTiles(SampleData.weekStats(), null, 1900)
+        }
+    }
 
     @Test
     @Config(qualifiers = "w400dp-h300dp-xxhdpi")

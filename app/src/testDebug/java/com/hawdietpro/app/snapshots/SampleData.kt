@@ -98,6 +98,26 @@ object SampleData {
         )
     }
 
+    /** Hari sibuk: banyak catatan, nama menu & nama pengguna sangat panjang. */
+    fun homeBusyLongNames(): HomeState {
+        val base = home()
+        val many = (0 until 14).map { i ->
+            val m = meals[i % meals.size]
+            m.copy(
+                id = 50L + i,
+                eatenAt = at(6 + i, 10),
+                mealType = MealType.entries[i % MealType.entries.size],
+                menuName = if (i % 3 == 0) "Nasi campur ayam betutu sambal matah lawar sayur urap telur pindang kerupuk" else m.menuName,
+            )
+        }
+        return base.copy(
+            name = "Ni Luh Putu Ayu Kadek Wahyuningsih Subrata",
+            meals = many,
+            total = many.map { it.total }.sum(),
+            byType = many.groupBy { it.mealType },
+        )
+    }
+
     fun homeEmpty(): HomeState {
         val target = TdeeCalculator.calculate(profile)
         val days = (0 until 14).map { i -> DayChip(today.minusDays((13 - i).toLong()), 0.0) }
