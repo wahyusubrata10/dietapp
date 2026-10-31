@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hawdietpro.app.snapshots.UiSnapshots" tests="19" skipped="0" failures="0" errors="0" timestamp="2026-10-31T13:45:42.031Z" hostname="runnervmnwato" time="20.714">
+  <properties/>
+  <testcase name="home_grape_light" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="9.858"/>
+  <testcase name="home_light_360_font130" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="1.146"/>
+  <testcase name="weight_adaptive_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.253"/>
+  <testcase name="wrap_page1" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.653"/>
+  <testcase name="wrap_page3" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.641"/>
+  <testcase name="home_ocean_amoled" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.75"/>
+  <testcase name="analytics_summary_light_font130" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.219"/>
+  <testcase name="settings_appearance_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.182"/>
+  <testcase name="analytics_summary_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.168"/>
+  <testcase name="home_empty_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.698"/>
+  <testcase name="home_empty_light" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.613"/>
+  <testcase name="bottom_bar_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.109"/>
+  <testcase name="home_busy_long_names" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="1.021"/>
+  <testcase name="home_light_full" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.882"/>
+  <testcase name="home_dark_360_font130" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.866"/>
+  <testcase name="quick_add_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.249"/>
+  <testcase name="home_light" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.693"/>
+  <testcase name="home_dark_full" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.95"/>
+  <testcase name="home_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.762"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
