@@ -3,6 +3,7 @@ package com.hawdietpro.app.ui.feature.history
 import com.hawdietpro.app.domain.nutrition.DayStatus
 import com.hawdietpro.app.ui.components.color
 import com.hawdietpro.app.ui.components.onColor
+import com.hawdietpro.app.ui.components.symbol
 import com.hawdietpro.app.ui.components.GradeBadge
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.ui.semantics.Role
