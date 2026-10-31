@@ -1,6 +1,8 @@
 package com.hawdietpro.app.ui.feature.home
 
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.data.prefs.SecureStorage
 import com.hawdietpro.app.data.remote.RemoteConfigStore
@@ -164,7 +166,10 @@ class HomeViewModel @Inject constructor(
             previousDayByType = prev,
             newAchievements = fresh,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState())
+    }
+        // Statistik, insight & badge dihitung di latar agar Beranda tidak tersendat.
+        .flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState())
 
     /** Salin semua makan [type] dari hari sebelumnya ke hari yang sedang dilihat (jam sama). */
     fun copyFromPreviousDay(type: MealType) {

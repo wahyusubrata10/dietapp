@@ -1,6 +1,8 @@
 package com.hawdietpro.app.ui.feature.analytics
 
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.data.gemini.GeminiError
 import com.hawdietpro.app.data.remote.RemoteConfigStore
@@ -109,7 +111,9 @@ class AnalyticsViewModel @Inject constructor(
                 loading = false,
             )
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AnalyticsUi())
+    }
+        .flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AnalyticsUi())
 
     init {
         viewModelScope.launch {

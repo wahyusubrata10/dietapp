@@ -1,6 +1,8 @@
 package com.hawdietpro.app.data.repository
 
 import com.hawdietpro.app.data.prefs.AppPreferences
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.domain.achievement.Achievement
 import com.hawdietpro.app.domain.achievement.AchievementCalculator
@@ -32,7 +34,7 @@ class AchievementRepository @Inject constructor(
             isVegetable = FoodClassifier(rules)::isVegetable,
             targetTolerancePct = rules.targetTolerancePct,
         ).compute(mealList, weightList, target, profile?.goal, exerciseList)
-    }
+    }.flowOn(Dispatchers.Default)
 
     /** Badge yang sudah terbuka tetapi belum pernah dilihat. */
     fun observeNew(): Flow<List<Achievement>> = combine(observe(), prefs.seenAchievements) { list, seen ->

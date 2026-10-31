@@ -1,6 +1,8 @@
 package com.hawdietpro.app.ui.feature.history
 
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import androidx.lifecycle.viewModelScope
 import com.hawdietpro.app.data.repository.ExerciseRepository
 import com.hawdietpro.app.data.repository.MealRepository
@@ -115,7 +117,9 @@ class HistoryViewModel @Inject constructor(
             exerciseByDay = burned,
             loading = false,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HistoryUi())
+    }
+        .flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HistoryUi())
 
     private data class Params(val mode: HistoryMode, val filters: HistoryFilters, val window: Long, val month: YearMonth, val selected: LocalDate)
 
