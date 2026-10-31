@@ -34,9 +34,28 @@ class CameraViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
-        CameraState(mealType = savedState.get<String>("type")?.takeIf { it.isNotBlank() }?.let(MealType::parse) ?: MealType.fromHour(LocalTime.now().hour)),
+        CameraState(
+            mealType = savedState.get<String>(KEY_MEAL_TYPE)?.let(MealType::parse)
+                ?: savedState.get<String>("type")?.takeIf { it.isNotBlank() }?.let(MealType::parse)
+                ?: MealType.fromHour(LocalTime.now().hour),
+            // Bila proses sempat dimatikan sistem setelah memotret, foto yang sudah jadi dipakai lagi.
+            photoPath = savedState.get<String>(KEY_PHOTO)?.takeIf { File(it).exists() },
+            capturedAt = savedState.get<Long>(KEY_CAPTURED_AT) ?: System.currentTimeMillis(),
+            hint = savedState.get<String>(KEY_HINT).orEmpty(),
+        ),
     )
     val state: StateFlow<CameraState> = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            _state.collect {
+                savedState[KEY_PHOTO] = it.photoPath
+                savedState[KEY_CAPTURED_AT] = it.capturedAt
+                savedState[KEY_MEAL_TYPE] = it.mealType.name
+                savedState[KEY_HINT] = it.hint
+            }
+        }
+    }
 
     private var handedOff = false
 
@@ -89,5 +108,12 @@ class CameraViewModel @Inject constructor(
 
     override fun onCleared() {
         if (!handedOff) discardPhoto()
+    }
+
+    private companion object {
+        const val KEY_PHOTO = "cam_photo"
+        const val KEY_CAPTURED_AT = "cam_captured_at"
+        const val KEY_MEAL_TYPE = "cam_meal_type"
+        const val KEY_HINT = "cam_hint"
     }
 }

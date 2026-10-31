@@ -177,15 +177,7 @@ fun MealPhoto(path: String?, modifier: Modifier = Modifier, size: Dp = 64.dp, co
     }
 }
 
-/** Cek file foto dengan cache agar scroll tidak membaca penyimpanan berulang di thread UI. */
-private val photoExistsCache = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
-
-fun photoExists(path: String): Boolean = photoExistsCache.getOrPut(path) { File(path).exists() }
-
-/** Dipanggil saat foto dihapus/dipulihkan agar cache tidak basi. */
-fun forgetPhoto(path: String) {
-    photoExistsCache.remove(path)
-}
+fun photoExists(path: String): Boolean = com.hawdietpro.app.core.PhotoFiles.exists(path)
 
 @Composable
 fun MealRow(meal: Meal, onClick: () -> Unit, modifier: Modifier = Modifier, showType: Boolean = true) {

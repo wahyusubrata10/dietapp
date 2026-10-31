@@ -52,10 +52,19 @@ class MealRepository @Inject constructor(
         return dao.saveMeal(entity, meal.items.mapIndexed { i, item -> item.toEntity(meal.id, i) })
     }
 
-    suspend fun delete(id: Long) {
-        val photo = dao.getMeal(id)?.meal?.photoPath
+    /**
+     * Hapus catatan. [keepPhoto] = true bila penghapusan masih bisa diurungkan (foto dihapus belakangan
+     * oleh [DeleteUndo]). Mengembalikan catatan yang dihapus.
+     */
+    suspend fun delete(id: Long, keepPhoto: Boolean = false): Meal? {
+        val meal = dao.getMeal(id)?.toDomain()
         dao.deleteMeal(id)
-        if (photo != null) withContext(Dispatchers.IO) { File(photo).delete() }
+        val photo = meal?.photoPath
+        if (photo != null && !keepPhoto) {
+            withContext(Dispatchers.IO) { File(photo).delete() }
+            com.hawdietpro.app.core.PhotoFiles.forget(photo)
+        }
+        return meal
     }
 
     suspend fun getAll(): List<Meal> = dao.getAllMeals().map { it.toDomain() }

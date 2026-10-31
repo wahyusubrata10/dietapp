@@ -1,5 +1,14 @@
 package com.hawdietpro.app.ui.feature.camera
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
@@ -113,7 +122,19 @@ fun CameraScreen(
     var hasPermission by remember {
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
     }
-    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { hasPermission = it }
+    // Ditolak permanen ("jangan tanya lagi"): dialog izin tidak muncul lagi → arahkan ke Pengaturan aplikasi.
+    var permanentlyDenied by remember { mutableStateOf(false) }
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        hasPermission = granted
+        permanentlyDenied = !granted && context.findActivity()?.let {
+            !ActivityCompat.shouldShowRequestPermissionRationale(it, Manifest.permission.CAMERA)
+        } == true
+    }
+    // Kembali dari Pengaturan: cek ulang izin.
+    LifecycleResumeEffect(Unit) {
+        hasPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        onPauseOrDispose { }
+    }
     LaunchedEffect(Unit) { if (!hasPermission) permissionLauncher.launch(Manifest.permission.CAMERA) }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -151,7 +172,18 @@ fun CameraScreen(
                 onManual = { onManual(state.mealType) },
                 onCaptureError = viewModel::showError,
             )
-            else -> NoPermission(onGrant = { permissionLauncher.launch(Manifest.permission.CAMERA) }, onGallery = pickFromGallery, onManual = { onManual(state.mealType) })
+            else -> NoPermission(
+                permanentlyDenied = permanentlyDenied,
+                onGrant = { permissionLauncher.launch(Manifest.permission.CAMERA) },
+                onOpenSettings = {
+                    context.startActivity(
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    )
+                },
+                onGallery = pickFromGallery,
+                onManual = { onManual(state.mealType) },
+            )
         }
 
         IconButton(
@@ -201,6 +233,8 @@ private fun CaptureStep(
     }
     var flashOn by remember { mutableStateOf(false) }
     val flash = remember { Animatable(0f) }
+    // Kunci rana sejak ditekan sampai foto tersimpan (cegah ketukan ganda → dua foto).
+    var capturing by remember { mutableStateOf(false) }
     DisposableEffect(lifecycleOwner) {
         controller.bindToLifecycle(lifecycleOwner)
         onDispose { controller.unbind() }
@@ -211,7 +245,8 @@ private fun CaptureStep(
     )
 
     fun shoot() {
-        if (busy) return
+        if (busy || capturing) return
+        capturing = true
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         scope.launch {
             flash.snapTo(0.85f)
@@ -222,8 +257,16 @@ private fun CaptureStep(
             ImageCapture.OutputFileOptions.Builder(file).build(),
             ContextCompat.getMainExecutor(context),
             object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(output: ImageCapture.OutputFileResults) = onCaptured(file)
-                override fun onError(exception: ImageCaptureException) = onCaptureError(exception.message ?: "Gagal mengambil foto")
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    capturing = false
+                    onCaptured(file)
+                }
+
+                override fun onError(exception: ImageCaptureException) {
+                    capturing = false
+                    file.delete()
+                    onCaptureError(exception.message ?: "Gagal mengambil foto")
+                }
             },
         )
     }
@@ -300,7 +343,7 @@ private fun CaptureStep(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RoundAction(Icons.Filled.PhotoLibrary, "Galeri", onGallery)
-                ShutterButton(enabled = !busy, onClick = ::shoot)
+                ShutterButton(enabled = !busy && !capturing, onClick = ::shoot)
                 RoundAction(Icons.Filled.EditNote, "Manual", onManual)
             }
         }
@@ -439,23 +482,46 @@ private fun ReviewStep(
 }
 
 @Composable
-private fun NoPermission(onGrant: () -> Unit, onGallery: () -> Unit, onManual: () -> Unit) {
+private fun NoPermission(
+    permanentlyDenied: Boolean,
+    onGrant: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onGallery: () -> Unit,
+    onManual: () -> Unit,
+) {
     Column(
         Modifier.fillMaxSize().padding(32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Icon(Icons.Filled.CameraAlt, null, tint = Color.White, modifier = Modifier.size(48.dp))
+        Spacer(Modifier.height(16.dp))
         Text("Izin kamera diperlukan", color = Color.White, style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(8.dp))
         Text(
-            "Izinkan kamera untuk memotret makanan, atau pilih foto dari galeri.",
-            color = Color.White.copy(alpha = 0.8f),
+            if (permanentlyDenied) "Izin kamera sedang dimatikan. Buka Pengaturan → Izin → Kamera → Izinkan, lalu kembali ke sini."
+            else "Izinkan kamera untuk memotret makanan, atau pilih foto dari galeri.",
+            color = Color.White.copy(alpha = 0.85f),
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(24.dp))
-        Button(onClick = onGrant) { Text("Izinkan kamera") }
+        if (permanentlyDenied) {
+            Button(onClick = onOpenSettings, shape = CircleShape) { Text("Buka Pengaturan") }
+        } else {
+            Button(onClick = onGrant, shape = CircleShape) { Text("Izinkan kamera") }
+        }
         Spacer(Modifier.height(8.dp))
-        OutlinedButton(onClick = onGallery) { Text("Pilih dari galeri", color = Color.White) }
+        OutlinedButton(onClick = onGallery, shape = CircleShape) { Text("Pilih dari galeri", color = Color.White) }
         TextButton(onClick = onManual) { Text("Input manual", color = Color.White) }
     }
+}
+
+/** Cari Activity dari Context Compose (bisa terbungkus ContextWrapper). */
+private fun Context.findActivity(): Activity? {
+    var c: Context? = this
+    while (c is ContextWrapper) {
+        if (c is Activity) return c
+        c = c.baseContext
+    }
+    return null
 }

@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.hawdietpro.app.data.repository.DeleteUndo
 import com.hawdietpro.app.data.repository.PendingRepository
 import com.hawdietpro.app.domain.model.MealType
 import javax.inject.Inject
@@ -38,7 +39,11 @@ class MainViewModel @Inject constructor(
     private val scheduler: WorkScheduler,
     store: RemoteConfigStore,
     private val pending: PendingRepository,
+    private val deleteUndo: DeleteUndo,
 ) : ViewModel() {
+
+    /** Kembalikan catatan makan yang baru saja dihapus (aksi "Urungkan" di snackbar). */
+    fun undoDelete() = deleteUndo.undo()
 
     val startState: StateFlow<StartState> = profiles.observeProfile()
         .map { if (it == null) StartState.NeedsOnboarding else StartState.Ready }

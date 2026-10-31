@@ -1,5 +1,11 @@
 package com.hawdietpro.app.ui.feature.meal
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.material.icons.filled.Info
+import com.hawdietpro.app.domain.nutrition.Plausibility
+import com.hawdietpro.app.ui.components.NoticeCard
+import com.hawdietpro.app.ui.components.StatusChip
 import com.hawdietpro.app.ui.components.AnimatedCount
 import com.hawdietpro.app.ui.components.BentoCard
 import com.hawdietpro.app.ui.components.PillTabs
@@ -137,6 +143,10 @@ fun MealEditorScreen(
     }
 
     var confirmDelete by remember { mutableStateOf(false) }
+    var confirmLeave by remember { mutableStateOf(false) }
+    val analyzingPhoto = state.phase == EditorPhase.Analyzing && state.mode == EditorMode.PHOTO
+    // Back saat analisa: tanya dulu agar foto tidak terbuang tanpa sengaja.
+    BackHandler(enabled = analyzingPhoto) { confirmLeave = true }
     var editIndex by rememberSaveable { mutableStateOf<Int?>(null) }
     var showAdd by rememberSaveable { mutableStateOf(false) }
     var linkIndex by rememberSaveable { mutableStateOf<Int?>(null) }
@@ -149,7 +159,7 @@ fun MealEditorScreen(
 
     HawScaffold(
         title = title,
-        onBack = { onClose(null) },
+        onBack = { if (analyzingPhoto) confirmLeave = true else onClose(null) },
         actions = {
             if (state.phase == EditorPhase.Ready) {
                 IconButton(onClick = viewModel::toggleFavorite) {
@@ -176,6 +186,7 @@ fun MealEditorScreen(
                 EditorPhase.Loading -> LoadingBox()
                 EditorPhase.Analyzing -> AnalyzingView(
                     photoPath = state.meal.photoPath,
+                    stage = state.stage,
                     onBackground = if (state.mode == EditorMode.PHOTO) viewModel::continueInBackground else null,
                 )
                 is EditorPhase.Error -> ErrorView(
@@ -193,6 +204,17 @@ fun MealEditorScreen(
                     viewModel = viewModel,
                     onEditItem = { editIndex = it },
                     onAdd = { showAdd = true },
+                )
+            }
+            // Gagal menyimpan: editan tetap ada, pesan muncul di atas.
+            state.notice?.let { msg ->
+                NoticeCard(
+                    "Belum tersimpan",
+                    msg,
+                    Icons.Filled.Info,
+                    MaterialTheme.colorScheme.error,
+                    Modifier.align(Alignment.TopCenter).padding(12.dp),
+                    trailing = { TextButton(onClick = viewModel::clearNotice) { Text("OK") } },
                 )
             }
         }
@@ -259,7 +281,7 @@ fun MealEditorScreen(
         AlertDialog(
             onDismissRequest = { confirmDelete = false },
             title = { Text("Hapus catatan?") },
-            text = { Text("Catatan makan dan fotonya akan dihapus permanen.") },
+            text = { Text("Catatan makan dan fotonya akan dihapus. Kamu masih bisa mengurungkannya beberapa detik setelahnya.") },
             confirmButton = {
                 TextButton(onClick = {
                     confirmDelete = false
@@ -267,6 +289,26 @@ fun MealEditorScreen(
                 }) { Text("Hapus") }
             },
             dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Batal") } },
+        )
+    }
+
+    if (confirmLeave) {
+        AlertDialog(
+            onDismissRequest = { confirmLeave = false },
+            title = { Text("Analisa masih berjalan") },
+            text = { Text("Lanjutkan di latar belakang (hasil tercatat otomatis & ada notifikasi), atau buang foto ini?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmLeave = false
+                    viewModel.continueInBackground()
+                }) { Text("Lanjut di latar belakang") }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    confirmLeave = false
+                    onClose(null)
+                }) { Text("Buang foto", color = MaterialTheme.colorScheme.error) }
+            },
         )
     }
 }
@@ -314,15 +356,16 @@ private fun PhotoHeader(path: String?, modifier: Modifier = Modifier) {
     }
 }
 
+/** Sesuai tahap yang dilaporkan MealAnalyzer (0..3). */
 private val ANALYZE_STEPS = listOf(
-    "Mengenali menu di foto",
-    "Memecah tiap elemen di piring",
+    "Menyiapkan foto",
+    "AI mengenali menu & tiap elemen di piring",
     "Mencocokkan dengan database gizi",
     "Menghitung skor gizi",
 )
 
 @Composable
-private fun AnalyzingView(photoPath: String?, onBackground: (() -> Unit)?) {
+private fun AnalyzingView(photoPath: String?, stage: Int, onBackground: (() -> Unit)?) {
     val cs = MaterialTheme.colorScheme
     val transition = rememberInfiniteTransition(label = "scan")
     val scan by transition.animateFloat(0f, 1f, infiniteRepeatable(tween(1600), RepeatMode.Reverse), label = "scanY")
@@ -333,7 +376,8 @@ private fun AnalyzingView(photoPath: String?, onBackground: (() -> Unit)?) {
             seconds++
         }
     }
-    val active = (seconds / 4).coerceAtMost(ANALYZE_STEPS.lastIndex)
+    // Tahap mengikuti progres nyata dari proses analisa (bukan sekadar waktu).
+    val active = stage.coerceIn(0, ANALYZE_STEPS.lastIndex)
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -398,7 +442,8 @@ private fun AnalyzingView(photoPath: String?, onBackground: (() -> Unit)?) {
             color = cs.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-        if (onBackground != null) {
+        // Tombol latar belakang muncul setelah beberapa detik (jarang perlu untuk analisa yang cepat).
+        if (onBackground != null && seconds >= 6) {
             Spacer(Modifier.height(20.dp))
             OutlinedButton(onClick = onBackground, shape = CircleShape) {
                 Icon(Icons.Filled.CloudQueue, null)
@@ -492,7 +537,8 @@ private fun EditorContent(
     var showTime by remember { mutableStateOf(false) }
 
     LazyColumn(
-        Modifier.fillMaxSize(),
+        // imePadding: kolom catatan di bawah tidak tertutup keyboard.
+        Modifier.fillMaxSize().imePadding(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
@@ -814,6 +860,10 @@ private fun ItemCard(item: FoodItem, onClick: () -> Unit) {
                     }
                     Spacer(Modifier.height(6.dp))
                     MacroInline(item.nutrients)
+                    Plausibility.check(item)?.let { reason ->
+                        Spacer(Modifier.height(6.dp))
+                        StatusChip("△ $reason · ketuk untuk periksa", HawTheme.colors.warning)
+                    }
                 }
                 Spacer(Modifier.width(8.dp))
                 Column(horizontalAlignment = Alignment.End) {

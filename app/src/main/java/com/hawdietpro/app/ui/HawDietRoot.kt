@@ -23,6 +23,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarResult
+import com.hawdietpro.app.data.repository.DeleteUndo
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -121,7 +124,15 @@ private fun MainScaffold(
     // Animasi centang untuk aksi simpan yang berhasil; pesan lain tetap lewat snackbar.
     var success by remember { mutableStateOf<Pair<Long, String>?>(null) }
     val showResult: (String) -> Unit = { msg ->
-        if (isSuccessMessage(msg)) success = System.currentTimeMillis() to msg else showMessage(msg)
+        when {
+            isSuccessMessage(msg) -> success = System.currentTimeMillis() to msg
+            // Hapus catatan bisa diurungkan selama snackbar tampil.
+            msg == DeleteUndo.DELETED_MESSAGE -> scope.launch {
+                val result = snackbar.showSnackbar(msg, actionLabel = "Urungkan", duration = SnackbarDuration.Long)
+                if (result == SnackbarResult.ActionPerformed) viewModel.undoDelete()
+            }
+            else -> showMessage(msg)
+        }
     }
 
     val backStack by navController.currentBackStackEntryAsState()

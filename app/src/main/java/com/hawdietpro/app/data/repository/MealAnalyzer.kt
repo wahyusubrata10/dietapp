@@ -47,9 +47,15 @@ class MealAnalyzer @Inject constructor(
     private val images: ImageProcessor,
     private val store: RemoteConfigStore,
 ) {
-    suspend fun analyze(photoPath: String, mealType: MealType, eatenAt: Long, userHint: String?): Meal {
+    /**
+     * [onStage] dipanggil saat tahap berganti (0 baca foto, 1 AI mengenali, 2 cocokkan DB, 3 nilai gizi)
+     * hanya untuk tampilan progres; tidak memengaruhi hasil.
+     */
+    suspend fun analyze(photoPath: String, mealType: MealType, eatenAt: Long, userHint: String?, onStage: (Int) -> Unit = {}): Meal {
+        onStage(0)
         val jpeg = images.readBytes(photoPath)
         val matcher = foods.matcher()
+        onStage(1)
         val time = Instant.ofEpochMilli(eatenAt).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("HH.mm"))
         val result = gemini.analyzeFood(
             jpeg,
@@ -63,6 +69,7 @@ class MealAnalyzer @Inject constructor(
                 } else emptyList(),
             ),
         )
+        onStage(2)
         val meal = Meal(
             eatenAt = eatenAt,
             mealType = mealType,
@@ -72,6 +79,7 @@ class MealAnalyzer @Inject constructor(
             items = withContext(Dispatchers.Default) { toItems(result, matcher) },
             aiNotes = result.notes?.takeIf { it.isNotBlank() },
         )
+        onStage(3)
         return evaluator.evaluate(meal)
     }
 

@@ -11,6 +11,8 @@ import com.hawdietpro.app.data.repository.MealAnalyzer
 import com.hawdietpro.app.data.repository.MealEvaluator
 import com.hawdietpro.app.data.repository.MealRepository
 import com.hawdietpro.app.data.repository.PendingRepository
+import com.hawdietpro.app.data.repository.DeleteUndo
+import com.hawdietpro.app.data.repository.DeleteUndo.Companion.DELETED_MESSAGE
 import com.hawdietpro.app.data.repository.EnergyRepository
 import com.hawdietpro.app.domain.model.FoodItem
 import com.hawdietpro.app.domain.model.FoodReference
@@ -53,11 +55,16 @@ data class EditorState(
     val dirty: Boolean = false,
     /** Pengali porsi seluruh piring (1 = sesuai foto/catatan). */
     val portion: Double = 1.0,
+    /** Tahap analisa yang sedang berjalan (0..3), untuk progres yang jujur. */
+    val stage: Int = 0,
+    /** Pesan sementara di layar (mis. gagal menyimpan); layar tetap terbuka. */
+    val notice: String? = null,
 )
 
 @HiltViewModel
 class MealEditorViewModel @Inject constructor(
     savedState: SavedStateHandle,
+    private val undo: DeleteUndo,
     private val analyzer: MealAnalyzer,
     private val evaluator: MealEvaluator,
     private val meals: MealRepository,
@@ -136,11 +143,13 @@ class MealEditorViewModel @Inject constructor(
     fun analyze() {
         val s = _state.value
         val photo = s.meal.photoPath ?: return
-        _state.update { it.copy(phase = EditorPhase.Analyzing) }
+        _state.update { it.copy(phase = EditorPhase.Analyzing, stage = 0) }
         analysisJob?.cancel()
         analysisJob = viewModelScope.launch {
             try {
-                val result = analyzer.analyze(photo, s.meal.mealType, s.meal.eatenAt, s.hint)
+                val result = analyzer.analyze(photo, s.meal.mealType, s.meal.eatenAt, s.hint) { stage ->
+                    _state.update { it.copy(stage = stage) }
+                }
                 _state.update { it.copy(meal = result.copy(id = it.meal.id, userNote = it.meal.userNote), phase = EditorPhase.Ready, dirty = true, portion = 1.0) }
             } catch (e: GeminiError) {
                 _state.update { it.copy(phase = EditorPhase.Error(e.message ?: "Analisa gagal", e.retryable, e.queueable && pendingId == null)) }
@@ -318,16 +327,32 @@ class MealEditorViewModel @Inject constructor(
 
     fun save() {
         val s = _state.value
-        if (s.meal.items.isEmpty()) return
-        _state.update { it.copy(phase = EditorPhase.Saving) }
+        // Ketukan ganda / sedang menyimpan: abaikan agar tidak tercatat dobel.
+        if (s.meal.items.isEmpty() || s.phase == EditorPhase.Saving) return
+        _state.update { it.copy(phase = EditorPhase.Saving, notice = null) }
         viewModelScope.launch {
-            val meal = evaluator.evaluate(s.meal.copy(menuName = s.meal.menuName.ifBlank { s.meal.items.first().name }))
-            meals.save(meal)
-            committed = true
-            pendingId?.let { pending.remove(it, deletePhoto = false) }
-            _state.update { it.copy(finishedMessage = if (s.mode == EditorMode.EDIT) "Perubahan disimpan" else "Tersimpan: ${meal.menuName}") }
+            try {
+                val meal = evaluator.evaluate(s.meal.copy(menuName = s.meal.menuName.ifBlank { s.meal.items.first().name }))
+                meals.save(meal)
+                committed = true
+                pendingId?.let { pending.remove(it, deletePhoto = false) }
+                _state.update { it.copy(finishedMessage = if (s.mode == EditorMode.EDIT) "Perubahan disimpan" else "Tersimpan: ${meal.menuName}") }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Editan tetap ada di layar; pengguna bisa mencoba lagi.
+                val full = e is android.database.sqlite.SQLiteFullException || e.message?.contains("ENOSPC") == true
+                _state.update {
+                    it.copy(
+                        phase = EditorPhase.Ready,
+                        notice = if (full) "Memori HP penuh. Kosongkan sedikit ruang lalu simpan lagi." else "Gagal menyimpan: ${e.message ?: "coba lagi"}",
+                    )
+                }
+            }
         }
     }
+
+    fun clearNotice() = _state.update { it.copy(notice = null) }
 
     /** Tandai/lepas favorit. Untuk catatan tersimpan langsung diperbarui di database. */
     fun toggleFavorite() {
@@ -353,8 +378,9 @@ class MealEditorViewModel @Inject constructor(
         val id = _state.value.meal.id
         if (id == 0L) return
         viewModelScope.launch {
-            meals.delete(id)
-            _state.update { it.copy(finishedMessage = "Catatan dihapus") }
+            // Foto belum dihapus: masih bisa diurungkan beberapa detik dari snackbar.
+            meals.delete(id, keepPhoto = true)?.let(undo::remember)
+            _state.update { it.copy(finishedMessage = DELETED_MESSAGE) }
         }
     }
 
