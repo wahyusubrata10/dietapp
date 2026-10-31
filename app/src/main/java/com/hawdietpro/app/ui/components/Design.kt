@@ -85,11 +85,15 @@ fun Modifier.bouncyClick(haptic: Boolean = true, onClick: () -> Unit): Modifier 
         }
 }
 
-/** Muncul perlahan dari bawah sekali saat pertama tampil (urutan [index] memberi efek berjenjang). */
+/**
+ * Muncul perlahan dari bawah saat layar pertama kali tampil (urutan [index] memberi efek berjenjang).
+ * Hanya aktif di dalam [IntroScope] selama intro; item yang muncul karena di-scroll tampil langsung.
+ */
 fun Modifier.enterAnimation(index: Int = 0): Modifier = composed {
+    if (!LocalIntroActive.current) return@composed Modifier
     val progress = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
-        progress.animateTo(1f, tween(durationMillis = 420, delayMillis = (index * 45).coerceAtMost(360), easing = FastOutSlowInEasing))
+        progress.animateTo(1f, tween(durationMillis = 460, delayMillis = (index * 40).coerceAtMost(320), easing = SmoothEasing))
     }
     graphicsLayer {
         alpha = progress.value
@@ -358,6 +362,7 @@ fun LabeledValue(label: String, value: String, modifier: Modifier = Modifier, va
 fun PillTabs(options: List<String>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier, compact: Boolean = false) {
     val cs = MaterialTheme.colorScheme
     val hc = HawTheme.colors
+    val haptic = LocalHapticFeedback.current
     androidx.compose.foundation.layout.BoxWithConstraints(
         modifier
             .fillMaxWidth()
@@ -393,7 +398,10 @@ fun PillTabs(options: List<String>, selected: Int, onSelect: (Int) -> Unit, modi
                         .width(itemWidth)
                         .height(height)
                         .clip(CircleShape)
-                        .clickable { onSelect(i) },
+                        .clickable {
+                            if (i != selected) haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onSelect(i)
+                        },
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(

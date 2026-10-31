@@ -68,6 +68,8 @@ import com.hawdietpro.app.ui.components.HawScaffold
 import com.hawdietpro.app.ui.components.LoadingBox
 import com.hawdietpro.app.ui.components.SkeletonScreen
 import com.hawdietpro.app.ui.components.PillTabs
+import com.hawdietpro.app.ui.components.tabTransition
+import androidx.compose.animation.AnimatedContent
 import com.hawdietpro.app.ui.components.MealRow
 import com.hawdietpro.app.ui.components.Pill
 import com.hawdietpro.app.ui.components.SoftProgress
@@ -90,23 +92,28 @@ fun HistoryScreen(
             SkeletonScreen(Modifier.padding(padding), statusBarInset = false)
             return@HawScaffold
         }
+        Column(Modifier.padding(padding).fillMaxSize()) {
+        PillTabs(
+            HistoryMode.entries.map { it.label },
+            HistoryMode.entries.indexOf(state.mode),
+            { viewModel.setMode(HistoryMode.entries[it]) },
+            Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+        AnimatedContent(
+            targetState = state.mode,
+            transitionSpec = { tabTransition(initialState.ordinal, targetState.ordinal) },
+            label = "historyMode",
+        ) { mode ->
         LazyColumn(
-            Modifier.padding(padding).fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
+            Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            item {
-                PillTabs(
-                    HistoryMode.entries.map { it.label },
-                    HistoryMode.entries.indexOf(state.mode),
-                    { viewModel.setMode(HistoryMode.entries[it]) },
-                )
-            }
             item { Filters(state, viewModel) }
 
-            if (state.mode == HistoryMode.GALLERY) {
+            if (mode == HistoryMode.GALLERY) {
                 galleryItems(state, onOpenMeal, viewModel)
-            } else if (state.mode == HistoryMode.TIMELINE) {
+            } else if (mode == HistoryMode.TIMELINE) {
                 if (state.groups.isEmpty()) {
                     item {
                         EmptyState(
@@ -117,7 +124,7 @@ fun HistoryScreen(
                     }
                 }
                 items(state.groups, key = { it.date.toEpochDay() }) { group ->
-                    DayCard(group, state.budgetFor(group.date), onOpenMeal)
+                    DayCard(group, state.budgetFor(group.date), onOpenMeal, Modifier.animateItem())
                 }
                 if (state.filters.query.isBlank() && state.groups.isNotEmpty()) {
                     item {
@@ -154,9 +161,11 @@ fun HistoryScreen(
                     item { Text("Tidak ada catatan di tanggal ini.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 }
                 items(state.selectedMeals, key = { it.id }) { meal ->
-                    MealRow(meal, onClick = { onOpenMeal(meal.id) })
+                    MealRow(meal, onClick = { onOpenMeal(meal.id) }, modifier = Modifier.animateItem())
                 }
             }
+        }
+        }
         }
     }
 }
@@ -193,10 +202,10 @@ private fun Filters(state: HistoryUi, viewModel: HistoryViewModel) {
 }
 
 @Composable
-private fun DayCard(group: DayGroup, target: Int?, onOpenMeal: (Long) -> Unit) {
+private fun DayCard(group: DayGroup, target: Int?, onOpenMeal: (Long) -> Unit, modifier: Modifier = Modifier) {
     val over = target != null && group.calories > target * 1.1
     val color = if (over) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-    HawCard(contentPadding = 14.dp) {
+    HawCard(modifier, contentPadding = 14.dp) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -348,7 +357,7 @@ private fun MonthStat(label: String, value: String, color: androidx.compose.ui.g
 
 /** Galeri: semua foto makanan (sesuai filter) dalam grid 3 kolom. */
 private fun androidx.compose.foundation.lazy.LazyListScope.galleryItems(state: HistoryUi, onOpenMeal: (Long) -> Unit, viewModel: HistoryViewModel) {
-    val photos = state.groups.flatMap { it.meals }.filter { m -> m.photoPath?.let { java.io.File(it).exists() } == true }
+    val photos = state.groups.flatMap { it.meals }.filter { m -> m.photoPath?.let { com.hawdietpro.app.ui.components.photoExists(it) } == true }
     if (photos.isEmpty()) {
         item {
             EmptyState(

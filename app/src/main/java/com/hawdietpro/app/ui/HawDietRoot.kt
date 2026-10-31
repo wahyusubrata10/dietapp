@@ -1,5 +1,17 @@
 package com.hawdietpro.app.ui
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
+import com.hawdietpro.app.ui.components.NAV_DURATION
+import com.hawdietpro.app.ui.components.SmoothEasing
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -190,7 +202,14 @@ private fun MainScaffold(
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(bottom = if (showBottomBar) padding.calculateBottomPadding() else 0.dp)) {
-            NavHost(navController = navController, startDestination = Routes.HOME) {
+            NavHost(
+                navController = navController,
+                startDestination = Routes.HOME,
+                enterTransition = { NavMotion.enter(initialState.destination.route, targetState.destination.route) },
+                exitTransition = { NavMotion.exit(initialState.destination.route, targetState.destination.route) },
+                popEnterTransition = { NavMotion.popEnter(initialState.destination.route, targetState.destination.route) },
+                popExitTransition = { NavMotion.popExit(initialState.destination.route, targetState.destination.route) },
+            ) {
                 composable(Routes.HOME) {
                     HomeScreen(
                         mainViewModel = viewModel,
@@ -316,6 +335,42 @@ private fun MainScaffold(
                 SuccessCheck(key, msg, onFinished = { if (success?.first == key) success = null })
             }
         }
+    }
+}
+
+/**
+ * Transisi antar layar bergaya iOS: layar baru masuk dari kanan sementara layar lama bergeser sedikit
+ * & meredup (paralaks); kamera/rekap naik dari bawah (modal); antar tab utama memudar dengan sedikit skala.
+ */
+private object NavMotion {
+    private val topLevel = TopLevelDestination.entries.map { it.route }.toSet()
+    private fun isTop(route: String?) = route in topLevel
+    private fun isModal(route: String?) = route?.startsWith("kamera") == true || route?.startsWith("rekap") == true
+
+    private fun <T> spec() = tween<T>(NAV_DURATION, easing = SmoothEasing)
+
+    fun enter(from: String?, to: String?): EnterTransition = when {
+        isTop(from) && isTop(to) -> fadeIn(tween(240)) + scaleIn(tween(320, easing = SmoothEasing), initialScale = 0.97f)
+        isModal(to) -> slideInVertically(spec()) { it } + fadeIn(tween(200))
+        else -> slideInHorizontally(spec()) { it }
+    }
+
+    fun exit(from: String?, to: String?): ExitTransition = when {
+        isTop(from) && isTop(to) -> fadeOut(tween(160))
+        isModal(to) -> fadeOut(tween(NAV_DURATION), targetAlpha = 0.6f)
+        else -> slideOutHorizontally(spec()) { -it / 4 } + fadeOut(spec(), targetAlpha = 0.55f)
+    }
+
+    fun popEnter(from: String?, to: String?): EnterTransition = when {
+        isTop(from) && isTop(to) -> fadeIn(tween(240))
+        isModal(from) -> fadeIn(tween(NAV_DURATION), initialAlpha = 0.6f)
+        else -> slideInHorizontally(spec()) { -it / 4 } + fadeIn(spec(), initialAlpha = 0.55f)
+    }
+
+    fun popExit(from: String?, to: String?): ExitTransition = when {
+        isTop(from) && isTop(to) -> fadeOut(tween(160))
+        isModal(from) -> slideOutVertically(spec()) { it } + fadeOut(tween(260, delayMillis = 120))
+        else -> slideOutHorizontally(spec()) { it }
     }
 }
 

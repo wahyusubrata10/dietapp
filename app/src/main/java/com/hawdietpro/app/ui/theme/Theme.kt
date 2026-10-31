@@ -1,7 +1,9 @@
 package com.hawdietpro.app.ui.theme
 
 import android.os.Build
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.isSystemInDarkTheme
+import com.hawdietpro.app.ui.components.PressIndication
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -244,7 +246,9 @@ fun HawDietTheme(
             colorScheme = scheme,
             typography = HawTypography,
             shapes = HawShapes,
-            content = content,
-        )
+        ) {
+            // Umpan balik tekan ala iOS (mengecil + memantul) untuk semua elemen yang bisa diketuk.
+            CompositionLocalProvider(LocalIndication provides PressIndication, content = content)
+        }
     }
 }

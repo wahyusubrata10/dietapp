@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -202,10 +203,19 @@ private fun DrawScope.drawTargetLine(y: Float, plot: Rect, color: Color, label: 
 private fun plotRect(size: Size, leftPad: Float, bottomPad: Float, topPad: Float) =
     Rect(leftPad, topPad, size.width - 4f, size.height - bottomPad)
 
+/**
+ * Grafik "tumbuh" sekali saat pertama tampil / datanya berubah.
+ * Status tersimpan (saveable) agar grafik tidak tumbuh ulang setiap kali di-scroll kembali ke layar.
+ */
 @Composable
 private fun rememberEntrance(key: Any?): Float {
-    val anim = remember(key) { Animatable(0f) }
-    LaunchedEffect(key) { anim.animateTo(1f, tween(650)) }
+    var playedFor by rememberSaveable { mutableStateOf<Int?>(null) }
+    val hash = key.hashCode()
+    val anim = remember(key) { Animatable(if (playedFor == hash) 1f else 0f) }
+    LaunchedEffect(key) {
+        anim.animateTo(1f, tween(700, easing = SmoothEasing))
+        playedFor = hash
+    }
     return anim.value
 }
 

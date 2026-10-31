@@ -84,6 +84,8 @@ import com.hawdietpro.app.ui.components.HawScaffold
 import com.hawdietpro.app.ui.components.LoadingBox
 import com.hawdietpro.app.ui.components.SkeletonScreen
 import com.hawdietpro.app.ui.components.PillTabs
+import com.hawdietpro.app.ui.components.tabTransition
+import androidx.compose.animation.AnimatedContent
 import com.hawdietpro.app.ui.components.StackedBarChart
 import com.hawdietpro.app.ui.components.StatTile
 import com.hawdietpro.app.ui.components.gradeColor
@@ -113,17 +115,23 @@ fun AnalyticsScreen(onOpenWeight: () -> Unit, onOpenWrap: () -> Unit = {}, viewM
         }
         Column(Modifier.padding(padding).fillMaxSize()) {
             PillTabs(TABS, tab, viewModel::setTab, Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
-            LazyColumn(
-                Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                if (tab != 3) periodHeader(state, viewModel)
-                when (tab) {
-                    0 -> summaryTab(state, stats, review, viewModel, onOpenWrap)
-                    1 -> nutritionTab(stats, state.target)
-                    2 -> patternTab(stats, state.period)
-                    else -> weightTab(state, onOpenWeight)
+            AnimatedContent(
+                targetState = tab,
+                transitionSpec = { tabTransition(initialState, targetState) },
+                label = "analyticsTab",
+            ) { t ->
+                LazyColumn(
+                    Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    if (t != 3) periodHeader(state, viewModel)
+                    when (t) {
+                        0 -> summaryTab(state, stats, review, viewModel, onOpenWrap)
+                        1 -> nutritionTab(stats, state.target)
+                        2 -> patternTab(stats, state.period)
+                        else -> weightTab(state, onOpenWeight)
+                    }
                 }
             }
         }

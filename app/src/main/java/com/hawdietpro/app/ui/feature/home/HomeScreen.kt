@@ -5,6 +5,9 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -104,6 +107,7 @@ import com.hawdietpro.app.ui.components.ArcGauge
 import com.hawdietpro.app.ui.components.BentoCard
 import com.hawdietpro.app.ui.components.GradeBadge
 import com.hawdietpro.app.ui.components.IconTile
+import com.hawdietpro.app.ui.components.IntroScope
 import com.hawdietpro.app.ui.components.ConfettiBurst
 import com.hawdietpro.app.ui.components.SkeletonScreen
 import com.hawdietpro.app.ui.components.MealPhoto
@@ -259,6 +263,7 @@ fun HomeContent(
                 drawRect(Brush.radialGradient(listOf(hc.glow, Color.Transparent), center = Offset(size.width * 0.9f, 0f), radius = size.width * 0.95f))
             },
     ) {
+        IntroScope {
         LazyColumn(
             modifier = Modifier.fillMaxSize().statusBarsPadding(),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp),
@@ -289,7 +294,7 @@ fun HomeContent(
                         previous = state.previousDayByType[type].orEmpty(),
                         isLast = index == types.lastIndex,
                         actions = actions,
-                        modifier = Modifier.enterAnimation(5 + index),
+                        modifier = Modifier.animateItem().enterAnimation(5 + index),
                     )
                 }
             }
@@ -316,6 +321,7 @@ fun HomeContent(
             state.tip?.let { tip ->
                 item(key = "tip") { NoticeCard("Tips hari ini", tip, Icons.Filled.TipsAndUpdates, MacroColors.Carbs) }
             }
+        }
         }
         // Confetti sekali untuk badge yang baru terbuka.
         val badgeKey = state.newAchievements.joinToString(",") { it.id }
@@ -442,7 +448,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.noticeItems(
                 is UpdateState.Available -> "Versi ${update.release.versionName} tersedia. Ketuk untuk melihat perubahan."
                 else -> ""
             }
-            NoticeCard("Update tersedia", text, Icons.Filled.SystemUpdate, MaterialTheme.colorScheme.tertiary, onClick = actions.onOpenUpdate)
+            NoticeCard("Update tersedia", text, Icons.Filled.SystemUpdate, MaterialTheme.colorScheme.tertiary, Modifier.animateItem(), onClick = actions.onOpenUpdate)
         }
         else -> Unit
     }
@@ -453,6 +459,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.noticeItems(
                 a.message,
                 Icons.Filled.Campaign,
                 if (a.level == "warning") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary,
+                Modifier.animateItem(),
                 trailing = { TextButton(onClick = { actions.onDismissAnnouncement(a.id) }) { Text("Tutup") } },
             )
         }
@@ -464,12 +471,13 @@ private fun androidx.compose.foundation.lazy.LazyListScope.noticeItems(
                 "Analisa foto butuh API key gratis dari Google AI Studio. Ketuk untuk mengisi.",
                 Icons.Filled.Key,
                 MaterialTheme.colorScheme.error,
+                Modifier.animateItem(),
                 onClick = actions.onOpenSettings,
             )
         }
     }
     state.wrapWeek?.let { week ->
-        item(key = "wrap") { WrapTeaser(week) { actions.onOpenWrap(week) } }
+        item(key = "wrap") { Box(Modifier.animateItem()) { WrapTeaser(week) { actions.onOpenWrap(week) } } }
     }
     if (state.newAchievements.isNotEmpty()) {
         item(key = "badges") {
@@ -479,6 +487,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.noticeItems(
                 fresh.joinToString("  ") { it.emoji } + "  · Ketuk untuk melihat koleksi",
                 Icons.Filled.EmojiEvents,
                 HawTheme.colors.warning,
+                Modifier.animateItem(),
                 onClick = actions.onOpenAchievements,
             )
         }
@@ -490,6 +499,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.noticeItems(
                 if (state.pendingFailed > 0) "Ketuk untuk coba lagi atau isi manual." else "Hasil tercatat otomatis & muncul notifikasi.",
                 Icons.Filled.CloudQueue,
                 if (state.pendingFailed > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                Modifier.animateItem(),
                 onClick = actions.onOpenQueue,
             )
         }
@@ -728,7 +738,7 @@ private fun MealTimelineRow(
         }
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f).padding(bottom = if (isLast) 0.dp else 12.dp)) {
-            BentoCard(padding = 12.dp, corner = 20.dp) {
+            BentoCard(Modifier.animateContentSize(spring(dampingRatio = 0.85f, stiffness = Spring.StiffnessMediumLow)), padding = 12.dp, corner = 20.dp) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(type.label, style = MaterialTheme.typography.titleSmall)

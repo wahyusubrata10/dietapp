@@ -7,6 +7,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import com.hawdietpro.app.ui.components.BentoCard
 import com.hawdietpro.app.ui.components.IconTile
 import com.hawdietpro.app.ui.components.bouncyClick
@@ -105,6 +106,8 @@ private fun BarItem(dest: TopLevelDestination, selected: Boolean, onNavigate: (S
         label = "navColor",
     )
     val indicator by animateFloatAsState(if (selected) 1f else 0f, spring(dampingRatio = Spring.DampingRatioMediumBouncy), label = "navInd")
+    // Ikon tab aktif "memantul" kecil saat dipilih.
+    val bounce by animateFloatAsState(if (selected) 1f else 0.9f, spring(dampingRatio = 0.4f, stiffness = Spring.StiffnessMediumLow), label = "navBounce")
     Column(
         modifier
             .clip(RoundedCornerShape(20.dp))
@@ -119,7 +122,12 @@ private fun BarItem(dest: TopLevelDestination, selected: Boolean, onNavigate: (S
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)),
             )
-            Icon(if (selected) dest.selectedIcon else dest.unselectedIcon, contentDescription = dest.label, tint = color, modifier = Modifier.size(22.dp))
+            Icon(
+                if (selected) dest.selectedIcon else dest.unselectedIcon,
+                contentDescription = dest.label,
+                tint = color,
+                modifier = Modifier.size(22.dp).graphicsLayer { scaleX = bounce; scaleY = bounce },
+            )
         }
         Spacer(Modifier.height(2.dp))
         Text(

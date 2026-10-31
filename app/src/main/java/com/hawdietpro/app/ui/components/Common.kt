@@ -44,6 +44,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import androidx.compose.ui.platform.LocalContext
 import com.hawdietpro.app.core.Format
 import com.hawdietpro.app.domain.model.Meal
 import com.hawdietpro.app.domain.model.MealType
@@ -157,9 +159,10 @@ fun mealTypeColor(type: MealType): Color = when (type) {
 @Composable
 fun MealPhoto(path: String?, modifier: Modifier = Modifier, size: Dp = 64.dp, corner: Dp = 16.dp) {
     val shape = RoundedCornerShape(corner)
-    if (path != null && File(path).exists()) {
+    if (path != null && photoExists(path)) {
+        val context = LocalContext.current
         AsyncImage(
-            model = File(path),
+            model = remember(path) { ImageRequest.Builder(context).data(File(path)).crossfade(180).build() },
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = modifier.size(size).clip(shape),
@@ -172,6 +175,16 @@ fun MealPhoto(path: String?, modifier: Modifier = Modifier, size: Dp = 64.dp, co
             Icon(Icons.Filled.Restaurant, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(size * 0.4f))
         }
     }
+}
+
+/** Cek file foto dengan cache agar scroll tidak membaca penyimpanan berulang di thread UI. */
+private val photoExistsCache = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
+
+fun photoExists(path: String): Boolean = photoExistsCache.getOrPut(path) { File(path).exists() }
+
+/** Dipanggil saat foto dihapus/dipulihkan agar cache tidak basi. */
+fun forgetPhoto(path: String) {
+    photoExistsCache.remove(path)
 }
 
 @Composable
