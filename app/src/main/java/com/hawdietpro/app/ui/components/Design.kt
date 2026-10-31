@@ -4,7 +4,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -34,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import kotlin.math.roundToInt
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -223,8 +223,8 @@ fun NoticeCard(
 /** Angka yang "menghitung" ke nilai baru (dengan pemisah ribuan). */
 @Composable
 fun AnimatedCount(value: Int, style: TextStyle, color: Color, modifier: Modifier = Modifier, prefix: String = "", suffix: String = "") {
-    val animated by animateIntAsState(value, tween(900, easing = FastOutSlowInEasing), label = "count")
-    Text(prefix + Format.grouped(animated) + suffix, style = style, color = color, modifier = modifier, maxLines = 1)
+    val animated by animateFromLast(value.toFloat())
+    Text(prefix + Format.grouped(animated.roundToInt()) + suffix, style = style, color = color, modifier = modifier, maxLines = 1)
 }
 
 /**
@@ -244,7 +244,8 @@ fun ArcGauge(
     overColor: Color,
     content: @Composable () -> Unit,
 ) {
-    val animated by animateFloatAsState(progress.coerceIn(0f, 1f), tween(1100, easing = FastOutSlowInEasing), label = "gauge")
+    // Busur bergerak dari nilai terakhir yang terlihat (mis. sebelum menyimpan makanan) ke nilai baru.
+    val animated by animateFromLast(progress.coerceIn(0f, 1f), durationMs = 1100)
     val over = progress > 1f
     Box(modifier.size(size), contentAlignment = Alignment.Center) {
         Canvas(Modifier.size(size)) {
@@ -272,7 +273,7 @@ fun ArcGauge(
 /** Cincin kecil untuk makro/progres. */
 @Composable
 fun MiniRing(fraction: Float, color: Color, modifier: Modifier = Modifier, size: Dp = 46.dp, stroke: Dp = 5.dp, track: Color = color.copy(alpha = 0.18f), content: @Composable () -> Unit = {}) {
-    val animated by animateFloatAsState(fraction.coerceIn(0f, 1f), tween(900, easing = FastOutSlowInEasing), label = "mini")
+    val animated by animateFromLast(fraction.coerceIn(0f, 1f))
     Box(modifier.size(size), contentAlignment = Alignment.Center) {
         Canvas(Modifier.size(size)) {
             val sw = stroke.toPx()

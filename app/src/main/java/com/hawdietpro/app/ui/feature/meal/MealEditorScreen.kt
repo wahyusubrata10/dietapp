@@ -18,6 +18,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.shape.CircleShape
@@ -111,6 +112,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.hawdietpro.app.ui.components.PhotoViewer
 import com.hawdietpro.app.core.Format
 import com.hawdietpro.app.domain.model.FoodItem
 import com.hawdietpro.app.domain.model.Meal
@@ -346,12 +348,18 @@ private fun SaveBar(state: EditorState, onSave: () -> Unit) {
 @Composable
 private fun PhotoHeader(path: String?, modifier: Modifier = Modifier) {
     if (path != null && File(path).exists()) {
+        var viewing by rememberSaveable { mutableStateOf(false) }
         AsyncImage(
             model = File(path),
             contentDescription = "Foto makanan",
             contentScale = ContentScale.Crop,
-            modifier = modifier.fillMaxWidth().aspectRatio(4f / 3f).clip(RoundedCornerShape(24.dp)),
+            modifier = modifier
+                .fillMaxWidth()
+                .aspectRatio(4f / 3f)
+                .clip(RoundedCornerShape(24.dp))
+                .clickable(onClickLabel = "Perbesar foto") { viewing = true },
         )
+        if (viewing) PhotoViewer(path, "Foto makanan", onDismiss = { viewing = false })
     }
 }
 
@@ -633,7 +641,15 @@ private fun EditorContent(
 /** Foto besar dengan gradasi gelap di bawah berisi skor & keyakinan AI. */
 @Composable
 private fun PhotoHero(meal: Meal) {
-    Box(Modifier.fillMaxWidth().aspectRatio(4f / 3f).clip(RoundedCornerShape(28.dp))) {
+    var viewing by rememberSaveable { mutableStateOf(false) }
+    if (viewing) PhotoViewer(meal.photoPath!!, "Foto ${meal.menuName}", onDismiss = { viewing = false })
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .aspectRatio(4f / 3f)
+            .clip(RoundedCornerShape(28.dp))
+            .clickable(onClickLabel = "Perbesar foto") { viewing = true },
+    ) {
         AsyncImage(
             model = File(meal.photoPath!!),
             contentDescription = "Foto makanan",

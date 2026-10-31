@@ -3,6 +3,7 @@ package com.hawdietpro.app.ui.components
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -13,6 +14,9 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -113,6 +117,23 @@ private class PressIndicationNode(private val interactionSource: InteractionSour
         scale(s, pivot = center) { this@draw.drawContent() }
         if (dim.value > 0f) drawRect(Color.Black.copy(alpha = 0.06f * dim.value))
     }
+}
+
+/**
+ * Seperti `animateFloatAsState`, tetapi nilai terakhir yang tampil ikut disimpan. Saat layar dibuka
+ * lagi (mis. kembali dari menyimpan makanan) angka & cincin bergerak dari nilai lama ke nilai baru,
+ * bukan langsung melompat. Item yang sekadar di-scroll keluar-masuk tidak dianimasikan ulang.
+ */
+@Composable
+fun animateFromLast(target: Float, durationMs: Int = 900): State<Float> {
+    var last by rememberSaveable { mutableFloatStateOf(target) }
+    val anim = remember { Animatable(last) }
+    val reduce = LocalReduceMotion.current
+    LaunchedEffect(target) {
+        if (reduce) anim.snapTo(target) else anim.animateTo(target, tween(durationMs, easing = FastOutSlowInEasing))
+        last = target
+    }
+    return anim.asState()
 }
 
 /** Transisi isi tab: geser ke arah tab yang dipilih + pudar (seperti segmented control iOS). */

@@ -60,6 +60,7 @@ import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.TipsAndUpdates
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -281,6 +282,10 @@ fun HomeContent(
 
             item(key = "hero") { HeroCard(state, actions.onSuggest, Modifier.enterAnimation(2)) }
             item(key = "quick") { QuickActions(state.isToday, actions, Modifier.enterAnimation(3)) }
+            // Pengguna baru (belum ada catatan sama sekali minggu ini): ajak mencatat makanan pertama.
+            if (!state.loading && state.isToday && state.meals.isEmpty() && state.days.none { it.calories > 0 } && state.previousDayByType.isEmpty()) {
+                item(key = "first_meal") { FirstMealCard(actions, Modifier.enterAnimation(3)) }
+            }
 
             item(key = "meals_title") {
                 SectionTitle(
@@ -631,6 +636,37 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit, modifier: Modifier
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = hc.heroContent)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FirstMealCard(actions: HomeActions, modifier: Modifier = Modifier) {
+    val cs = MaterialTheme.colorScheme
+    BentoCard(modifier.fillMaxWidth(), color = cs.primaryContainer) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.size(52.dp).clip(RoundedCornerShape(16.dp)).background(cs.primary),
+                contentAlignment = Alignment.Center,
+            ) { Icon(Icons.Filled.CameraAlt, null, tint = cs.onPrimary, modifier = Modifier.size(26.dp)) }
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text("Foto makanan pertamamu", style = MaterialTheme.typography.titleMedium, color = cs.onPrimaryContainer)
+                Text(
+                    "Arahkan kamera ke piring. Kalori & gizinya dihitung otomatis, dan kamu tetap bisa mengoreksinya.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = cs.onPrimaryContainer.copy(alpha = 0.85f),
+                )
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Button(onClick = { actions.onAdd(null) }) {
+                Icon(Icons.Filled.CameraAlt, null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Buka kamera")
+            }
+            TextButton(onClick = actions.onManual) { Text("Isi manual", color = cs.onPrimaryContainer) }
         }
     }
 }
