@@ -58,6 +58,10 @@ private data class Particle(val angle: Float, val speed: Float, val size: Float,
  */
 @Composable
 fun ConfettiBurst(key: Any, modifier: Modifier = Modifier, onFinished: () -> Unit = {}) {
+    if (LocalReduceMotion.current) {
+        LaunchedEffect(key) { onFinished() }
+        return
+    }
     val colors = listOf(Color(0xFF5FE0A8), Color(0xFFFFD27A), Color(0xFFFF9C8F), Color(0xFFA9C4FF), Color(0xFFFF92B8), Color.White)
     val particles = remember(key) {
         val rnd = Random(key.hashCode())
@@ -148,6 +152,7 @@ fun SuccessCheck(key: Any, message: String, modifier: Modifier = Modifier, onFin
 private fun shimmerBrush(): Brush {
     val base = MaterialTheme.colorScheme.surfaceContainerHigh
     val highlight = MaterialTheme.colorScheme.surfaceContainerHighest
+    if (LocalReduceMotion.current) return Brush.linearGradient(listOf(base, base))
     val transition = rememberInfiniteTransition(label = "shimmer")
     val x by transition.animateFloat(-400f, 1400f, infiniteRepeatable(tween(1300, easing = LinearEasing), RepeatMode.Restart), label = "shimmerX")
     return Brush.linearGradient(listOf(base, highlight, base), start = Offset(x, 0f), end = Offset(x + 400f, 300f))

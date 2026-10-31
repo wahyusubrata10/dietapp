@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -64,6 +66,7 @@ import com.hawdietpro.app.ui.theme.HawTheme
 
 /** Mengecil sedikit saat ditekan (umpan balik sentuh yang terasa "hidup"). */
 fun Modifier.pressScale(interaction: MutableInteractionSource, pressed: Float = 0.965f): Modifier = composed {
+    if (LocalReduceMotion.current) return@composed Modifier
     val isPressed by interaction.collectIsPressedAsState()
     val scale by animateFloatAsState(
         if (isPressed) pressed else 1f,
@@ -378,25 +381,29 @@ fun PillTabs(options: List<String>, selected: Int, onSelect: (Int) -> Unit, modi
             spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessMediumLow),
             label = "pill",
         )
-        val height = if (compact) 34.dp else 40.dp
+        // Tinggi minimum (bukan tetap) agar teks tidak terpotong saat font diperbesar; reguler = target sentuh 48dp.
+        val height = if (compact) 40.dp else 48.dp
         if (selected in options.indices) {
-            Box(
-                Modifier
-                    .padding(start = offset)
-                    .width(itemWidth)
-                    .height(height)
-                    .clip(CircleShape)
-                    .background(cs.primary),
-            )
+            Box(Modifier.matchParentSize()) {
+                Box(
+                    Modifier
+                        .padding(start = offset)
+                        .width(itemWidth)
+                        .fillMaxHeight()
+                        .clip(CircleShape)
+                        .background(cs.primary),
+                )
+            }
         }
-        Row(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min)) {
             options.forEachIndexed { i, label ->
                 val active = i == selected
                 val color by androidx.compose.animation.animateColorAsState(if (active) cs.onPrimary else cs.onSurfaceVariant, label = "pillText")
                 Box(
                     Modifier
                         .width(itemWidth)
-                        .height(height)
+                        .heightIn(min = height)
+                        .fillMaxHeight()
                         .clip(CircleShape)
                         .clickable {
                             if (i != selected) haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -409,7 +416,9 @@ fun PillTabs(options: List<String>, selected: Int, onSelect: (Int) -> Unit, modi
                         style = if (compact) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelLarge,
                         fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
                         color = color,
-                        maxLines = 1,
+                        maxLines = 2,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp),
                         overflow = TextOverflow.Ellipsis,
                     )
                 }

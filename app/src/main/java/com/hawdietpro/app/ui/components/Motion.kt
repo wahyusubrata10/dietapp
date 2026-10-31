@@ -1,5 +1,6 @@
 package com.hawdietpro.app.ui.components
 
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Spring
@@ -27,6 +28,17 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/**
+ * true bila pengguna mematikan animasi di Android (Opsi pengembang / Aksesibilitas → hapus animasi).
+ * Efek dekoratif (intro berjenjang, confetti, kilau, pemindai, pantulan tekan) lalu dilewati.
+ */
+val LocalReduceMotion = staticCompositionLocalOf { false }
+
+/** Membaca skala animasi sistem; 0 = animasi dimatikan. */
+fun systemReducesMotion(context: android.content.Context): Boolean = runCatching {
+    android.provider.Settings.Global.getFloat(context.contentResolver, android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
+}.getOrDefault(false)
+
 /** Kurva gerak bergaya iOS: cepat di awal, mendarat sangat halus. */
 val SmoothEasing = CubicBezierEasing(0.2f, 0.9f, 0.25f, 1f)
 
@@ -49,7 +61,7 @@ fun IntroScope(durationMs: Long = 900, content: @Composable () -> Unit) {
             done = true
         }
     }
-    CompositionLocalProvider(LocalIntroActive provides !done, content = content)
+    CompositionLocalProvider(LocalIntroActive provides (!done && !LocalReduceMotion.current), content = content)
 }
 
 /**

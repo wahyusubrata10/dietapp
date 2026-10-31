@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -64,6 +65,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -85,6 +87,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -635,13 +638,17 @@ private fun HeroCard(state: HomeState, onSuggest: () -> Unit, modifier: Modifier
 @Composable
 private fun HeroStat(icon: ImageVector, label: String, value: String) {
     val hc = HawTheme.colors
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(96.dp)) {
+    // Lebar minimum (bukan tetap) agar angka tidak terpotong saat ukuran huruf sistem diperbesar.
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.widthIn(min = 88.dp, max = 128.dp).semantics(mergeDescendants = true) {},
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, null, tint = hc.heroContentSub, modifier = Modifier.size(14.dp))
             Spacer(Modifier.width(4.dp))
-            Text(label, style = MaterialTheme.typography.labelMedium, color = hc.heroContentSub)
+            Text(label, style = MaterialTheme.typography.labelMedium, color = hc.heroContentSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        Text(value, style = NumberMedium, color = hc.heroContent)
+        Text(value, style = NumberMedium, color = hc.heroContent, maxLines = 1)
     }
 }
 
@@ -759,6 +766,7 @@ private fun MealTimelineRow(
                     }
                     Box(
                         Modifier
+                            .minimumInteractiveComponentSize()
                             .size(34.dp)
                             .clip(CircleShape)
                             .background(color.copy(alpha = 0.15f))

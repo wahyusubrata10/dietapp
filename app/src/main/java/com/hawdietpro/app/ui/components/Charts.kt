@@ -49,6 +49,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.sp
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -252,7 +254,7 @@ fun BarChart(
     val targetColor = MaterialTheme.colorScheme.tertiary
 
     Canvas(
-        modifier.fillMaxWidth().height(height).pointerInput(values) {
+        modifier.fillMaxWidth().semantics { contentDescription = chartDescription(values) }.height(height).pointerInput(values) {
             detectTapGestures { pos ->
                 val plot = plotRect(Size(size.width.toFloat(), size.height.toFloat()), 40.dp.toPx(), 22.dp.toPx(), 28.dp.toPx())
                 val slot = plot.width / values.size
@@ -330,7 +332,7 @@ fun LineChart(
     val targetColor = MaterialTheme.colorScheme.tertiary
 
     Canvas(
-        modifier.fillMaxWidth().height(height).pointerInput(series) {
+        modifier.fillMaxWidth().semantics { contentDescription = chartDescription(all) }.height(height).pointerInput(series) {
             detectTapGestures { pos ->
                 val plot = plotRect(Size(size.width.toFloat(), size.height.toFloat()), 40.dp.toPx(), 22.dp.toPx(), 28.dp.toPx())
                 val step = plot.width / (n - 1)
@@ -447,7 +449,7 @@ fun StackedBarChart(
     val gap = MaterialTheme.colorScheme.surfaceContainerLow
 
     Canvas(
-        modifier.fillMaxWidth().height(height).pointerInput(stacks) {
+        modifier.fillMaxWidth().semantics { contentDescription = chartDescription(totals) }.height(height).pointerInput(stacks) {
             detectTapGestures { pos ->
                 val plot = plotRect(Size(size.width.toFloat(), size.height.toFloat()), 40.dp.toPx(), 22.dp.toPx(), 28.dp.toPx())
                 val slot = plot.width / stacks.size
@@ -509,7 +511,7 @@ fun DivergingBarChart(
     val progress = rememberEntrance(values)
 
     Canvas(
-        modifier.fillMaxWidth().height(height).pointerInput(values) {
+        modifier.fillMaxWidth().semantics { contentDescription = chartDescription(present) }.height(height).pointerInput(values) {
             detectTapGestures { pos ->
                 val plot = plotRect(Size(size.width.toFloat(), size.height.toFloat()), 44.dp.toPx(), 22.dp.toPx(), 28.dp.toPx())
                 val slot = plot.width / values.size
@@ -563,7 +565,7 @@ fun DonutChart(
     val track = MaterialTheme.colorScheme.surfaceContainerHighest
     Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(size), contentAlignment = Alignment.Center) {
-            Canvas(Modifier.size(size)) {
+            Canvas(Modifier.size(size).semantics { contentDescription = slices.joinToString { "${it.label} ${it.value.roundToInt()}" } }) {
                 val stroke = this.size.minDimension * 0.15f
                 val inset = stroke / 2
                 val arcSize = Size(this.size.width - stroke, this.size.height - stroke)
@@ -654,4 +656,10 @@ fun LineTrendChart(values: List<Double>, labels: List<String>, modifier: Modifie
         height = height,
         emptyText = emptyText,
     )
+}
+
+/** Ringkasan grafik untuk pembaca layar (TalkBack): rentang & rata-rata nilai. */
+private fun chartDescription(values: List<Double>): String {
+    if (values.isEmpty()) return "Grafik kosong"
+    return "Grafik ${values.size} data. Terendah ${defaultFormat(values.min())}, tertinggi ${defaultFormat(values.max())}, rata-rata ${defaultFormat(values.average())}."
 }

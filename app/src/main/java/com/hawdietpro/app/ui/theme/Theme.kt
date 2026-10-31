@@ -1,5 +1,8 @@
 package com.hawdietpro.app.ui.theme
 
+import androidx.compose.runtime.remember
+import com.hawdietpro.app.ui.components.systemReducesMotion
+import com.hawdietpro.app.ui.components.LocalReduceMotion
 import android.os.Build
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -264,7 +267,12 @@ fun HawDietTheme(
             shapes = HawShapes,
         ) {
             // Umpan balik tekan ala iOS (mengecil + memantul) untuk semua elemen yang bisa diketuk.
-            CompositionLocalProvider(LocalIndication provides PressIndication, content = content)
+            val reduceMotion = remember { systemReducesMotion(context) }
+            CompositionLocalProvider(
+                LocalIndication provides PressIndication,
+                LocalReduceMotion provides reduceMotion,
+                content = content,
+            )
         }
     }
 }

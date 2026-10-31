@@ -5,6 +5,11 @@ import com.hawdietpro.app.ui.components.color
 import com.hawdietpro.app.ui.components.onColor
 import com.hawdietpro.app.ui.components.GradeBadge
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
 import com.hawdietpro.app.ui.components.hawSegmentedColors
@@ -326,7 +331,18 @@ private fun DayCell(date: LocalDate, calories: Double?, target: Int?, selected: 
                     else -> Modifier
                 },
             )
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            // TalkBack membaca satu kalimat utuh, bukan potongan angka.
+            .clearAndSetSemantics {
+                contentDescription = buildString {
+                    append("Tanggal ${date.dayOfMonth}")
+                    if (isToday) append(", hari ini")
+                    if (filled && calories != null) append(", ${Format.grouped(calories.roundToInt())} kkal, ${status.label}")
+                    else if (!date.isAfter(LocalDate.now())) append(", ${DayStatus.KOSONG.label}")
+                }
+                this.selected = selected
+                role = Role.Button
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -337,8 +353,9 @@ private fun DayCell(date: LocalDate, calories: Double?, target: Int?, selected: 
             color = if (filled) status.onColor() else MaterialTheme.colorScheme.onSurfaceVariant,
         )
         if (filled && calories != null) {
+            // Simbol menyertai warna agar status terbaca tanpa membedakan warna.
             Text(
-                Format.grouped(calories.roundToInt()),
+                "${status.symbol()}${Format.grouped(calories.roundToInt())}",
                 style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
                 color = status.onColor().copy(alpha = 0.85f),
                 maxLines = 1,
