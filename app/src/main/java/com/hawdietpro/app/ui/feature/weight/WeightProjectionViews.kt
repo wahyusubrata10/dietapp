@@ -38,14 +38,18 @@ import kotlin.math.roundToInt
 
 private fun signed(v: Double, unit: String) = (if (v > 0) "+" else if (v < 0) "−" else "") + Format.oneDecimal(abs(v)) + unit
 
-/** Proyeksi tubuh dengan dua tampilan: berat (kg) dan BMI (berat dibanding tinggi badan). */
+/** Proyeksi tubuh dengan tiga tampilan: berat (kg), BMI, dan bentuk tubuh 3D. */
 @Composable
 fun BodyProjectionSection(p: WeightProjection) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        PillTabs(listOf("Berat", "BMI"), tab, { tab = it }, compact = true)
+        PillTabs(listOf("Berat", "BMI", "Tubuh 3D"), tab, { tab = it }, compact = true)
         AnimatedContent(tab, transitionSpec = { tabTransition(initialState, targetState) }, label = "bodyTab") { t ->
-            if (t == 0) WeightProjectionSection(p) else BmiSection(p)
+            when (t) {
+                0 -> WeightProjectionSection(p)
+                1 -> BmiSection(p)
+                else -> BodyShapeSection(p)
+            }
         }
     }
 }

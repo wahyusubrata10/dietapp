@@ -182,6 +182,22 @@ class UiSnapshots {
     }
 
     @Test
+    @Config(qualifiers = "w400dp-h1200dp-xxhdpi")
+    fun body_shape_dark() = snap("body_shape_dark") {
+        androidx.compose.foundation.layout.Box(Modifier.padding(16.dp)) {
+            com.hawdietpro.app.ui.feature.weight.BodyShapeSection(SampleData.home().projection!!)
+        }
+    }
+
+    @Test
+    @Config(qualifiers = "w360dp-h1200dp-xxhdpi")
+    fun body_shape_light_font130() = snap("body_shape_light_font130", dark = false, fontScale = 1.3f) {
+        androidx.compose.foundation.layout.Box(Modifier.padding(16.dp)) {
+            com.hawdietpro.app.ui.feature.weight.BodyShapeSection(SampleData.home().projection!!)
+        }
+    }
+
+    @Test
     fun analytics_summary_dark() = snap("analytics_summary_dark") {
         androidx.compose.foundation.layout.Column(Modifier.padding(16.dp)) {
             com.hawdietpro.app.ui.feature.analytics.SummaryTiles(SampleData.weekStats(), null, 1900)

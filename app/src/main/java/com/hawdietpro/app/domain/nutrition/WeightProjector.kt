@@ -1,5 +1,6 @@
 package com.hawdietpro.app.domain.nutrition
 
+import com.hawdietpro.app.domain.model.Sex
 import com.hawdietpro.app.domain.model.UserProfile
 import com.hawdietpro.app.domain.model.WeightEntry
 import java.time.LocalDate
@@ -48,6 +49,8 @@ data class WeightProjection(
     val targetDate: LocalDate?,
     /** Tinggi badan dari profil (cm), dipakai untuk proyeksi BMI; 0 = tidak diketahui. */
     val heightCm: Double = 0.0,
+    /** Jenis kelamin dari profil, untuk visualisasi bentuk tubuh. */
+    val sex: Sex = Sex.PRIA,
 )
 
 /**
@@ -139,6 +142,7 @@ object WeightProjector {
             targetWeight = target,
             targetDate = targetDate,
             heightCm = profile.heightCm,
+            sex = profile.sex,
         )
     }
 

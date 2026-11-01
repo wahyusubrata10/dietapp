@@ -94,6 +94,12 @@ object WrapColors {
 /** Sorotan hangat di atas latar gelap/foto (lampu kilat aktif, hari "lebih" di rekap). */
 val Highlight = Color(0xFFFFD27A)
 
+// ── Manekin 3D: biru "tanah liat" untuk tubuh terkini, abu hangat untuk pembanding ──
+object BodyColors {
+    val Current = Color(0xFF7FA6D9)
+    val Compare = Color(0xFFB9AFA6)
+}
+
 // ── Waktu makan ────────────────────────────────────────────────────────────
 object MealTypeColors {
     val Sarapan = Color(0xFFC0801A)
