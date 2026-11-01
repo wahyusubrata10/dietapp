@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -155,7 +157,9 @@ fun BodyShapeSection(p: WeightProjection) {
                 Box(
                     Modifier
                         .fillMaxWidth()
-                        .height(360.dp)
+                        // Tinggi mengikuti lebar (dua figur berdampingan) agar tidak ada ruang kosong di layar sempit.
+                        .aspectRatio(1.05f)
+                        .heightIn(max = 380.dp)
                         .clip(RoundedCornerShape(20.dp))
                         .background(Brush.verticalGradient(listOf(cs.surfaceContainerHigh, cs.surfaceContainerLow)))
                         .semantics {
@@ -347,7 +351,8 @@ private fun BodyFigure(params: BodyParams?, yaw: () -> Float, color: Color, heig
         // Skala sama untuk kedua tubuh (tinggi sama) sehingga perbedaan lebar terlihat jujur.
         // Dibatasi juga oleh lebar: rentang lengan pose-A ±64% tinggi badan (+ ruang saat diputar).
         val pxPerCm = min(h * 0.84f / heightCm.toFloat(), w * 0.94f / (0.64f * heightCm.toFloat()))
-        val floor = h * 0.9f
+        // Figur di tengah vertikal, menyisakan ruang petunjuk di bawah.
+        val floor = min(h * 0.9f, (h + heightCm.toFloat() * pxPerCm) / 2f)
         val shadowW = size.width * 0.62f
         drawOval(
             Brush.radialGradient(listOf(Color.Black.copy(alpha = 0.22f), Color.Transparent)),
