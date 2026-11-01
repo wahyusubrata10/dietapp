@@ -345,7 +345,8 @@ private fun BodyFigure(params: BodyParams?, yaw: () -> Float, color: Color, heig
         val w = (size.width * scale).toInt().coerceAtLeast(1)
         val h = (size.height * scale).toInt().coerceAtLeast(1)
         // Skala sama untuk kedua tubuh (tinggi sama) sehingga perbedaan lebar terlihat jujur.
-        val pxPerCm = h * 0.84f / heightCm.toFloat()
+        // Dibatasi juga oleh lebar: rentang lengan pose-A ±64% tinggi badan (+ ruang saat diputar).
+        val pxPerCm = min(h * 0.84f / heightCm.toFloat(), w * 0.94f / (0.64f * heightCm.toFloat()))
         val floor = h * 0.9f
         val shadowW = size.width * 0.62f
         drawOval(
@@ -369,15 +370,14 @@ private fun SnapshotInfo(s: BodySnapshot?, p: WeightProjection, modifier: Modifi
             return@Column
         }
         val bmi = TdeeCalculator.bmi(s.weightKg, p.heightCm)
+        val cls = BmiClass.of(bmi)
         Text(Format.kg(s.weightKg), style = MaterialTheme.typography.titleMedium)
+        Text(s.source.label, style = MaterialTheme.typography.labelSmall, color = cs.onSurfaceVariant)
+        Spacer(Modifier.height(4.dp))
+        Text("BMI ${Format.oneDecimal(bmi)}", style = MaterialTheme.typography.labelMedium, color = cls.color())
+        Text(cls.label, style = MaterialTheme.typography.labelSmall, color = cls.color(), textAlign = TextAlign.Center)
         Text(
-            "BMI ${Format.oneDecimal(bmi)} · ${BmiClass.of(bmi).label}",
-            style = MaterialTheme.typography.labelMedium,
-            color = BmiClass.of(bmi).color(),
-            textAlign = TextAlign.Center,
-        )
-        Text(
-            "Pinggang ±${BodyTimeline.waistCm(s.weightKg, p.heightCm, p.sex).roundToInt()} cm · ${s.source.label}",
+            "Pinggang ±${BodyTimeline.waistCm(s.weightKg, p.heightCm, p.sex).roundToInt()} cm",
             style = MaterialTheme.typography.labelSmall,
             color = cs.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -391,5 +391,5 @@ private fun deltaText(a: BodySnapshot, b: BodySnapshot, p: WeightProjection): St
     val dBmi = TdeeCalculator.bmi(b.weightKg, p.heightCm) - TdeeCalculator.bmi(a.weightKg, p.heightCm)
     val dWaist = BodyTimeline.waistCm(b.weightKg, p.heightCm, p.sex) - BodyTimeline.waistCm(a.weightKg, p.heightCm, p.sex)
     fun signed(v: Double, unit: String) = (if (v > 0) "+" else "−") + Format.oneDecimal(abs(v)) + unit
-    return "Dari kiri ke kanan: ${signed(dKg, " kg")}, BMI ${signed(dBmi, "")}, pinggang ±${signed(dWaist, " cm")}."
+    return "Dari kiri ke kanan: berat ${signed(dKg, " kg")}, BMI ${signed(dBmi, "")}, perkiraan pinggang ${signed(dWaist, " cm")}."
 }
