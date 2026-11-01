@@ -132,6 +132,7 @@ import com.hawdietpro.app.ui.components.mealTypeColor
 import com.hawdietpro.app.ui.feature.exercise.ExerciseSheet
 import com.hawdietpro.app.ui.feature.suggest.MenuSuggestionSheet
 import com.hawdietpro.app.ui.theme.HawTheme
+import com.hawdietpro.app.domain.nutrition.TdeeCalculator
 import com.hawdietpro.app.ui.theme.MacroColors
 import com.hawdietpro.app.ui.theme.NumberDisplay
 import com.hawdietpro.app.ui.theme.NumberLarge
@@ -953,7 +954,14 @@ private fun WeightTile(p: WeightProjection?, onClick: () -> Unit, modifier: Modi
             val series = (listOf(p.startWeight) + p.days.map { it.estimatedWeight }).takeLast(21)
             Spacer(Modifier.height(6.dp))
             Sparkline(series, MaterialTheme.colorScheme.primary, Modifier.fillMaxWidth().height(34.dp))
-            Text("sejak ${Format.dayMonth(p.startDate)}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            val bmi = if (p.heightCm > 0) TdeeCalculator.bmi(p.estimatedToday, p.heightCm) else null
+            Text(
+                bmi?.let { "BMI ${Format.oneDecimal(it)} · ${TdeeCalculator.bmiCategory(it)}" } ?: "sejak ${Format.dayMonth(p.startDate)}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }

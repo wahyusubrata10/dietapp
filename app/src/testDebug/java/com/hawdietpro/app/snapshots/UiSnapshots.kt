@@ -166,6 +166,22 @@ class UiSnapshots {
     fun wrap_page3() = snap("wrap_page3") { com.hawdietpro.app.ui.feature.wrap.WrapContent(SampleData.wrap(), onClose = {}, initialPage = 3) }
 
     @Test
+    @Config(qualifiers = "w400dp-h2000dp-xxhdpi")
+    fun bmi_section_light() = snap("bmi_section_light", dark = false) {
+        androidx.compose.foundation.layout.Box(Modifier.padding(16.dp)) {
+            com.hawdietpro.app.ui.feature.weight.BmiSection(SampleData.home().projection!!)
+        }
+    }
+
+    @Test
+    @Config(qualifiers = "w360dp-h2000dp-xxhdpi")
+    fun bmi_section_dark_font130() = snap("bmi_section_dark_font130", fontScale = 1.3f) {
+        androidx.compose.foundation.layout.Box(Modifier.padding(16.dp)) {
+            com.hawdietpro.app.ui.feature.weight.BmiSection(SampleData.home().projection!!)
+        }
+    }
+
+    @Test
     fun analytics_summary_dark() = snap("analytics_summary_dark") {
         androidx.compose.foundation.layout.Column(Modifier.padding(16.dp)) {
             com.hawdietpro.app.ui.feature.analytics.SummaryTiles(SampleData.weekStats(), null, 1900)

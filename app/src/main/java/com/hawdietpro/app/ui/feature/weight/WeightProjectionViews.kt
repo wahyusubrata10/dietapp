@@ -2,6 +2,9 @@ package com.hawdietpro.app.ui.feature.weight
 
 import com.hawdietpro.app.ui.theme.HawTheme
 import com.hawdietpro.app.ui.components.StatRow
+import androidx.compose.animation.AnimatedContent
+import com.hawdietpro.app.ui.components.PillTabs
+import com.hawdietpro.app.ui.components.tabTransition
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,6 +37,18 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 private fun signed(v: Double, unit: String) = (if (v > 0) "+" else if (v < 0) "−" else "") + Format.oneDecimal(abs(v)) + unit
+
+/** Proyeksi tubuh dengan dua tampilan: berat (kg) dan BMI (berat dibanding tinggi badan). */
+@Composable
+fun BodyProjectionSection(p: WeightProjection) {
+    var tab by rememberSaveable { mutableIntStateOf(0) }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        PillTabs(listOf("Berat", "BMI"), tab, { tab = it }, compact = true)
+        AnimatedContent(tab, transitionSpec = { tabTransition(initialState, targetState) }, label = "bodyTab") { t ->
+            if (t == 0) WeightProjectionSection(p) else BmiSection(p)
+        }
+    }
+}
 
 /** Bagian lengkap: ringkasan, grafik perkiraan vs aktual vs target + proyeksi, dan surplus/defisit harian. */
 @Composable
@@ -201,7 +216,7 @@ private fun ProjectionText(p: WeightProjection) {
     Text(text, style = MaterialTheme.typography.bodyMedium)
 }
 
-private data class ProjectionChart(
+internal data class ProjectionChart(
     val labels: List<String>,
     val fullLabels: List<String>,
     val estimate: List<Double?>,
@@ -209,8 +224,11 @@ private data class ProjectionChart(
     val forecast: List<Double?>,
 )
 
-/** Menyusun sumbu X: [awal/rentang] … hari ini … +28 hari proyeksi. */
-private fun buildChart(p: WeightProjection, rangeDays: Int): ProjectionChart {
+/**
+ * Menyusun sumbu X: [awal/rentang] … hari ini … +28 hari proyeksi.
+ * [transform] mengubah berat ke satuan lain (mis. BMI) tanpa mengubah susunan data.
+ */
+internal fun buildChart(p: WeightProjection, rangeDays: Int, transform: (Double) -> Double = { it }): ProjectionChart {
     val today = p.forecast.firstOrNull()?.first ?: p.days.lastOrNull()?.date?.plusDays(1) ?: p.startDate
     val rangeStart = today.minusDays(rangeDays.toLong())
     val first = if (rangeDays == 0 || rangeStart.isBefore(p.startDate)) p.startDate else rangeStart
@@ -227,8 +245,8 @@ private fun buildChart(p: WeightProjection, rangeDays: Int): ProjectionChart {
     return ProjectionChart(
         labels = dates.map { Format.dayMonth(it) },
         fullLabels = dates.map { Format.dayMonth(it) },
-        estimate = dates.map { d -> if (d.isAfter(today)) null else estimateByDate[d] },
-        actual = dates.map { actualByDate[it] },
-        forecast = dates.map { d -> if (d.isBefore(today)) null else forecastByDate[d] },
+        estimate = dates.map { d -> if (d.isAfter(today)) null else estimateByDate[d]?.let(transform) },
+        actual = dates.map { actualByDate[it]?.let(transform) },
+        forecast = dates.map { d -> if (d.isBefore(today)) null else forecastByDate[d]?.let(transform) },
     )
 }

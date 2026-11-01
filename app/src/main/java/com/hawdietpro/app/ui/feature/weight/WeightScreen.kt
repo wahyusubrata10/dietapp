@@ -128,6 +128,7 @@ fun WeightScreen(onBack: () -> Unit, viewModel: WeightViewModel = hiltViewModel(
                         "BMI",
                         latest?.let { l -> state.heightCm?.let { Format.oneDecimal(TdeeCalculator.bmi(l.weightKg, it)) } } ?: "-",
                         Modifier.weight(1f),
+                        sub = latest?.let { l -> state.heightCm?.let { TdeeCalculator.bmiCategory(TdeeCalculator.bmi(l.weightKg, it)) } },
                     )
                 }
             }
@@ -144,7 +145,7 @@ fun WeightScreen(onBack: () -> Unit, viewModel: WeightViewModel = hiltViewModel(
                 item { AdaptiveSection(a, state.adaptiveOn, state.targetCalories, viewModel::setAdaptive) }
             }
             state.projection?.let { proj ->
-                item { WeightProjectionSection(proj) }
+                item { BodyProjectionSection(proj) }
             }
             if (state.entries.isNotEmpty()) {
                 item { Text("Riwayat timbangan", style = MaterialTheme.typography.titleMedium) }

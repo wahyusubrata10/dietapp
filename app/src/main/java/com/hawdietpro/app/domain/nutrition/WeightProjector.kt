@@ -46,6 +46,8 @@ data class WeightProjection(
     val targetWeight: Double?,
     /** Perkiraan tanggal mencapai berat target (null bila tidak searah / tanpa target). */
     val targetDate: LocalDate?,
+    /** Tinggi badan dari profil (cm), dipakai untuk proyeksi BMI; 0 = tidak diketahui. */
+    val heightCm: Double = 0.0,
 )
 
 /**
@@ -136,6 +138,7 @@ object WeightProjector {
             forecast = forecast,
             targetWeight = target,
             targetDate = targetDate,
+            heightCm = profile.heightCm,
         )
     }
 

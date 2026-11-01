@@ -58,14 +58,7 @@ object TdeeCalculator {
     }
 
     /** Kategori BMI untuk orang Asia (WHO Asia-Pasifik). */
-    fun bmiCategory(bmi: Double): String = when {
-        bmi <= 0 -> "-"
-        bmi < 18.5 -> "Berat badan kurang"
-        bmi < 23.0 -> "Normal"
-        bmi < 25.0 -> "Berlebih"
-        bmi < 30.0 -> "Obesitas I"
-        else -> "Obesitas II"
-    }
+    fun bmiCategory(bmi: Double): String = if (bmi <= 0) "-" else BmiClass.of(bmi).label
 
     fun minimumCalories(sex: Sex): Int = if (sex == Sex.PRIA) MIN_CALORIES_MALE else MIN_CALORIES_FEMALE
 

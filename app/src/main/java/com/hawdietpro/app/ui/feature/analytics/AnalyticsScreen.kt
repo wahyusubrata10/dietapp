@@ -84,7 +84,7 @@ import com.hawdietpro.app.ui.components.StatTile
 import com.hawdietpro.app.ui.components.gradeColor
 import com.hawdietpro.app.ui.components.mealTypeColor
 import com.hawdietpro.app.ui.feature.home.InsightCard
-import com.hawdietpro.app.ui.feature.weight.WeightProjectionSection
+import com.hawdietpro.app.ui.feature.weight.BodyProjectionSection
 import com.hawdietpro.app.ui.theme.MacroColors
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -693,7 +693,7 @@ private fun LazyListScope.weightTab(state: AnalyticsUi, onOpenWeight: () -> Unit
     if (p == null) {
         item { Text("Lengkapi profil untuk melihat perkiraan berat.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
     } else {
-        item { WeightProjectionSection(p) }
+        item { BodyProjectionSection(p) }
     }
 }
 
