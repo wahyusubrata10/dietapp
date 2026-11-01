@@ -108,10 +108,10 @@ fun BmiSection(p: WeightProjection) {
 
         StatRow {
             StatTile(
-                "Berat normal untukmu",
+                "Berat normal",
                 "${Format.oneDecimal(b.healthyMinKg)}–${Format.oneDecimal(b.healthyMaxKg)}",
                 Modifier.weight(1f),
-                sub = "kg · BMI 18,5–22,9",
+                sub = "kg untuk tinggimu",
                 color = cs.primaryContainer,
             )
             StatTile(
@@ -281,14 +281,16 @@ private fun BmiScale(b: BmiProjection) {
             drawCircle(ink, radius = 6.dp.toPx(), center = Offset(cx, size.height / 2))
         }
         // Angka batas kategori di bawah skala.
-        BoxWithConstraints(Modifier.fillMaxWidth().height(18.dp)) {
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
             listOf(18.5, 23.0, 25.0, 30.0).forEach { v ->
-                Box(Modifier.offset(x = maxWidth * fraction(v) - 14.dp).width(28.dp)) {
+                Box(Modifier.offset(x = maxWidth * fraction(v) - 24.dp).width(48.dp)) {
                     Text(
                         Format.oneDecimal(v),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        softWrap = false,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
