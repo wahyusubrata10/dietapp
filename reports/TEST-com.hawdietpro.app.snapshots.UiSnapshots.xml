@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hawdietpro.app.snapshots.UiSnapshots" tests="23" skipped="0" failures="0" errors="0" timestamp="2026-11-01T02:16:56.411Z" hostname="runnervmnwato" time="27.108">
+  <properties/>
+  <testcase name="body_shape_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="9.706"/>
+  <testcase name="home_grape_light" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="1.389"/>
+  <testcase name="home_light_360_font130" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="1.512"/>
+  <testcase name="weight_adaptive_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.385"/>
+  <testcase name="wrap_page1" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.889"/>
+  <testcase name="wrap_page3" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.869"/>
+  <testcase name="home_ocean_amoled" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="1.011"/>
+  <testcase name="analytics_summary_light_font130" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.295"/>
+  <testcase name="settings_appearance_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.275"/>
+  <testcase name="analytics_summary_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.26"/>
+  <testcase name="home_empty_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.863"/>
+  <testcase name="home_empty_light" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.844"/>
+  <testcase name="bottom_bar_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.143"/>
+  <testcase name="home_busy_long_names" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="1.476"/>
+  <testcase name="home_light_full" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="1.242"/>
+  <testcase name="home_dark_360_font130" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="1.241"/>
+  <testcase name="quick_add_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.298"/>
+  <testcase name="bmi_section_dark_font130" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.586"/>
+  <testcase name="home_light" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.826"/>
+  <testcase name="bmi_section_light" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.508"/>
+  <testcase name="body_shape_light_font130" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.387"/>
+  <testcase name="home_dark_full" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="1.256"/>
+  <testcase name="home_dark" classname="com.hawdietpro.app.snapshots.UiSnapshots" time="0.845"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
