@@ -226,7 +226,12 @@ private fun MilestoneRow(m: BmiMilestone, nowKg: Double) {
         Column(Modifier.weight(1f)) {
             Text("Masuk ${m.reachedClass.label}", style = MaterialTheme.typography.titleSmall)
             Text(
-                "BMI ${Format.oneDecimal(m.bmi)} · ${Format.kg(m.weightKg)}" +
+                // BMI dibulatkan bisa terbaca sama dengan batasnya (24,98 → "25"), jadi tampilkan batasnya.
+                (if (m.downward) {
+                    "BMI < ${Format.oneDecimal(m.reachedClass.upper)} · ≤ ${Format.kg(m.weightKg)}"
+                } else {
+                    "BMI ≥ ${Format.oneDecimal(m.reachedClass.lower)} · ≥ ${Format.kg(m.weightKg)}"
+                }) +
                     if (m.reached) "" else " · ${Format.oneDecimal(abs(m.weightKg - nowKg))} kg lagi",
                 style = MaterialTheme.typography.bodySmall,
                 color = cs.onSurfaceVariant,

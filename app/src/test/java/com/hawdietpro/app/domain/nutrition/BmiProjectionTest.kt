@@ -48,8 +48,10 @@ class BmiProjectionTest {
         val proj = projection(p, 87.6, -700.0)
         assertEquals(proj.estimatedToday / (1.75 * 1.75), b.current, 1e-9)
         assertEquals(87.6 / (1.75 * 1.75), b.start, 1e-9)
-        assertEquals(18.5 * 1.75 * 1.75, b.healthyMinKg, 1e-9)
-        assertEquals(22.9 * 1.75 * 1.75, b.healthyMaxKg, 1e-9)
+        // 1,75 m: BMI 18,5 = 56,66 kg → 56,7; BMI < 23 = < 70,44 kg → 70,4.
+        assertEquals(56.7, b.healthyMinKg, 1e-9)
+        assertEquals(70.4, b.healthyMaxKg, 1e-9)
+        assertEquals(b.healthyMaxKg, b.milestones.last().weightKg, 1e-9)
         assertTrue("harus turun ke rentang sehat", b.kgToHealthy < 0)
         assertEquals(b.healthyMaxKg - proj.estimatedToday, b.kgToHealthy, 1e-9)
         // Proyeksi BMI = proyeksi berat / tinggi².
@@ -101,6 +103,7 @@ class BmiProjectionTest {
         val m = b.milestones.single()
         assertEquals(BmiClass.NORMAL, m.reachedClass)
         assertTrue(m.bmi >= 18.5)
+        assertFalse(m.downward)
         assertTrue(TdeeCalculator.bmi(m.weightKg - 0.1, 175.0) < 18.5)
         assertNotNull(m.date)
     }

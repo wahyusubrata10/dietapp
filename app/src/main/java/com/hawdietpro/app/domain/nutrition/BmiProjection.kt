@@ -29,6 +29,8 @@ data class BmiMilestone(
     val reached: Boolean,
     /** Perkiraan tanggal tercapai dengan pola makan saat ini (null bila belum searah / terlalu jauh). */
     val date: LocalDate?,
+    /** true = dicapai dengan turun berat (melewati batas atas kategori), false = dengan naik berat. */
+    val downward: Boolean = true,
 )
 
 data class BmiProjection(
@@ -69,6 +71,20 @@ object BmiProjector {
         return bmi * m * m
     }
 
+    /** Berat terberat (kelipatan 0,1 kg) yang BMI-nya masih di bawah [bmiUpper]. */
+    fun maxWeightBelow(bmiUpper: Double, heightCm: Double): Double {
+        var w = floor(weightFor(bmiUpper, heightCm) * 10) / 10
+        while (TdeeCalculator.bmi(w, heightCm) >= bmiUpper) w -= 0.1
+        return w
+    }
+
+    /** Berat teringan (kelipatan 0,1 kg) yang BMI-nya sudah mencapai [bmiLower]. */
+    fun minWeightFrom(bmiLower: Double, heightCm: Double): Double {
+        var w = ceil(weightFor(bmiLower, heightCm) * 10) / 10
+        while (TdeeCalculator.bmi(w, heightCm) < bmiLower) w += 0.1
+        return w
+    }
+
     /** null bila tinggi badan tidak diketahui / tidak wajar. */
     fun project(p: WeightProjection): BmiProjection? {
         val h = p.heightCm
@@ -78,8 +94,9 @@ object BmiProjector {
         val now = p.estimatedToday
         val current = bmi(now)
         val start = bmi(p.startWeight)
-        val healthyMin = weightFor(HEALTHY_MIN, h)
-        val healthyMax = weightFor(HEALTHY_MAX, h)
+        // Sama persis dengan batas kategori Normal (BMI 18,5 sampai < 23) agar angka di layar konsisten.
+        val healthyMin = minWeightFrom(BmiClass.NORMAL.lower, h)
+        val healthyMax = maxWeightBelow(BmiClass.NORMAL.upper, h)
         val kgToHealthy = when {
             now > healthyMax -> healthyMax - now
             now < healthyMin -> healthyMin - now
@@ -105,17 +122,15 @@ object BmiProjector {
             // Turun: setiap batas atas kategori di bawah kategori tertinggi, sampai masuk Normal.
             for (i in highest.ordinal - 1 downTo BmiClass.NORMAL.ordinal) {
                 val cls = BmiClass.entries[i]
-                var w = floor(weightFor(cls.upper, h) * 10) / 10
-                if (bmi(w) >= cls.upper) w -= 0.1
+                val w = maxWeightBelow(cls.upper, h)
                 val reached = now <= w
                 milestones += BmiMilestone(cls, w, bmi(w), reached, if (reached) null else dateFor(w))
             }
         } else if (minOf(currentClass, startClass) == BmiClass.KURANG) {
             // Naik: masuk rentang normal dari bawah.
-            var w = ceil(weightFor(HEALTHY_MIN, h) * 10) / 10
-            if (bmi(w) < HEALTHY_MIN) w += 0.1
+            val w = minWeightFrom(BmiClass.NORMAL.lower, h)
             val reached = now >= w
-            milestones += BmiMilestone(BmiClass.NORMAL, w, bmi(w), reached, if (reached) null else dateFor(w))
+            milestones += BmiMilestone(BmiClass.NORMAL, w, bmi(w), reached, if (reached) null else dateFor(w), downward = false)
         }
 
         val target = p.targetWeight?.let(::bmi)
