@@ -79,6 +79,10 @@ jobs:
           echo "signed=true" >> "$GITHUB_OUTPUT"
           echo "Keystore OK"
 
+      # Unduhan distribusi Gradle kadang gagal sesaat (504/timeout): coba ulang sebelum build.
+      - name: Siapkan Gradle
+        run: for i in 1 2 3 4; do ./gradlew --version -q && break; sleep $((i * 15)); done
+
       - name: Unit test
         run: ./gradlew testReleaseUnitTest
 
