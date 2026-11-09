@@ -117,8 +117,10 @@ class BackupRepository @Inject constructor(
             },
             barcodeProducts = barcodes.getAll().map { b ->
                 BackupBarcodeProduct(
-                    b.barcode, b.name, b.brand, b.calories, b.protein, b.carbs, b.fat, b.fiber, b.sugar, b.sodium,
-                    b.servingG, b.packageG, b.source, b.complete, magnesium = b.magnesium,
+                    barcode = b.barcode, name = b.name, brand = b.brand, calories = b.calories, protein = b.protein,
+                    carbs = b.carbs, fat = b.fat, fiber = b.fiber, sugar = b.sugar, sodium = b.sodium,
+                    magnesium = b.magnesium, servingG = b.servingG, packageG = b.packageG, source = b.source,
+                    complete = b.complete,
                 )
             },
         )
