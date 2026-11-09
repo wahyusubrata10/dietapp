@@ -81,7 +81,16 @@ jobs:
 
       # Unduhan distribusi Gradle kadang gagal sesaat (504/timeout): coba ulang sebelum build.
       - name: Siapkan Gradle
-        run: for i in 1 2 3 4; do ./gradlew --version -q && break; sleep $((i * 15)); done
+        run: |
+          D="$HOME/.gradle/wrapper/dists/gradle-8.14.3-bin"
+          # Sisa unduhan gagal yang ikut ter-cache membuat wrapper terus gagal: mulai bersih.
+          ls "$D"/*/gradle-8.14.3/bin/gradle >/dev/null 2>&1 || rm -rf "$D"
+          for i in 1 2 3 4 5 6; do
+            ./gradlew --version -q && exit 0
+            rm -rf "$D"
+            sleep $((i * 20))
+          done
+          exit 1
 
       - name: Unit test
         run: ./gradlew testReleaseUnitTest
