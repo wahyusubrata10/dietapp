@@ -27,6 +27,8 @@ data class DailyTarget(
     val warnings: List<String>,
     /** true = TDEE berasal dari data timbangan & catatan makan (adaptif), bukan rumus saja. */
     val adaptive: Boolean = false,
+    /** Kebutuhan magnesium harian (mg, AKG 2019). */
+    val magnesiumMg: Int = 0,
 )
 
 /**
@@ -143,6 +145,7 @@ object TdeeCalculator {
             weeksToTarget = weeksToTarget,
             warnings = warnings,
             adaptive = measuredTdee != null,
+            magnesiumMg = Magnesium.dailyTargetMg(profile.sex, profile.age),
         )
     }
 

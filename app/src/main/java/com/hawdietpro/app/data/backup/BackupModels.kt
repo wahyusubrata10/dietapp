@@ -31,6 +31,8 @@ data class BackupBarcodeProduct(
     val sugar: Double = 0.0,
     val sodium: Double = 0.0,
     val servingG: Double? = null,
+    /** Magnesium mg/100 g (cadangan lama tidak punya: 0 lalu diisi ulang). */
+    val magnesium: Double = 0.0,
     val packageG: Double? = null,
     val source: String,
     val complete: Boolean = true,
@@ -89,6 +91,8 @@ data class BackupItem(
     val fiber: Double,
     val sugar: Double = 0.0,
     val sodium: Double = 0.0,
+    /** Magnesium (mg). Cadangan versi lama tidak punya → 0, lalu dihitung ulang setelah dipulihkan. */
+    val magnesium: Double = 0.0,
     val cookingMethod: String? = null,
     val source: String = "AI",
     val foodRefId: String? = null,

@@ -73,6 +73,8 @@ data class Settings(
     val lastUpdateCheck: Long = 0,
     val lastRemoteSync: Long = 0,
     val foodDbVersion: Int = 0,
+    /** Versi pengisian ulang magnesium catatan lama yang sudah dijalankan (0 = belum). */
+    val magnesiumBackfill: Int = 0,
     val skippedUpdateVersionCode: Int = 0,
     /** true = target & perkiraan berat memakai kebutuhan kalori yang dipelajari dari timbangan. */
     val adaptiveTdee: Boolean = true,
@@ -99,6 +101,7 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
         val LAST_UPDATE_CHECK = longPreferencesKey("last_update_check")
         val LAST_REMOTE_SYNC = longPreferencesKey("last_remote_sync")
         val FOOD_DB_VERSION = intPreferencesKey("food_db_version")
+        val MAGNESIUM_BACKFILL = intPreferencesKey("magnesium_backfill")
         val SKIPPED_UPDATE = intPreferencesKey("skipped_update_version")
         val SEEN_ACHIEVEMENTS = stringSetPreferencesKey("seen_achievements")
         val ADAPTIVE_TDEE = booleanPreferencesKey("adaptive_tdee")
@@ -120,6 +123,7 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
             lastUpdateCheck = p[Keys.LAST_UPDATE_CHECK] ?: 0,
             lastRemoteSync = p[Keys.LAST_REMOTE_SYNC] ?: 0,
             foodDbVersion = p[Keys.FOOD_DB_VERSION] ?: 0,
+            magnesiumBackfill = p[Keys.MAGNESIUM_BACKFILL] ?: 0,
             skippedUpdateVersionCode = p[Keys.SKIPPED_UPDATE] ?: 0,
             adaptiveTdee = p[Keys.ADAPTIVE_TDEE] ?: true,
             accent = AccentColor.parse(p[Keys.ACCENT]),
@@ -150,6 +154,7 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
     suspend fun setLastUpdateCheck(time: Long) = context.dataStore.edit { it[Keys.LAST_UPDATE_CHECK] = time }
     suspend fun setLastRemoteSync(time: Long) = context.dataStore.edit { it[Keys.LAST_REMOTE_SYNC] = time }
     suspend fun setFoodDbVersion(version: Int) = context.dataStore.edit { it[Keys.FOOD_DB_VERSION] = version }
+    suspend fun setMagnesiumBackfill(version: Int) = context.dataStore.edit { it[Keys.MAGNESIUM_BACKFILL] = version }
     suspend fun setSkippedUpdate(versionCode: Int) = context.dataStore.edit { it[Keys.SKIPPED_UPDATE] = versionCode }
     suspend fun setAdaptiveTdee(value: Boolean) = context.dataStore.edit { it[Keys.ADAPTIVE_TDEE] = value }
     suspend fun setAccent(value: AccentColor) = context.dataStore.edit { it[Keys.ACCENT] = value.name }

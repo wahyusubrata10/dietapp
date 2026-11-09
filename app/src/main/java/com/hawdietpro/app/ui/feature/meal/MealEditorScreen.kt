@@ -31,6 +31,7 @@ import com.hawdietpro.app.domain.model.NutritionSource
 import com.hawdietpro.app.ui.components.Pill
 import com.hawdietpro.app.ui.components.SectionHeader
 import com.hawdietpro.app.ui.components.SoftProgress
+import com.hawdietpro.app.domain.nutrition.Magnesium
 import com.hawdietpro.app.domain.nutrition.NutritionLimits
 import com.hawdietpro.app.ui.theme.HawTheme
 import androidx.compose.animation.core.RepeatMode
@@ -726,6 +727,27 @@ private fun NutritionCard(meal: Meal) {
             LimitValue("🍬 Gula", "${Format.oneDecimal(t.sugar)} g", t.sugar / NutritionLimits.SUGAR_G, Modifier.weight(1f))
             LimitValue("🧂 Natrium", "${Format.grouped(t.sodium.roundToInt())} mg", t.sodium / NutritionLimits.SODIUM_MG, Modifier.weight(1f))
         }
+        Spacer(Modifier.height(12.dp))
+        MagnesiumValue(t.magnesium)
+    }
+}
+
+/** Magnesium: makin tinggi makin baik (target harian AKG), berbeda dengan gula/natrium yang dibatasi. */
+@Composable
+private fun MagnesiumValue(mg: Double) {
+    val fraction = mg / Magnesium.DEFAULT_TARGET_MG
+    Column(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("🥬 Magnesium", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+            Text("${Format.grouped(mg.roundToInt())} mg", style = MaterialTheme.typography.labelLarge)
+        }
+        Spacer(Modifier.height(6.dp))
+        SoftProgress(fraction.toFloat(), MacroColors.Fiber, height = 6.dp)
+        Text(
+            "${(fraction * 100).roundToInt()}% kebutuhan harian (±${Magnesium.DEFAULT_TARGET_MG} mg)",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

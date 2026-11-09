@@ -21,19 +21,21 @@ object NutritionCalculator {
         val grams = newGrams.coerceAtLeast(0.0)
         val scaled = if (item.grams > 0) item.nutrients * (grams / item.grams) else item.nutrients
         val nutrients = when {
-            ref != null && item.source == NutritionSource.DB -> withSugarSodium(fromReference(ref, grams), ref, scaled)
+            ref != null && item.source == NutritionSource.DB -> withMicronutrients(fromReference(ref, grams), ref, scaled)
             else -> scaled
         }
         return item.copy(grams = grams, nutrients = nutrients)
     }
 
-    /** Bila DB belum punya data gula/natrium, pakai angka [fallback] (estimasi AI) yang sudah diskalakan. */
-    private fun withSugarSodium(fromDb: Nutrients, ref: FoodReference, fallback: Nutrients): Nutrients =
-        if (ref.hasSugarSodium) fromDb else fromDb.copy(sugar = fallback.sugar, sodium = fallback.sodium)
+    /** Bila DB belum punya data gula/natrium/magnesium, pakai angka [fallback] (estimasi AI) yang sudah diskalakan. */
+    private fun withMicronutrients(fromDb: Nutrients, ref: FoodReference, fallback: Nutrients): Nutrients {
+        val withSugarSodium = if (ref.hasSugarSodium) fromDb else fromDb.copy(sugar = fallback.sugar, sodium = fallback.sodium)
+        return if (ref.hasMagnesium) withSugarSodium else withSugarSodium.copy(magnesium = fallback.magnesium)
+    }
 
     /** Menerapkan referensi DB ke elemen (gram tetap, angka gizi diganti DB). */
     fun applyReference(item: FoodItem, ref: FoodReference): FoodItem = item.copy(
-        nutrients = withSugarSodium(fromReference(ref, item.grams), ref, item.nutrients),
+        nutrients = withMicronutrients(fromReference(ref, item.grams), ref, item.nutrients),
         source = NutritionSource.DB,
         foodRefId = ref.id,
         category = ref.category,

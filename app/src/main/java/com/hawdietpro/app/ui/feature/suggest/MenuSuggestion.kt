@@ -132,6 +132,8 @@ class MenuSuggestionViewModel @Inject constructor(
                         put("sisa_protein_g", (t.proteinG - total.protein).roundToInt())
                         put("target_serat_g", t.fiberG)
                         put("sisa_serat_g", (t.fiberG - total.fiber).roundToInt())
+                        put("target_magnesium_mg", t.magnesiumMg)
+                        put("sisa_magnesium_mg", (t.magnesiumMg - total.magnesium).roundToInt())
                     }
                     put("gula_hari_ini_g", total.sugar.roundToInt())
                     put("batas_gula_g", NutritionLimits.SUGAR_G.roundToInt())

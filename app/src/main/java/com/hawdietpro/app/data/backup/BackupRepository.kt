@@ -5,6 +5,7 @@ import android.net.Uri
 import com.hawdietpro.app.BuildConfig
 import com.hawdietpro.app.core.Format
 import com.hawdietpro.app.core.ImageProcessor
+import com.hawdietpro.app.data.repository.MagnesiumBackfill
 import com.hawdietpro.app.data.local.HawDatabase
 import com.hawdietpro.app.data.local.dao.BarcodeProductDao
 import com.hawdietpro.app.data.local.dao.ExerciseDao
@@ -59,6 +60,7 @@ class BackupRepository @Inject constructor(
     private val json: Json,
     private val exercises: ExerciseDao,
     private val barcodes: BarcodeProductDao,
+    private val magnesium: MagnesiumBackfill,
 ) {
     data class ImportResult(val meals: Int, val weights: Int, val photos: Int, val exercises: Int = 0)
 
@@ -96,6 +98,7 @@ class BackupRepository @Inject constructor(
                             fiber = i.nutrients.fiber,
                             sugar = i.nutrients.sugar,
                             sodium = i.nutrients.sodium,
+                            magnesium = i.nutrients.magnesium,
                             cookingMethod = i.cookingMethod,
                             source = i.source.name,
                             foodRefId = i.foodRefId,
@@ -115,7 +118,7 @@ class BackupRepository @Inject constructor(
             barcodeProducts = barcodes.getAll().map { b ->
                 BackupBarcodeProduct(
                     b.barcode, b.name, b.brand, b.calories, b.protein, b.carbs, b.fat, b.fiber, b.sugar, b.sodium,
-                    b.servingG, b.packageG, b.source, b.complete,
+                    b.servingG, b.packageG, b.source, b.complete, magnesium = b.magnesium,
                 )
             },
         )
@@ -184,7 +187,7 @@ class BackupRepository @Inject constructor(
                         FoodItem(
                             name = i.name,
                             grams = i.grams,
-                            nutrients = Nutrients(i.calories, i.protein, i.carbs, i.fat, i.fiber, i.sugar, i.sodium),
+                            nutrients = Nutrients(i.calories, i.protein, i.carbs, i.fat, i.fiber, i.sugar, i.sodium, i.magnesium),
                             cookingMethod = i.cookingMethod,
                             source = NutritionSource.parse(i.source),
                             foodRefId = i.foodRefId,
@@ -207,8 +210,10 @@ class BackupRepository @Inject constructor(
             barcodes.upsertAll(
                 data.barcodeProducts.map { b ->
                     BarcodeProductEntity(
-                        b.barcode, b.name, b.brand, b.calories, b.protein, b.carbs, b.fat, b.fiber, b.sugar, b.sodium,
-                        b.servingG, b.packageG, b.source, b.complete, System.currentTimeMillis(),
+                        barcode = b.barcode, name = b.name, brand = b.brand, calories = b.calories, protein = b.protein,
+                        carbs = b.carbs, fat = b.fat, fiber = b.fiber, sugar = b.sugar, sodium = b.sodium,
+                        magnesium = b.magnesium, servingG = b.servingG, packageG = b.packageG, source = b.source,
+                        complete = b.complete, updatedAt = System.currentTimeMillis(),
                     )
                 },
             )
@@ -245,6 +250,8 @@ class BackupRepository @Inject constructor(
         // Foto yang tidak dipakai (catatan duplikat) dibersihkan.
         val used = meals.getAllPhotoPaths().toSet()
         photoMap.values.filter { it !in used }.forEach { File(it).delete() }
+        // Cadangan dari versi sebelum fitur magnesium: isi magnesiumnya dari database makanan.
+        runCatching { magnesium.run() }
         ImportResult(mealCount, data.weights.size, photoMap.size, exerciseCount)
     }
 
@@ -289,7 +296,7 @@ class BackupRepository @Inject constructor(
         val out = context.contentResolver.openOutputStream(target) ?: error("Tidak bisa menulis file")
         OutputStreamWriter(out, Charsets.UTF_8).use { w ->
             w.write("﻿")
-            w.write("Tanggal;Jam;Waktu makan;Menu;Elemen;Gram;Kalori (kkal);Protein (g);Karbo (g);Lemak (g);Serat (g);Gula (g);Natrium (mg);Metode masak;Sumber angka;Skor gizi;Penilaian;Catatan\n")
+            w.write("Tanggal;Jam;Waktu makan;Menu;Elemen;Gram;Kalori (kkal);Protein (g);Karbo (g);Lemak (g);Serat (g);Gula (g);Natrium (mg);Magnesium (mg);Metode masak;Sumber angka;Skor gizi;Penilaian;Catatan\n")
             all.forEach { m ->
                 val dt = Instant.ofEpochMilli(m.eatenAt).atZone(zone)
                 m.items.forEach { i ->
@@ -308,6 +315,7 @@ class BackupRepository @Inject constructor(
                             dec(i.nutrients.fiber),
                             dec(i.nutrients.sugar),
                             dec(i.nutrients.sodium),
+                            dec(i.nutrients.magnesium),
                             i.cookingMethod.orEmpty(),
                             i.source.label,
                             m.grade?.name.orEmpty(),

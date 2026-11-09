@@ -47,6 +47,8 @@ jobs:
           mkdir -p "$OUT/reports"
           cp app/build/snapshots/*.png "$OUT/" 2>/dev/null || true
           cp app/build/test-results/testDebugUnitTest/*.xml "$OUT/reports/" 2>/dev/null || true
+          # Skema Room hasil ekspor (untuk tes migrasi database).
+          cp -r app/schemas "$OUT/schemas" 2>/dev/null || true
           {
             echo "commit: $GITHUB_SHA"
             echo "render: ${{ steps.render.outcome }}"

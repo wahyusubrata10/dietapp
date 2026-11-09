@@ -170,6 +170,7 @@ class PeriodStatsCalculator(private val rules: InsightRulesFile, private val zon
             put("exerciseDays", exerciseDays.size.toDouble())
             put("avgNetCalories", if (daysLogged > 0) logged.sumOf { it.netCalories } / daysLogged else 0.0)
             put("avgSodiumMg", avg.sodium)
+            put("avgMagnesiumMg", avg.magnesium)
             put("daysSugarOver", logged.count { it.nutrients.sugar > 50.0 }.toDouble())
             put("daysSodiumOver", logged.count { it.nutrients.sodium > 2000.0 }.toDouble())
             put("avgProteinPct", split.proteinPct)

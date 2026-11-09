@@ -65,6 +65,7 @@ import com.hawdietpro.app.domain.insight.RankedItem
 import com.hawdietpro.app.domain.model.Grade
 import com.hawdietpro.app.domain.model.MealType
 import com.hawdietpro.app.domain.nutrition.DailyTarget
+import com.hawdietpro.app.domain.nutrition.Magnesium
 import com.hawdietpro.app.domain.nutrition.NutritionLimits
 import com.hawdietpro.app.ui.components.BarChart
 import com.hawdietpro.app.ui.components.Banner
@@ -527,6 +528,8 @@ private fun LazyListScope.nutritionTab(stats: PeriodStats, target: DailyTarget?)
             val logged = stats.days.filter { it.mealCount > 0 }
             val proteinHit = logged.count { it.nutrients.protein >= target.proteinG * 0.9 }
             val fiberHit = logged.count { it.nutrients.fiber >= target.fiberG * 0.9 }
+            val magnesiumTarget = target.magnesiumMg.takeIf { it > 0 } ?: Magnesium.DEFAULT_TARGET_MG
+            val magnesiumHit = logged.count { it.nutrients.magnesium >= magnesiumTarget * 0.9 }
             val calHit = logged.count { abs(it.netCalories - target.calories) <= target.calories * 0.1 }
             HawCard {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -534,6 +537,7 @@ private fun LazyListScope.nutritionTab(stats: PeriodStats, target: DailyTarget?)
                     HitBar("Kalori sesuai target (±10%)", calHit, logged.size, MaterialTheme.colorScheme.primary)
                     HitBar("Protein ≥ ${target.proteinG} g", proteinHit, logged.size, MacroColors.Protein)
                     HitBar("Serat ≥ ${target.fiberG} g", fiberHit, logged.size, MacroColors.Fiber)
+                    HitBar("Magnesium ≥ ${Format.grouped(magnesiumTarget)} mg", magnesiumHit, logged.size, MacroColors.Fiber)
                     Text(
                         "Rata-rata protein ${avg.protein.roundToInt()} g (target ${target.proteinG} g) · serat ${avg.fiber.roundToInt()} g (target ${target.fiberG} g)",
                         style = MaterialTheme.typography.bodySmall,
@@ -544,8 +548,42 @@ private fun LazyListScope.nutritionTab(stats: PeriodStats, target: DailyTarget?)
         }
     }
     item { SugarSaltCard(stats) }
+    item { MagnesiumCard(stats, target?.magnesiumMg?.takeIf { it > 0 } ?: Magnesium.DEFAULT_TARGET_MG) }
     item { GradeCard(stats) }
     if (stats.topSources.isNotEmpty()) item { RankCard("Sumber kalori terbesar", stats.topSources, showCount = false) }
+}
+
+@Composable
+private fun MagnesiumCard(stats: PeriodStats, targetMg: Int) {
+    val logged = stats.days.filter { it.mealCount > 0 }
+    val avg = stats.averagePerDay.magnesium
+    val reached = logged.count { it.nutrients.magnesium >= targetMg * 0.9 }
+    HawCard {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Magnesium", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Mineral untuk otot, saraf, tidur, dan gula darah. Kebutuhanmu ±${Format.grouped(targetMg)} mg/hari (AKG 2019). " +
+                    "Sumber terbaik: tempe, kacang-kacangan, sayur hijau (bayam, kangkung), alpukat, pisang, nasi merah.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            StatRow {
+                StatTile("Rata-rata", "${Format.grouped(avg.roundToInt())} mg", Modifier.weight(1f), sub = "${(avg / targetMg * 100).roundToInt()}% kebutuhan", accent = MacroColors.Fiber)
+                StatTile("Hari tercukupi", "$reached/${logged.size}", Modifier.weight(1f), sub = "≥ 90% kebutuhan", accent = MacroColors.Fiber)
+            }
+            BarChart(
+                values = stats.days.map { it.nutrients.magnesium },
+                labels = stats.days.map { it.date.dayOfMonth.toString() },
+                tooltipLabels = dayTooltips(stats),
+                target = targetMg.toDouble(),
+                targetLabel = "Kebutuhan",
+                barColor = MacroColors.Fiber,
+                valueFormat = { Format.grouped(it.roundToInt()) },
+                height = 170.dp,
+                emptyText = "Belum ada data magnesium",
+            )
+        }
+    }
 }
 
 @Composable

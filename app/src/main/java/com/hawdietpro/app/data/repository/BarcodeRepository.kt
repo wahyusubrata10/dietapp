@@ -6,6 +6,7 @@ import com.hawdietpro.app.data.gemini.GeminiClient
 import com.hawdietpro.app.data.local.dao.BarcodeProductDao
 import com.hawdietpro.app.data.local.toDomain
 import com.hawdietpro.app.data.local.toEntity
+import com.hawdietpro.app.domain.nutrition.Magnesium
 import com.hawdietpro.app.domain.model.FoodItem
 import com.hawdietpro.app.domain.model.Meal
 import com.hawdietpro.app.domain.model.MealType
@@ -126,13 +127,17 @@ class BarcodeRepository @Inject constructor(
 
     /** Mencatat produk sebagai satu kali makan. */
     suspend fun log(product: PackagedProduct, grams: Double, mealType: MealType, eatenAt: Long): Long {
-        val item = FoodItem(
-            name = product.displayName,
-            grams = grams,
-            nutrients = product.nutrientsFor(grams),
-            source = NutritionSource.KEMASAN,
-            foodRefId = "barcode:${product.barcode}",
-            category = "kemasan",
+        // Label gizi jarang mencantumkan magnesium: bila kosong, diperkirakan dari komposisinya.
+        val item = Magnesium.fill(
+            FoodItem(
+                name = product.displayName,
+                grams = grams,
+                nutrients = product.nutrientsFor(grams),
+                source = NutritionSource.KEMASAN,
+                foodRefId = "barcode:${product.barcode}",
+                category = "kemasan",
+            ),
+            null,
         )
         val meal = evaluator.evaluate(
             Meal(

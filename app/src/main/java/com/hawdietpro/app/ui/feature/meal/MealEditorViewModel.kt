@@ -20,6 +20,7 @@ import com.hawdietpro.app.domain.model.Meal
 import com.hawdietpro.app.domain.model.MealType
 import com.hawdietpro.app.domain.model.NutritionSource
 import com.hawdietpro.app.domain.model.Nutrients
+import com.hawdietpro.app.domain.nutrition.Magnesium
 import com.hawdietpro.app.domain.nutrition.NutritionCalculator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -300,16 +301,17 @@ class MealEditorViewModel @Inject constructor(
             source = NutritionSource.DB,
             foodRefId = ref.id,
             category = ref.category,
-        )
+        ).let { if (ref.hasMagnesium) it else Magnesium.fill(it, ref) }
         val name = if (m.menuName.isBlank()) ref.name else m.menuName
         m.copy(items = m.items + item, menuName = name)
     }
 
     fun addCustom(name: String, grams: Double, nutrients: Nutrients, saveToDb: Boolean) {
         viewModelScope.launch {
-            var item = FoodItem(name = name.trim(), grams = grams, nutrients = nutrients, source = NutritionSource.MANUAL)
+            // Label kemasan jarang mencantumkan magnesium → diperkirakan dari komposisi yang diisi.
+            var item = Magnesium.fill(FoodItem(name = name.trim(), grams = grams, nutrients = nutrients, source = NutritionSource.MANUAL), null)
             if (saveToDb && grams > 0) {
-                val ref = foods.addUserFood(name, nutrients * (100.0 / grams), grams)
+                val ref = foods.addUserFood(name, item.nutrients * (100.0 / grams), grams)
                 item = item.copy(foodRefId = ref.id)
             }
             mutateMeal { m -> m.copy(items = m.items + item, menuName = m.menuName.ifBlank { name.trim() }) }

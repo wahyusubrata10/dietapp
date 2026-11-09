@@ -101,6 +101,8 @@ data class GeminiElement(
     @SerialName("serat_g") val fiber: Double = 0.0,
     @SerialName("gula_g") val sugar: Double = 0.0,
     @SerialName("natrium_mg") val sodium: Double = 0.0,
+    /** null = prompt lama tanpa magnesium → diperkirakan di HP. */
+    @SerialName("magnesium_mg") val magnesium: Double? = null,
     @SerialName("metode_masak") val cookingMethod: String? = null,
 )
 

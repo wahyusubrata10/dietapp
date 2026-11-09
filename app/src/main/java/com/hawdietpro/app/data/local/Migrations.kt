@@ -74,5 +74,18 @@ object Migrations {
         }
     }
 
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+    /**
+     * v6: magnesium (mg). Hanya menambah kolom — data lama utuh; nilainya diisi kemudian oleh
+     * MagnesiumBackfill dari database makanan.
+     */
+    val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE meal_entry ADD COLUMN total_magnesium REAL NOT NULL DEFAULT 0")
+            db.execSQL("ALTER TABLE food_element ADD COLUMN magnesium REAL NOT NULL DEFAULT 0")
+            db.execSQL("ALTER TABLE food_reference ADD COLUMN magnesium REAL")
+            db.execSQL("ALTER TABLE barcode_product ADD COLUMN magnesium REAL NOT NULL DEFAULT 0")
+        }
+    }
+
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
 }

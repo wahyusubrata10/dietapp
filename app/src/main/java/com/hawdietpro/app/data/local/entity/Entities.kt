@@ -41,6 +41,7 @@ data class MealEntryEntity(
     @ColumnInfo(name = "total_fiber") val totalFiber: Double,
     @ColumnInfo(name = "total_sugar", defaultValue = "0") val totalSugar: Double = 0.0,
     @ColumnInfo(name = "total_sodium", defaultValue = "0") val totalSodium: Double = 0.0,
+    @ColumnInfo(name = "total_magnesium", defaultValue = "0") val totalMagnesium: Double = 0.0,
     @ColumnInfo(defaultValue = "0") val favorite: Boolean = false,
     val grade: String?,
     /** Label penilaian, dipisah "|" (contoh: "Tinggi karbo|Kurang sayur"). */
@@ -78,6 +79,7 @@ data class FoodElementEntity(
     val fiber: Double,
     @ColumnInfo(defaultValue = "0") val sugar: Double = 0.0,
     @ColumnInfo(defaultValue = "0") val sodium: Double = 0.0,
+    @ColumnInfo(defaultValue = "0") val magnesium: Double = 0.0,
     @ColumnInfo(name = "cooking_method") val cookingMethod: String?,
     @ColumnInfo(name = "nutrition_source") val nutritionSource: String,
     @ColumnInfo(name = "food_ref_id") val foodRefId: String?,
@@ -111,6 +113,8 @@ data class FoodReferenceEntity(
     val sugar: Double? = null,
     /** Natrium mg/100 g; null = belum ada data. */
     val sodium: Double? = null,
+    /** Magnesium mg/100 g; null = belum ada data. */
+    val magnesium: Double? = null,
     @ColumnInfo(name = "default_serving_g") val defaultServingG: Double,
     @ColumnInfo(name = "serving_label") val servingLabel: String?,
     /** TKPI, POPULER, atau USER (ditambah pengguna). */
@@ -160,6 +164,7 @@ data class BarcodeProductEntity(
     val fiber: Double,
     val sugar: Double,
     val sodium: Double,
+    @ColumnInfo(defaultValue = "0") val magnesium: Double = 0.0,
     @ColumnInfo(name = "serving_g") val servingG: Double?,
     @ColumnInfo(name = "package_g") val packageG: Double?,
     val source: String,

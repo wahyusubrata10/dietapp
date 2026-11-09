@@ -10,6 +10,7 @@ import com.hawdietpro.app.domain.model.MealType
 import com.hawdietpro.app.domain.model.NutritionSource
 import com.hawdietpro.app.domain.model.Nutrients
 import com.hawdietpro.app.domain.nutrition.FoodMatcher
+import com.hawdietpro.app.domain.nutrition.Magnesium
 import com.hawdietpro.app.domain.nutrition.NutritionCalculator
 import com.hawdietpro.app.domain.scoring.MealScorer
 import java.time.Instant
@@ -93,7 +94,10 @@ class MealAnalyzer @Inject constructor(
         result.elements
             .filter { it.name.isNotBlank() && it.grams > 0 }
             .map { e ->
-                val ai = Nutrients(e.calories, e.protein, e.carbs, e.fat, e.fiber, e.sugar.coerceAtLeast(0.0), e.sodium.coerceAtLeast(0.0))
+                val ai = Nutrients(
+                    e.calories, e.protein, e.carbs, e.fat, e.fiber, e.sugar.coerceAtLeast(0.0), e.sodium.coerceAtLeast(0.0),
+                    (e.magnesium ?: 0.0).coerceAtLeast(0.0),
+                )
                 val item = FoodItem(
                     name = e.name.trim().replaceFirstChar { it.uppercase() },
                     grams = e.grams,
@@ -103,13 +107,15 @@ class MealAnalyzer @Inject constructor(
                     aiNutrients = ai,
                 )
                 val match = matcher.match(item.name, item.cookingMethod)
-                when {
+                val resolved = when {
                     match == null -> item
                     // Produk kemasan: angka AI bisa berasal dari label gizi di foto, jadi tidak ditimpa
                     // perkiraan DB; cukup ditautkan agar nama & kategori konsisten.
                     match.reference.source == KEMASAN -> item.copy(foodRefId = match.reference.id, category = match.reference.category)
                     else -> NutritionCalculator.applyReference(item, match.reference)
                 }
+                // AI tidak mengisi magnesium (prompt lama/terlewat): ambil dari DB atau perkirakan.
+                if (e.magnesium == null) Magnesium.fill(resolved, match?.reference) else resolved
             }
 
     private companion object {

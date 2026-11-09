@@ -6,6 +6,7 @@ import androidx.work.Configuration
 import com.hawdietpro.app.core.Notifications
 import com.hawdietpro.app.data.remote.RemoteConfigStore
 import com.hawdietpro.app.data.repository.FoodRepository
+import com.hawdietpro.app.data.repository.MagnesiumBackfill
 import com.hawdietpro.app.di.ApplicationScope
 import com.hawdietpro.app.widget.AppShortcuts
 import com.hawdietpro.app.widget.WidgetUpdater
@@ -25,6 +26,7 @@ class HawDietApp : Application(), Configuration.Provider {
     @Inject lateinit var remoteConfig: RemoteConfigStore
     @Inject lateinit var pendingProcessor: PendingProcessor
     @Inject lateinit var widgetUpdater: WidgetUpdater
+    @Inject lateinit var magnesiumBackfill: MagnesiumBackfill
 
     @Inject
     @field:ApplicationScope
@@ -40,6 +42,8 @@ class HawDietApp : Application(), Configuration.Provider {
         Notifications.createChannels(this)
         appScope.launch {
             runCatching { foods.seedIfNeeded() }
+            // Catatan lama (sebelum fitur magnesium) diisi sekali setelah database makanan siap.
+            runCatching { magnesiumBackfill.runIfNeeded() }
         }
         scheduler.schedulePeriodic(remoteConfig.appConfig.value.updateCheckIntervalHours)
         pendingProcessor.start()

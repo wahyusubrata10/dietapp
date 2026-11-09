@@ -108,6 +108,8 @@ data class FoodDbItem(
     val sugar: Double? = null,
     /** Natrium mg/100 g (null = belum ada data). */
     val sodium: Double? = null,
+    /** Magnesium mg/100 g (null = belum ada data). */
+    val magnesium: Double? = null,
     val servingG: Double = 100.0,
     val servingLabel: String? = null,
     val source: String = "POPULER",

@@ -14,6 +14,8 @@ data class Nutrients(
     val sugar: Double = 0.0,
     /** Natrium (mg). 2.000 mg natrium ≈ 5 g garam. */
     val sodium: Double = 0.0,
+    /** Magnesium (mg). */
+    val magnesium: Double = 0.0,
 ) {
     operator fun plus(other: Nutrients) = Nutrients(
         calories + other.calories,
@@ -23,6 +25,7 @@ data class Nutrients(
         fiber + other.fiber,
         sugar + other.sugar,
         sodium + other.sodium,
+        magnesium + other.magnesium,
     )
 
     operator fun times(factor: Double) = Nutrients(
@@ -33,6 +36,7 @@ data class Nutrients(
         fiber * factor,
         sugar * factor,
         sodium * factor,
+        magnesium * factor,
     )
 
     /** Persentase energi dari tiap makro (protein & karbo 4 kkal/g, lemak 9 kkal/g). */

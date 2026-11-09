@@ -110,6 +110,7 @@ class PeriodReviewRepository @Inject constructor(
                     put("karbo_g", t.carbsG)
                     put("lemak_g", t.fatG)
                     put("serat_g", t.fiberG)
+                    put("magnesium_mg", t.magnesiumMg)
                     put("tdee", t.tdee)
                     put("bmi", t.bmi)
                 }
@@ -123,6 +124,7 @@ class PeriodReviewRepository @Inject constructor(
                 put("karbo_g", r1(avg.carbs))
                 put("lemak_g", r1(avg.fat))
                 put("serat_g", r1(avg.fiber))
+                put("magnesium_mg", avg.magnesium.roundToInt())
                 put("persen_energi_protein", split.proteinPct.roundToInt())
                 put("persen_energi_karbo", split.carbsPct.roundToInt())
                 put("persen_energi_lemak", split.fatPct.roundToInt())

@@ -58,6 +58,8 @@ object OpenFoodFactsParser {
                 fiber = per100("fiber") ?: 0.0,
                 sugar = per100("sugars") ?: 0.0,
                 sodium = sodiumMg ?: 0.0,
+                // OFF menyimpan mineral dalam gram per 100 g.
+                magnesium = per100("magnesium")?.let { it * 1000 } ?: 0.0,
             ),
             servingG = servingG,
             packageG = packageG,

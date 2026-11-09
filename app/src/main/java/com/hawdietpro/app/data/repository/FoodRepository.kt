@@ -32,7 +32,9 @@ class FoodRepository @Inject constructor(
     suspend fun seedIfNeeded(force: Boolean = false) = mutex.withLock {
         val file = store.loadFoodDb()
         val seeded = prefs.current().foodDbVersion
-        if (!force && seeded == file.version && dao.count() > 0) return@withLock
+        // Versi sama tapi data magnesium belum tersalin (file sempat disalin aplikasi versi lama) → salin ulang.
+        val missingMagnesium = file.foods.any { it.magnesium != null } && dao.countBundledWithoutMagnesium() > 0
+        if (!force && seeded == file.version && dao.count() > 0 && !missingMagnesium) return@withLock
         val refs = file.foods.map { it.toReference().toEntity(file.version) }
         dao.upsertAll(refs)
         dao.deleteBundledOlderThan(file.version)
@@ -77,6 +79,7 @@ class FoodRepository @Inject constructor(
             defaultServingG = servingG,
             servingLabel = "1 porsi",
             source = "USER",
+            hasMagnesium = per100g.magnesium > 0,
         )
         dao.upsertAll(listOf(ref.toEntity(0)))
         mutex.withLock { cachedMatcher = null }

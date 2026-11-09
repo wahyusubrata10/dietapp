@@ -44,6 +44,8 @@ data class FoodReference(
     val source: String,
     /** false = DB belum punya data gula/natrium untuk makanan ini (pakai estimasi AI). */
     val hasSugarSodium: Boolean = false,
+    /** false = DB belum punya data magnesium untuk makanan ini. */
+    val hasMagnesium: Boolean = false,
 )
 
 data class UserProfile(

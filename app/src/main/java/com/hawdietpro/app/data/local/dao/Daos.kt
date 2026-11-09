@@ -46,6 +46,28 @@ abstract class MealDao {
     @Query("DELETE FROM meal_entry WHERE id = :id")
     abstract suspend fun deleteMeal(id: Long)
 
+    /** Elemen yang belum punya angka magnesium (catatan dari sebelum fitur magnesium / cadangan lama). */
+    @Query("SELECT * FROM food_element WHERE magnesium = 0 AND grams > 0")
+    abstract suspend fun getElementsWithoutMagnesium(): List<FoodElementEntity>
+
+    @Query("UPDATE food_element SET magnesium = :mg WHERE id = :id")
+    abstract suspend fun setElementMagnesium(id: Long, mg: Double)
+
+    @Query(
+        "UPDATE meal_entry SET total_magnesium = " +
+            "(SELECT COALESCE(SUM(magnesium), 0) FROM food_element WHERE food_element.meal_id = meal_entry.id) " +
+            "WHERE id IN (:mealIds)",
+    )
+    abstract suspend fun refreshMagnesiumTotals(mealIds: List<Long>)
+
+    /** Menulis magnesium per elemen (id elemen → mg) lalu menghitung ulang total makan terkait, atomik. */
+    @Transaction
+    open suspend fun applyMagnesium(values: Map<Long, Double>, mealIds: Collection<Long>) {
+        values.forEach { (id, mg) -> setElementMagnesium(id, mg) }
+        // Batas variabel SQLite (999): proses bertahap.
+        mealIds.distinct().chunked(500).forEach { refreshMagnesiumTotals(it) }
+    }
+
     @Query("UPDATE meal_entry SET favorite = :favorite WHERE id = :id")
     abstract suspend fun setFavorite(id: Long, favorite: Boolean)
 
@@ -136,6 +158,10 @@ interface FoodReferenceDao {
 
     @Query("SELECT COUNT(*) FROM food_reference")
     suspend fun count(): Int
+
+    /** Makanan bawaan yang belum punya data magnesium (mis. tersalin oleh versi aplikasi lama). */
+    @Query("SELECT COUNT(*) FROM food_reference WHERE source != 'USER' AND magnesium IS NULL")
+    suspend fun countBundledWithoutMagnesium(): Int
 }
 
 @Dao

@@ -133,6 +133,8 @@ import com.hawdietpro.app.ui.feature.exercise.ExerciseSheet
 import com.hawdietpro.app.ui.feature.suggest.MenuSuggestionSheet
 import com.hawdietpro.app.ui.theme.HawTheme
 import com.hawdietpro.app.domain.nutrition.TdeeCalculator
+import com.hawdietpro.app.domain.model.Nutrients
+import com.hawdietpro.app.domain.nutrition.Magnesium
 import com.hawdietpro.app.ui.theme.MacroColors
 import com.hawdietpro.app.ui.theme.NumberDisplay
 import com.hawdietpro.app.ui.theme.NumberLarge
@@ -322,7 +324,9 @@ fun HomeContent(
             }
             item(key = "energy") { EnergyCard(state.adaptive, state.target?.calories, actions.onOpenWeight, Modifier.enterAnimation(10)) }
             if (state.meals.isNotEmpty()) {
-                item(key = "limits") { LimitsCard(state.total.sugar, state.total.sodium, Modifier.enterAnimation(11)) }
+                item(key = "limits") {
+                    LimitsCard(state.total, state.target?.magnesiumMg, Modifier.enterAnimation(11))
+                }
             }
 
             if (state.insights.isNotEmpty()) {
@@ -1025,12 +1029,43 @@ fun EnergyCard(a: AdaptiveTdee?, targetCalories: Int?, onClick: () -> Unit, modi
 
 /** Batas harian gula & garam (Kemenkes): ringkas, satu kartu. */
 @Composable
-private fun LimitsCard(sugar: Double, sodium: Double, modifier: Modifier = Modifier) {
+private fun LimitsCard(total: Nutrients, magnesiumTarget: Int?, modifier: Modifier = Modifier) {
     BentoCard(modifier.fillMaxWidth(), padding = 14.dp) {
         Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-            LimitBar("🍬 Gula", sugar, NutritionLimits.SUGAR_G, "g", Modifier.weight(1f))
-            LimitBar("🧂 Natrium", sodium, NutritionLimits.SODIUM_MG, "mg", Modifier.weight(1f))
+            LimitBar("🍬 Gula", total.sugar, NutritionLimits.SUGAR_G, "g", Modifier.weight(1f))
+            LimitBar("🧂 Natrium", total.sodium, NutritionLimits.SODIUM_MG, "mg", Modifier.weight(1f))
         }
+        Spacer(Modifier.height(14.dp))
+        MagnesiumBar(total.magnesium, (magnesiumTarget?.takeIf { it > 0 } ?: Magnesium.DEFAULT_TARGET_MG).toDouble())
+    }
+}
+
+/** Magnesium adalah target yang perlu DICAPAI (bukan batas), jadi warnanya hijau saat terpenuhi. */
+@Composable
+private fun MagnesiumBar(value: Double, target: Double) {
+    val ratio = (value / target).toFloat()
+    val reached = ratio >= 1f
+    val color = if (reached) HawTheme.colors.success else MacroColors.Fiber
+    Column(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text("🥬 Magnesium", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+            Text(Format.grouped(value.roundToInt()), style = NumberMedium, color = color)
+            Text(
+                " / ${Format.grouped(target.roundToInt())} mg",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 2.dp),
+            )
+        }
+        Spacer(Modifier.height(6.dp))
+        ProgressBar(ratio, color, height = 6.dp)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            if (reached) "✓ Kebutuhan magnesium hari ini terpenuhi"
+            else "Sumber magnesium: tempe, kacang, bayam/kangkung, alpukat, pisang, nasi merah",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
