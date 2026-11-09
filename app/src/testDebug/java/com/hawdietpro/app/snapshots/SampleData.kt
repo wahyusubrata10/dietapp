@@ -30,7 +30,7 @@ object SampleData {
     val profile = UserProfile("Wahyu Subrata", 30, Sex.PRIA, 175.0, 87.6, ActivityLevel.SEDENTARI, Goal.TURUN, 80.0)
 
     private fun item(name: String, g: Double, kcal: Double, p: Double, c: Double, f: Double, fiber: Double = 1.0) =
-        FoodItem(name = name, grams = g, nutrients = Nutrients(kcal, p, c, f, fiber, 4.0, 300.0))
+        FoodItem(name = name, grams = g, nutrients = Nutrients(kcal, p, c, f, fiber, 4.0, 300.0, magnesium = fiber * 8 + p * 1.5))
 
     val meals = listOf(
         Meal(

@@ -49,7 +49,7 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          ./gradlew :app:testDebugUnitTest --tests "com.hawdietpro.app.snapshots.*" 2>&1 | tee "$RUNNER_TEMP/build.log"
+          ./gradlew :app:testDebugUnitTest --tests "com.hawdietpro.app.snapshots.*" --tests "com.hawdietpro.app.db.*" 2>&1 | tee "$RUNNER_TEMP/build.log"
 
       - name: Publikasikan ke branch ui-snapshots
         if: always()

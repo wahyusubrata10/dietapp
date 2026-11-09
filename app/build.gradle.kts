@@ -75,6 +75,8 @@ android {
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
+    // Skema Room yang diekspor dipakai tes migrasi (Robolectric); hanya ikut varian debug.
+    sourceSets.getByName("debug").assets.srcDir("$projectDir/schemas")
     testOptions {
         unitTests.isReturnDefaultValues = true
         // Snapshot UI (Robolectric) butuh resource Android (font, tema).
@@ -178,5 +180,7 @@ dependencies {
     testDebugImplementation(libs.robolectric)
     testDebugImplementation(platform(libs.androidx.compose.bom))
     testDebugImplementation(libs.androidx.compose.ui.test.junit4)
+    // Tes migrasi database (membaca skema di app/schemas).
+    testDebugImplementation(libs.androidx.room.testing)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
