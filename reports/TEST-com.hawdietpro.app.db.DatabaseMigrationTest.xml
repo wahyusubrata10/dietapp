@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hawdietpro.app.db.DatabaseMigrationTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-09T08:22:39.992Z" hostname="runnervmwuk1x" time="7.668">
+  <properties/>
+  <testcase name="Room membuka database hasil migrasi lalu pengisian magnesium memperbarui total" classname="com.hawdietpro.app.db.DatabaseMigrationTest" time="7.547"/>
+  <testcase name="v5 ke v6 mempertahankan data dan menambah kolom magnesium" classname="com.hawdietpro.app.db.DatabaseMigrationTest" time="0.121"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
